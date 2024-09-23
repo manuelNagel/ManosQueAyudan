@@ -1,23 +1,40 @@
 package main
 
 import (
-    "net/http"
-    "github.com/labstack/echo/v4"
+	"database/sql"
+	"log"
+
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	"github.com/go-sql-driver/mysql"
+	"github.com/gorilla/sessions"
+)
+
+var (
+	db    *sql.DB
+	store = sessions.NewCookieStore([]byte("your-secret-key"))
 )
 
 func main() {
-    e := echo.New()
+	// Database connection
+	var err error
+	db, err = sql.Open("mysql", "user:password@tcp(127.0.0.1:3306)/mydatabase")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
 
-    // Serve static files (React build)
-    e.Static("/", "frontend/build")
+	e := echo.New()
 
-    // API routes
-    e.GET("/api/users", func(c echo.Context) error {
-        return c.JSON(http.StatusOK, map[string]string{
-            "message": "Hello from Golang API!",
-        })
-    })
+	// Middleware
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+	e.Use(middleware.CORS())
+	e.Use(sessionMiddleware)
 
-    // Start the server
-    e.Logger.Fatal(e.Start(":8080"))
+	// Setup routes
+	setupRoutes(e)
+
+	// Start server
+	e.Logger.Fatal(e.Start(":8080"))
 }
