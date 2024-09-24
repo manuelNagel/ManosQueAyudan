@@ -1,50 +1,71 @@
 package controllers
-
 import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"ManosQueAyudan/backend/services"
-	"ManosQueAyudan/backend/utils"
+	"github.com/gorilla/sessions"
+	"backend/models"
+	"backend/services"
 )
 
 type AuthController struct {
-	Service *services.UsuarioService
+	UserService *services.UsuarioService
+	Store       *sessions.CookieStore
 }
 
-func NewAuthController(service *services.UsuarioService) *AuthController {
-	return &AuthController{Service: service}
+func NewAuthController(userService *services.UsuarioService, store *sessions.CookieStore) *AuthController {
+	return &AuthController{
+		UserService: userService,
+		Store:       store,
+	}
 }
 
 func (c *AuthController) Login(ctx echo.Context) error {
-	var loginData struct {
+	var loginRequest struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
 
-	if err := ctx.Bind(&loginData); err != nil {
-		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	if err := ctx.Bind(&loginRequest); err != nil {
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request payload"})
 	}
 
-	usuario, err := c.Service.AuthenticateUser(loginData.Email, loginData.Password)
+	user, err := c.UserService.AuthenticateUser(loginRequest.Email, loginRequest.Password)
 	if err != nil {
 		return ctx.JSON(http.StatusUnauthorized, map[string]string{"error": "Invalid credentials"})
 	}
 
-	session, _ := utils.GetSessionStore().Get(ctx.Request(), "session-name")
-	session.Values["authenticated"] = true
-	session.Values["user_id"] = usuario.IdUsuario
-	session.Save(ctx.Request(), ctx.Response())
+	session, _ := c.Store.Get(ctx.Request(), "session-name")
+	session.Values["user_id"] = user.ID
+	session.Save(ctx.Request(), ctx.Response().Writer)
 
-	return ctx.JSON(http.StatusOK, map[string]string{"message": "Logged in successfully"})
+	return ctx.JSON(http.StatusOK, user)
 }
 
 func (c *AuthController) Logout(ctx echo.Context) error {
-	session, _ := utils.GetSessionStore().Get(ctx.Request(), "session-name")
-	session.Values["authenticated"] = false
+	session, _ := c.Store.Get(ctx.Request(), "session-name")
 	session.Values["user_id"] = nil
 	session.Options.MaxAge = -1
-	session.Save(ctx.Request(), ctx.Response())
+	session.Save(ctx.Request(), ctx.Response().Writer)
 
 	return ctx.JSON(http.StatusOK, map[string]string{"message": "Logged out successfully"})
+}
+
+func (c *AuthController) Register(ctx echo.Context) error {
+	var user models.Usuario
+	if err := ctx.Bind(&user); err != nil {
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request payload"})
+	}
+
+	err := c.UserService.CreateUsuario(&user)
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to create user"})
+	}
+
+	// Automatically log in the user after registration
+	session, _ := c.Store.Get(ctx.Request(), "session-name")
+	session.Values["user_id"] = user.ID
+	session.Save(ctx.Request(), ctx.Response().Writer)
+
+	return ctx.JSON(http.StatusCreated, user)
 }

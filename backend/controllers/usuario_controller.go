@@ -5,8 +5,8 @@ import (
 	"strconv"
 
 	"github.com/labstack/echo/v4"
-	"ManosQueAyudan/backend/models"
-	"ManosQueAyudan/backend/services"
+	"backend/models"
+	"backend/services"
 )
 
 type UsuarioController struct {
@@ -43,4 +43,12 @@ func (c *UsuarioController) CreateUsuario(ctx echo.Context) error {
 	}
 
 	return ctx.JSON(http.StatusCreated, usuario)
+}
+
+func (c *UsuarioController) GetCurrentUser(ctx echo.Context) error {
+	user, ok := ctx.Get("user").(*models.Usuario)
+	if !ok {
+		return ctx.JSON(http.StatusUnauthorized, map[string]string{"error": "Not authenticated"})
+	}
+	return ctx.JSON(http.StatusOK, user)
 }

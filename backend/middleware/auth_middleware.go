@@ -2,16 +2,34 @@ package middleware
 
 import (
 	"net/http"
+
 	"github.com/labstack/echo/v4"
-	"ManosQueAyudan/backend/utils"
+	"github.com/gorilla/sessions"
+	"backend/services"
 )
 
-func AuthMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		session, _ := utils.GetSessionStore().Get(c.Request(), "session-name")
-		if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
-			return echo.NewHTTPError(http.StatusUnauthorized, "Please log in to access this resource")
+func AuthMiddleware(store *sessions.CookieStore, userService *services.UsuarioService) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			session, err := store.Get(c.Request(), "session-name")
+			if err != nil {
+				return echo.NewHTTPError(http.StatusInternalServerError, "Could not retrieve session")
+			}
+
+			userID, ok := session.Values["user_id"]
+			if !ok {
+				return echo.NewHTTPError(http.StatusUnauthorized, "Not authenticated")
+			}
+
+			user, err := userService.GetUsuario(userID.(int))
+			if err != nil {
+				return echo.NewHTTPError(http.StatusUnauthorized, "Invalid user session")
+			}
+
+			// Add user to context
+			c.Set("user", user)
+
+			return next(c)
 		}
-		return next(c)
 	}
 }

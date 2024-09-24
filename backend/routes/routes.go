@@ -1,10 +1,10 @@
 package routes
-
+/*
 import (
 	"github.com/labstack/echo/v4"
-	"ManosQueAyudan/backend/controllers"
-	"ManosQueAyudan/backend/middleware"
-	"ManosQueAyudan/backend/services"
+	"backend/controllers"
+	"backend/middleware"
+	"backend/services"
 )
 
 func SetupRoutes(e *echo.Echo, userService *services.UsuarioService) {
@@ -26,3 +26,4 @@ func SetupRoutes(e *echo.Echo, userService *services.UsuarioService) {
 	protected.GET("/users/:id", userController.GetUsuario)
 
 }
+	*/
