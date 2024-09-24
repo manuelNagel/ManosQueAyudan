@@ -2,4 +2,6 @@
 Repositorio de el proyecto tp final "Manos que Ayudan"
 
 
-El backend esté programado en Go
+El backend está programado en Go
+
+Frontend programado en React
