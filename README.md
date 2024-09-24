@@ -1,2 +1,5 @@
 # ManosQueAyudan
-Repositorio de el pyoecto tp final manos que ayudan
+Repositorio de el proyecto tp final "Manos que Ayudan"
+
+
+El backend esté programado en Go
