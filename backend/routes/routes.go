@@ -1,19 +1,28 @@
-package main
+package routes
 
 import (
 	"github.com/labstack/echo/v4"
+	"ManosQueAyudan/backend/controllers"
+	"ManosQueAyudan/backend/middleware"
+	"ManosQueAyudan/backend/services"
 )
 
-func setupRoutes(e *echo.Echo) {
-	// Auth routes
-	e.POST("/api/auth/register", authController.register)
-	e.POST("/api/auth/login", authController.login)
-	e.POST("/api/auth/logout", authController.logout)
+func SetupRoutes(e *echo.Echo, userService *services.UsuarioService) {
+	// Controllers
+	userController := controllers.NewUsuarioController(userService)
+	authController := controllers.NewAuthController(userService)
 
-	// User routes
-	e.GET("/api/user", userController.getUser, authMiddleware)
+	// Rutas publicas
+	e.POST("/api/login", authController.Login)
+	e.POST("/api/logout", authController.Logout)
+	e.POST("/api/register", userController.CreateUsuario)
 
-	// Admin routes
-	admin := e.Group("/api/admin", adminMiddleware)
-	admin.GET("/dashboard", adminController.getDashboard)
+	// agrupamienot API 
+	api := e.Group("/api")
+
+	// Rutas Protegidas
+	protected := api.Group("")
+	protected.Use(middleware.AuthMiddleware)
+	protected.GET("/users/:id", userController.GetUsuario)
+
 }

@@ -4,73 +4,47 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"ManosQueAyudan/backend/services"
+	"ManosQueAyudan/backend/utils"
 )
 
 type AuthController struct {
-	DB    *sql.DB
-	Store sessions.Store
+	Service *services.UsuarioService
 }
 
-func (ac *AuthController) register(c echo.Context) error {
-	u := new(models.User)
-	if err := c.Bind(u); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "Invalid request payload")
-	}
-
-	if err := u.HashPassword(); err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Could not hash password")
-	}
-
-	// Default to 'regular' user type if not specified
-	if u.UserType == "" {
-		u.UserType = "regular"
-	}
-
-	_, err := ac.DB.Exec("INSERT INTO users (username, password, email, user_type) VALUES (?, ?, ?, ?)", 
-		u.Username, u.Password, u.Email, u.UserType)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Could not create user")
-	}
-
-	return c.JSON(http.StatusCreated, map[string]string{"message": "User created successfully"})
+func NewAuthController(service *services.UsuarioService) *AuthController {
+	return &AuthController{Service: service}
 }
 
-func (ac *AuthController) login(c echo.Context) error {
-	u := new(models.User)
-	if err := c.Bind(u); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "Invalid request payload")
+func (c *AuthController) Login(ctx echo.Context) error {
+	var loginData struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
 	}
 
-	storedUser := new(models.User)
-	err := ac.DB.QueryRow("SELECT id, username, password, user_type FROM users WHERE username = ?", 
-		u.Username).Scan(&storedUser.ID, &storedUser.Username, &storedUser.Password, &storedUser.UserType)
+	if err := ctx.Bind(&loginData); err != nil {
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
+
+	usuario, err := c.Service.AuthenticateUser(loginData.Email, loginData.Password)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusUnauthorized, "Invalid credentials")
+		return ctx.JSON(http.StatusUnauthorized, map[string]string{"error": "Invalid credentials"})
 	}
 
-	if !storedUser.CheckPassword(u.Password) {
-		return echo.NewHTTPError(http.StatusUnauthorized, "Invalid credentials")
-	}
-
-	// Create session
-	session, _ := ac.Store.Get(c.Request(), "session-name")
+	session, _ := utils.GetSessionStore().Get(ctx.Request(), "session-name")
 	session.Values["authenticated"] = true
-	session.Values["user_id"] = storedUser.ID
-	session.Values["user_type"] = storedUser.UserType
-	session.Save(c.Request(), c.Response())
+	session.Values["user_id"] = usuario.IdUsuario
+	session.Save(ctx.Request(), ctx.Response())
 
-	return c.JSON(http.StatusOK, map[string]string{
-		"message": "Logged in successfully",
-		"userType": storedUser.UserType,
-	})
+	return ctx.JSON(http.StatusOK, map[string]string{"message": "Logged in successfully"})
 }
 
-func (ac *AuthController) logout(c echo.Context) error {
-	session, _ := ac.Store.Get(c.Request(), "session-name")
+func (c *AuthController) Logout(ctx echo.Context) error {
+	session, _ := utils.GetSessionStore().Get(ctx.Request(), "session-name")
 	session.Values["authenticated"] = false
 	session.Values["user_id"] = nil
-	session.Values["user_type"] = nil
-	session.Save(c.Request(), c.Response())
+	session.Options.MaxAge = -1
+	session.Save(ctx.Request(), ctx.Response())
 
-	return c.JSON(http.StatusOK, map[string]string{"message": "Logged out successfully"})
+	return ctx.JSON(http.StatusOK, map[string]string{"message": "Logged out successfully"})
 }

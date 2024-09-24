@@ -1,21 +1,21 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
-import Login from './components/Login';
-import Register from './components/Register';
-import Dashboard from './components/Dashboard';
-import AdminDashboard from './components/AdminDashboard';
-import PrivateRoute from './components/PrivateRoute';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
+import Login from './pages/Login/Login';
+import Registro from './pages/Registro/Registro';
+import Home from './pages/Home/Home';
+import Perfil from './components/Perfil/Perfil';
 
 function App() {
   return (
     <Router>
-      <Switch>
-        <Route path="/login" component={Login} />
-        <Route path="/register" component={Register} />
-        <PrivateRoute path="/dashboard" component={Dashboard} />
-        <PrivateRoute path="/admin" component={AdminDashboard} />
-        <Redirect from="/" to="/dashboard" />
-      </Switch>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Registro />} />
+        <Route path="/perfil" element={<Perfil />} />
+
+      </Routes>
     </Router>
   );
 }
