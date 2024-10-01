@@ -18,15 +18,20 @@ func NewUsuarioController(service *services.UsuarioService) *UsuarioController {
 }
 
 func (c *UsuarioController) GetUsuario(ctx echo.Context) error {
-	id, err := strconv.Atoi(ctx.Param("id"))
-	if err != nil {
-		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid user ID"})
-	}
+	idStr := ctx.Param("id")
 
-	usuario, err := c.Service.GetUsuario(id)
-	if err != nil {
-		return ctx.JSON(http.StatusNotFound, map[string]string{"error": "User not found"})
-	}
+	id64, err := strconv.ParseUint(idStr, 10, 32)
+    if err != nil {
+        return ctx.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid user ID"})
+    }
+    
+    id := uint(id64)
+
+    usuario, err := c.Service.GetUsuario(id)
+    if err != nil {
+        return ctx.JSON(http.StatusNotFound, map[string]string{"error": "User not found"})
+    }
+
 
 	return ctx.JSON(http.StatusOK, usuario)
 }
@@ -51,4 +56,30 @@ func (c *UsuarioController) GetCurrentUser(ctx echo.Context) error {
 		return ctx.JSON(http.StatusUnauthorized, map[string]string{"error": "Not authenticated"})
 	}
 	return ctx.JSON(http.StatusOK, user)
+}
+
+func (c *UsuarioController) UpdateProfile(ctx echo.Context) error {
+    user := ctx.Get("user").(*models.Usuario)
+    
+    var updatedUser models.Usuario
+    if err := ctx.Bind(&updatedUser); err != nil {
+        return ctx.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request payload"})
+    }
+
+    user.Nombre = updatedUser.Nombre
+    user.Apellido = updatedUser.Apellido
+    user.Ciudad = updatedUser.Ciudad
+    user.RadioTrabajo = updatedUser.RadioTrabajo
+
+    if user.Email != updatedUser.Email {
+        // IMPLEMENTAR LOGICA DE MAIL
+        user.Email = updatedUser.Email
+    }
+
+    err := c.Service.UpdateUsuario(user)
+    if err != nil {
+        return ctx.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to update user"})
+    }
+
+    return ctx.JSON(http.StatusOK, user)
 }

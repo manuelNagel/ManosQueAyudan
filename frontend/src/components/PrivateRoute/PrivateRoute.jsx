@@ -1,26 +1,15 @@
 import React from 'react';
-import { Route, Redirect } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { Navigate, Outlet } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
-function PrivateRoute({ component: Component, ...rest }) {
-  const { isAuthenticated, userType } = useAuth();
+const PrivateRoute = () => {
+  const { user, loading } = useAuth();
 
-  return (
-    <Route
-      {...rest}
-      render={(props) =>
-        isAuthenticated ? (
-          rest.path.startsWith('/admin') && userType !== 'admin' ? (
-            <Redirect to="/dashboard" />
-          ) : (
-            <Component {...props} />
-          )
-        ) : (
-          <Redirect to="/login" />
-        )
-      }
-    />
-  );
-}
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  return user ? <Outlet /> : <Navigate to="/login" />;
+};
 
 export default PrivateRoute;

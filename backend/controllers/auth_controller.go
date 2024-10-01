@@ -20,6 +20,26 @@ func NewAuthController(userService *services.UsuarioService, store *sessions.Coo
 	}
 }
 
+func (c *AuthController) GetCurrentUser(ctx echo.Context) error {
+	session, err := c.Store.Get(ctx.Request(), "session-name")
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Could not retrieve session")
+	}
+
+	userID, ok := session.Values["user_id"]
+	if !ok {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Not authenticated")
+	}
+
+	user, err := c.UserService.GetUsuario(userID.(uint))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Invalid user session")
+	}
+
+	return ctx.JSON(http.StatusOK, user)
+}
+
+// Update the Login method in AuthController
 func (c *AuthController) Login(ctx echo.Context) error {
 	var loginRequest struct {
 		Email    string `json:"email"`
@@ -27,18 +47,19 @@ func (c *AuthController) Login(ctx echo.Context) error {
 	}
 
 	if err := ctx.Bind(&loginRequest); err != nil {
-		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request payload"})
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid request payload")
 	}
 
 	user, err := c.UserService.AuthenticateUser(loginRequest.Email, loginRequest.Password)
 	if err != nil {
-		return ctx.JSON(http.StatusUnauthorized, map[string]string{"error": "Invalid credentials"})
+		return echo.NewHTTPError(http.StatusUnauthorized, "Invalid credentials")
 	}
 
 	session, _ := c.Store.Get(ctx.Request(), "session-name")
 	session.Values["user_id"] = user.ID
 	session.Save(ctx.Request(), ctx.Response().Writer)
 
+	user.Password = ""
 	return ctx.JSON(http.StatusOK, user)
 }
 
@@ -67,5 +88,6 @@ func (c *AuthController) Register(ctx echo.Context) error {
 	session.Values["user_id"] = user.ID
 	session.Save(ctx.Request(), ctx.Response().Writer)
 
-	return ctx.JSON(http.StatusCreated, user)
+	user.Password = ""
+    return ctx.JSON(http.StatusCreated, map[string]interface{}{"user": user})
 }

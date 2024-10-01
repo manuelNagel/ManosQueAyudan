@@ -15,7 +15,7 @@ func NewUsuarioService(db *gorm.DB) *UsuarioService {
 	return &UsuarioService{DB: db}
 }
 
-func (s *UsuarioService) GetUsuario(id int) (*models.Usuario, error) {
+func (s *UsuarioService) GetUsuario(id uint) (*models.Usuario, error) {
 	var usuario models.Usuario
 	result := s.DB.First(&usuario, id)
 	if result.Error != nil {
@@ -55,7 +55,7 @@ func (s *UsuarioService) UpdateUsuario(usuario *models.Usuario) error {
 	return result.Error
 }
 
-func (s *UsuarioService) DeleteUsuario(id int) error {
+func (s *UsuarioService) DeleteUsuario(id uint) error {
 	result := s.DB.Delete(&models.Usuario{}, id)
 	return result.Error
 }

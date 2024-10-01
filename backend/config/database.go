@@ -16,10 +16,10 @@ func InitDB() (*gorm.DB, error) {
 	
 	// Auto Migrate the schemas
 	/*
-	err = db.AutoMigrate(&models.Usuario{}, &models.Feedback{}, &models.Habilidades{})
+	err = db.AutoMigrate(&models.Usuario{})
 	if err != nil {
-		return nil, fmt.Errorf("failed to auto migrate schemas: %v", err)
-	}
+    return nil, fmt.Errorf("failed to auto migrate schemas: %v", err)
+}
 	*/
 	return db, nil
 }

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import Navbar from '../../components/Navbar/Navbar';
 import FormInput from '../../components/FormInput/FormInput';
 
@@ -9,6 +10,8 @@ const Login = () => {
     password: ''
   });
   const [errors, setErrors] = useState({});
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -18,9 +21,18 @@ const Login = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login attempt with:', formData);
+    try {
+      const result = await login(formData.email, formData.password);
+      if (result.success) {
+        navigate('/perfil');
+      } else {
+        setErrors({ general: result.error });
+      }
+    } catch (error) {
+      setErrors({ general: 'An error occurred during login' });
+    }
   };
 
   return (
@@ -30,6 +42,7 @@ const Login = () => {
         <div className="row justify-content-center">
           <div className="col-md-6">
             <h2 className="mb-4">Login</h2>
+            {errors.general && <div className="alert alert-danger">{errors.general}</div>}
             <form onSubmit={handleSubmit}>
               <FormInput
                 label="Email"
