@@ -56,7 +56,7 @@ func (c *AuthController) Login(ctx echo.Context) error {
 	}
 
 	session, _ := c.Store.Get(ctx.Request(), "session-name")
-	session.Values["user_id"] = user.IdUsuario
+	session.Values["user_id"] = user.Id
 	session.Save(ctx.Request(), ctx.Response().Writer)
 
 	user.Password = ""
@@ -85,7 +85,7 @@ func (c *AuthController) Register(ctx echo.Context) error {
 
 	// Automatically log in the user after registration
 	session, _ := c.Store.Get(ctx.Request(), "session-name")
-	session.Values["user_id"] = user.IdUsuario
+	session.Values["user_id"] = user.Id
 	session.Save(ctx.Request(), ctx.Response().Writer)
 
 	user.Password = ""
