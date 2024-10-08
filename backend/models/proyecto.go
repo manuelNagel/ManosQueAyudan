@@ -1,7 +1,7 @@
 package models
 
-import(
-	"time"
+import (
+    "time"
 )
 
 type Proyecto struct {
@@ -14,9 +14,10 @@ type Proyecto struct {
     Descripcion           string    `gorm:"column:Descripcion" json:"descripcion"`
     Horario               time.Time `gorm:"column:Horario" json:"horario"`
     Habilitado            bool      `gorm:"column:Habilitado" json:"habilitado"`
-    Usuarios 			  []Usuario `gorm:"many2many:Proyectos_Usuarios;foreignKey:IdProyecto;joinForeignKey:IdProyecto,IdRol;References:Id;joinReferences:IdUsuario" json:"usuarios"`
-	Roles 				  []RolProyecto `gorm:"many2many:Proyectos_Usuarios;foreignKey:IdProyecto;joinForeignKey:IdProyecto;References:IdRol;joinReferences:IdRol" json:"roles"`
-	Denuncias             []Denuncia `gorm:"many2many:Denuncia_Proyecto;joinForeignKey:IdProyecto;joinReferences:IdDenuncia" json:"denuncias"`
+    Usuarios              []Usuario `gorm:"many2many:Proyectos_Usuarios;foreignKey:IdProyecto;joinForeignKey:IdProyecto;References:Id;joinReferences:IdUsuario" json:"usuarios"`
+    Roles                 []RolProyecto `gorm:"many2many:Proyectos_Usuarios;foreignKey:IdProyecto;joinForeignKey:IdProyecto;References:IdRol;joinReferences:IdRol" json:"roles"`
+    ProyectosUsuarios     []ProyectosUsuarios `gorm:"foreignKey:IdProyecto" json:"-"`
+	Denuncias             []Denuncia `gorm:"many2many:Denuncia_Proyecto;joinForeignKey:ProyectoDenunciado;joinReferences:IdDenuncia" json:"denuncias"`
 }
 
 func (Proyecto) TableName() string {

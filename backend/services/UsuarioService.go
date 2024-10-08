@@ -1,8 +1,10 @@
 package services
 
 import (
-	"errors"
 	"backend/models"
+	"errors"
+	"log"
+
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -41,6 +43,7 @@ func (s *UsuarioService) GetUsuarioByEmail(email string) (*models.Usuario, error
 
 func (s *UsuarioService) CreateUsuario(usuario *models.Usuario) error {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(usuario.Password), bcrypt.DefaultCost)
+	log.Printf((usuario.Password))
 	if err != nil {
 		return err
 	}
@@ -71,6 +74,7 @@ func (s *UsuarioService) AuthenticateUser(email, password string) (*models.Usuar
 	}
 
 	err := bcrypt.CompareHashAndPassword([]byte(usuario.Password), []byte(password))
+	
 	if err != nil {
 		return nil, errors.New("invalid credentials")
 	}

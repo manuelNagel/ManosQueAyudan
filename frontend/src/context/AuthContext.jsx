@@ -86,7 +86,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await axios.post('/api/register', userData, { withCredentials: true });
       setUser(res.data);
-      return { success: true };
+      return { success: true, user: res.data };
     } catch (error) {
       console.error('Registration error:', error);
       return { success: false, error: error.response?.data?.error || 'An error occurred during registration' };

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"gorm.io/gorm"
 	"gorm.io/driver/mysql"
-	"backend/models"
 )
 
 func customMigrate(db *gorm.DB, model interface{}) error {
@@ -17,15 +16,17 @@ func customMigrate(db *gorm.DB, model interface{}) error {
 }
 
 func InitDB() (*gorm.DB, error) {
-	dsn := "root:Stroppierdoor13@tcp(localhost:3306)/manosqueayudan?charset=utf8mb4&parseTime=True&loc=Local"
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		return nil, fmt.Errorf("failed to connect to database: %v", err)
-	}
-	db.Exec("SET FOREIGN_KEY_CHECKS=0;")
+    dsn := "root:Stroppierdoor13@tcp(localhost:3306)/manosqueayudan?charset=utf8mb4&parseTime=True&loc=Local"
+    db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+    if err != nil {
+        return nil, fmt.Errorf("failed to connect to database: %v", err)
+    }
+    
+    /*db.Exec("SET FOREIGN_KEY_CHECKS=0;")
     defer db.Exec("SET FOREIGN_KEY_CHECKS=1;")
-	// Auto Migrate the schemas
-	models := []interface{}{
+
+    // Auto Migrate all tables except ProyectosUsuarios
+    modelsToMigrate := []interface{}{
         &models.Actividad{},
         &models.Usuario{},
         &models.Denuncia{},
@@ -36,14 +37,24 @@ func InitDB() (*gorm.DB, error) {
         &models.Notificacion{},
         &models.RolProyecto{},
         &models.RolSistema{},
-        &models.ProyectosUsuarios{},
-	}
+    }
 
-	for _, model := range models {
-        if err := customMigrate(db, model); err != nil {
+    for _, model := range modelsToMigrate {
+        if err := db.AutoMigrate(model); err != nil {
             return nil, fmt.Errorf("failed to migrate %T: %v", model, err)
         }
     }
-	
-	return db, nil
+
+    // Handle ProyectosUsuarios separately
+    if db.Migrator().HasTable(&models.ProyectosUsuarios{}) {
+        // Table exists, do nothing
+    } else {
+        // Table doesn't exist, create it
+        err = db.Migrator().CreateTable(&models.ProyectosUsuarios{})
+        if err != nil {
+            return nil, fmt.Errorf("failed to create ProyectosUsuarios table: %v", err)
+        }
+    }
+	*/
+    return db, nil
 }
