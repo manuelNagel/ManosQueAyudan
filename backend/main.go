@@ -27,6 +27,8 @@ func main() {
 
 	// Initialize services
 	userService := services.NewUsuarioService(db)
+    proyectoService := services.NewProyectoService(db)
+
 
 	// Initialize Echo
 	e := echo.New()
@@ -44,6 +46,8 @@ func main() {
 	// Inicializa controllers
 	authController := controllers.NewAuthController(userService, store)
 	userController := controllers.NewUsuarioController(userService)
+    proyectoController := controllers.NewProyectoController(proyectoService)
+
 
 	// Rutas publicas
 	e.POST("/api/login", authController.Login)
@@ -57,8 +61,11 @@ func main() {
 	r.GET("/users/:id", userController.GetUsuario)
     r.PUT("/update-profile", userController.UpdateProfile)
 
-	// Add other protected routes here
-
+    r.POST("/projects", proyectoController.CreateProyecto)
+	r.GET("/projects/:id", proyectoController.GetProyecto)
+	r.PUT("/projects/:id", proyectoController.UpdateProyecto)
+	r.DELETE("/projects/:id", proyectoController.DeleteProyecto)
+	r.GET("/projects", proyectoController.ListProyectos)
 	// Comenzar server
 	e.Logger.Fatal(e.Start(":8080"))
 }

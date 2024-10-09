@@ -4,7 +4,10 @@ import { AuthProvider } from './context/AuthContext';
 import Login from './pages/Login/Login';
 import Registro from './pages/Registro/Registro';
 import Home from './pages/Home/Home';
+import ProjectList from './components/ProjectList/ProjectList'
 import Perfil from './pages/Perfil/Perfil';
+import Project from './pages/Project/Project';
+
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 
 function App() {
@@ -17,6 +20,9 @@ function App() {
           <Route path="/register" element={<Registro />} />
           <Route element={<PrivateRoute />}>
             <Route path="/perfil" element={<Perfil />} />
+            <Route path="/projects" element={<ProjectList />} />
+            <Route path="/projects/new" element={<Project />} />
+            <Route path="/projects/edit/:id" element={<Project />} />
           </Route>
         </Routes>
       </Router>

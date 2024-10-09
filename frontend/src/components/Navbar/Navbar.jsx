@@ -1,8 +1,18 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Dropdown } from 'react-bootstrap';
-import logo from '../../assets/images/logo.png'
+import { Link, useNavigate } from 'react-router-dom';
+import { Dropdown, Nav } from 'react-bootstrap';
+import { useAuth } from '../../context/AuthContext';
+import logo from '../../assets/images/logo.png';
+
 const Navbar = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login');
+  };
+
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
       <div className="container">
@@ -10,20 +20,39 @@ const Navbar = () => {
           <img src={logo} alt="Logo" width="30" height="30" className="d-inline-block align-top" />
           ManosQueAyudan
         </Link>
-        <div className="navbar-nav ml-auto">
+        <Nav className="ml-auto">
+          {user && (
+            <Dropdown>
+              <Dropdown.Toggle variant="success" id="dropdown-basic">
+                Actions
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                <Dropdown.Item as={Link} to="/projects/new">Crear Proyecto</Dropdown.Item>
+                <Dropdown.Item as={Link} to="/projects">Mis Proyectos</Dropdown.Item>
+                <Dropdown.Item as={Link} to="/projects/search">Buscar Proyectos</Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+          )}
+          
           <Dropdown>
-            <Dropdown.Toggle variant="success" id="dropdown-basic">
-              Actions
+            <Dropdown.Toggle variant="outline-primary" id="dropdown-user">
+              {user ? user.nombre || 'Usuario' : 'Usuario'}
             </Dropdown.Toggle>
             <Dropdown.Menu>
-              <Dropdown.Item as={Link} to="/action1">Crear Proyecto</Dropdown.Item>
-              <Dropdown.Item as={Link} to="/action2">Mis proyectos</Dropdown.Item>
-              <Dropdown.Item as={Link} to="/action3">Buscar Proyectos</Dropdown.Item>
+              {user ? (
+                <>
+                  <Dropdown.Item as={Link} to="/perfil">Ver Perfil</Dropdown.Item>
+                  <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
+                </>
+              ) : (
+                <>
+                  <Dropdown.Item as={Link} to="/login">Login</Dropdown.Item>
+                  <Dropdown.Item as={Link} to="/register">Register</Dropdown.Item>
+                </>
+              )}
             </Dropdown.Menu>
           </Dropdown>
-          <Link to="/login" className="btn btn-outline-primary ml-2">Login</Link>
-          <Link to="/register" className="btn btn-primary ml-2">Register</Link>
-        </div>
+        </Nav>
       </div>
     </nav>
   );

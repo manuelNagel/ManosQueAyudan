@@ -6,6 +6,7 @@ type Actividad struct {
     Nombre          string `gorm:"column:Nombre" json:"nombre"`
     Descripcion     string `gorm:"column:Descripcion" json:"descripcion"`
     Estado          bool   `gorm:"column:Estado" json:"estado"`
+	ProyectoID      uint   `gorm:"column:ProyectoID" json:"proyectoID"`
 }
 
 func (Actividad) TableName() string {
