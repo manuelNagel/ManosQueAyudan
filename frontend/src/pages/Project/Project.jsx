@@ -12,7 +12,7 @@ const Project = () => {
     nombre: '',
     descripcion: '',
     fechaInicio: '',
-    fechaFinalizacion: '', // Add this field
+    fechaFinalizacion: '',
     localizacion: '',
     cantidadParticipantes: 0,
     horario: '',
@@ -36,9 +36,9 @@ const Project = () => {
       const fetchedProject = response.data;
       setProject({
         ...fetchedProject,
-        fechaInicio: fetchedProject.fechaInicio.split('T')[0], // Format date for input
-        fechaFinalizacion: fetchedProject.fechaFinalizacion.split('T')[0], // Format date for input
-        horario: new Date(fetchedProject.horario).toTimeString().slice(0,5) // Format time as HH:MM
+        fechaInicio: fetchedProject.fechaInicio.split('T')[0],
+        fechaFinalizacion: fetchedProject.fechaFinalizacion.split('T')[0],
+        horario: new Date(fetchedProject.horario).toTimeString().slice(0,5)
       });
     } catch (error) {
       console.error('Error fetching project:', error);
@@ -64,13 +64,18 @@ const Project = () => {
     setNewActivity({ nombre: '', descripcion: '', estado: false });
   };
 
+  const formatDateForBackend = (dateString) => {
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0] + "T00:00:00Z";
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formattedProject = {
       ...project,
-      fechaInicio: new Date(project.fechaInicio).toISOString(),
-      fechaFinalizacion: new Date(project.fechaFinalizacion).toISOString(),
-      horario: `${project.horario}:00`, // Append seconds to match Time format
+      fechaInicio: formatDateForBackend(project.fechaInicio),
+      fechaFinalizacion: formatDateForBackend(project.fechaFinalizacion),
+      horario: new Date(`1970-01-01T${project.horario}:00Z`).toISOString(),
       cantidadParticipantes: parseInt(project.cantidadParticipantes, 10)
     };
     console.log("Formatted project data being sent:", formattedProject);
