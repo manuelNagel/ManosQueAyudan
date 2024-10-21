@@ -66,6 +66,8 @@ func main() {
 	r.PUT("/projects/:id", proyectoController.UpdateProyecto)
 	r.DELETE("/projects/:id", proyectoController.DeleteProyecto)
 	r.GET("/projects", proyectoController.ListProyectos)
+    r.PUT("/projects/:id/actividades", proyectoController.UpdateActividad)
+    r.DELETE("/projects/:id/actividades/:actividadId", proyectoController.DeleteActividad)
 	// Comenzar server
 	e.Logger.Fatal(e.Start(":8080"))
 }

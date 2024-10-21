@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Container, Form } from 'react-bootstrap';
+import { Container, Form, Button } from 'react-bootstrap';
 import axios from 'axios';
 
 import ProjectForm from '../../components/ProjectForm/ProjectForm';
 import ActividadList from '../../components/ActividadList/ActividadList';
 import ActividadForm from '../../components/ActividadForm/ActividadForm';
+import Navbar from '../../components/Navbar/Navbar'
 
 const Project = () => {
   const [project, setProject] = useState({
@@ -58,10 +59,26 @@ const Project = () => {
   const addActivity = () => {
     setProject(prev => ({
       ...prev,
-      actividades: [...prev.actividades, newActivity],
+      actividades: [...prev.actividades, { ...newActivity, id: Date.now() }],
       habilitado: true
     }));
     setNewActivity({ nombre: '', descripcion: '', estado: false });
+  };
+
+  const editActivity = (activityId, updatedActivity) => {
+    setProject(prev => ({
+      ...prev,
+      actividades: prev.actividades.map(act => 
+        act.id === activityId ? { ...act, ...updatedActivity } : act
+      )
+    }));
+  };
+
+  const deleteActivity = (activityId) => {
+    setProject(prev => ({
+      ...prev,
+      actividades: prev.actividades.filter(act => act.id !== activityId)
+    }));
   };
 
   const formatDateForBackend = (dateString) => {
@@ -95,12 +112,26 @@ const Project = () => {
 
   return (
     <Container>
+        <Navbar></Navbar>
       <h1>{id ? 'Edit Project' : 'Create New Project'}</h1>
-      <ProjectForm project={project} handleChange={handleChange} handleSubmit={handleSubmit} />
+      <ProjectForm 
+        project={project} 
+        handleChange={handleChange} 
+        handleSubmit={handleSubmit}
+        isEditing={!!id}
+      />
       
       <h2>Actividades</h2>
-      <ActividadList activities={project.actividades} />
-      <ActividadForm newActivity={newActivity} handleActivityChange={handleActivityChange} addActivity={addActivity} />
+      <ActividadList 
+        activities={project.actividades} 
+        editActivity={editActivity}
+        deleteActivity={deleteActivity}
+      />
+      <ActividadForm 
+        newActivity={newActivity} 
+        handleActivityChange={handleActivityChange} 
+        addActivity={addActivity}
+      />
 
       <Form.Group className="mt-3">
         <Form.Check 

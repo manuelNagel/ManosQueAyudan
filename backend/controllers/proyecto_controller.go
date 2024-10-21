@@ -46,26 +46,60 @@ func (c *ProyectoController) GetProyecto(ctx echo.Context) error {
 }
 
 func (c *ProyectoController) UpdateProyecto(ctx echo.Context) error {
-	id, _ := strconv.Atoi(ctx.Param("id"))
-	proyecto := new(models.Proyecto)
-	if err := ctx.Bind(proyecto); err != nil {
-		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request payload"})
-	}
-	proyecto.IdProyecto = uint(id)
+    id, _ := strconv.Atoi(ctx.Param("id"))
+    proyecto := new(models.Proyecto)
+    if err := ctx.Bind(proyecto); err != nil {
+        return ctx.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request payload"})
+    }
+    proyecto.IdProyecto = uint(id)
 
-	if err := c.Service.UpdateProyecto(proyecto); err != nil {
-		return ctx.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to update project"})
-	}
+    if err := c.Service.UpdateProyecto(proyecto); err != nil {
+        log.Printf("Error updating project: %v", err)
+        return ctx.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to update project"})
+    }
 
-	return ctx.JSON(http.StatusOK, proyecto)
+    return ctx.JSON(http.StatusOK, proyecto)
+}
+
+func (c *ProyectoController) UpdateActividad(ctx echo.Context) error {
+    proyectoID, _ := strconv.Atoi(ctx.Param("id"))
+    actividad := new(models.Actividad)
+    if err := ctx.Bind(actividad); err != nil {
+        return ctx.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request payload"})
+    }
+
+    if err := c.Service.UpdateActividad(uint(proyectoID), *actividad); err != nil {
+        log.Printf("Error updating actividad: %v", err)
+        return ctx.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to update actividad"})
+    }
+
+    return ctx.JSON(http.StatusOK, actividad)
+}
+
+func (c *ProyectoController) DeleteActividad(ctx echo.Context) error {
+    proyectoID, _ := strconv.Atoi(ctx.Param("id"))
+    actividadID, _ := strconv.Atoi(ctx.Param("actividadId"))
+
+    if err := c.Service.DeleteActividad(uint(proyectoID), uint(actividadID)); err != nil {
+        log.Printf("Error deleting actividad: %v", err)
+        return ctx.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to delete actividad"})
+    }
+
+    return ctx.NoContent(http.StatusOK)
 }
 
 func (c *ProyectoController) DeleteProyecto(ctx echo.Context) error {
-	id, _ := strconv.Atoi(ctx.Param("id"))
-	if err := c.Service.DeleteProyecto(uint(id)); err != nil {
-		return ctx.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to delete project"})
-	}
-	return ctx.NoContent(http.StatusNoContent)
+    id, err := strconv.Atoi(ctx.Param("id"))
+    if err != nil {
+        return ctx.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid project ID"})
+    }
+
+    if err := c.Service.DeleteProyecto(uint(id)); err != nil {
+        log.Printf("Error deleting project: %v", err)
+        return ctx.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to delete project"})
+    }
+
+    return ctx.NoContent(http.StatusOK)
 }
 
 func (c *ProyectoController) ListProyectos(ctx echo.Context) error {

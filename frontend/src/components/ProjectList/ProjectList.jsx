@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Table, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import Navbar from '../Navbar/Navbar'
 
 const ProjectList = () => {
   const [projects, setProjects] = useState([]);
@@ -19,8 +20,21 @@ const ProjectList = () => {
     }
   };
 
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this project?')) {
+      try {
+        await axios.delete(`/api/projects/${id}`);
+        // Refresh the project list after deletion
+        fetchProjects();
+      } catch (error) {
+        console.error('Error deleting project:', error);
+      }
+    }
+  };
+
   return (
     <Container>
+         <Navbar></Navbar>
       <h1>Mis Proyectos</h1>
       <Table striped bordered hover>
         <thead>
@@ -39,8 +53,15 @@ const ProjectList = () => {
               <td>{project.localizacion}</td>
               <td>
                 <Link to={`/projects/edit/${project.idProyecto}`}>
-                  <Button variant="primary" size="sm">Editar</Button>
+                  <Button variant="primary" size="sm" className="me-2">Editar</Button>
                 </Link>
+                <Button 
+                  variant="danger" 
+                  size="sm" 
+                  onClick={() => handleDelete(project.idProyecto)}
+                >
+                  Eliminar
+                </Button>
               </td>
             </tr>
           ))}

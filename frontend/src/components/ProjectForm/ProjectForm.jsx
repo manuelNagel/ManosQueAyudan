@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form, Button } from 'react-bootstrap';
 
-const ProjectForm = ({ project, handleChange, handleSubmit }) => {
+const ProjectForm = ({ project, handleChange, handleSubmit, isEditing }) => {
   return (
     <Form onSubmit={handleSubmit}>
       <Form.Group>
@@ -33,7 +33,7 @@ const ProjectForm = ({ project, handleChange, handleSubmit }) => {
         <Form.Control type="time" name="horario" value={project.horario} onChange={handleChange} required />
       </Form.Group>
       <Button variant="primary" type="submit" className="mt-3">
-        {project.IdProyecto ? 'Update Project' : 'Create Project'}
+        {isEditing ? 'Update Project' : 'Create Project'}
       </Button>
     </Form>
   );
