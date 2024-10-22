@@ -10,7 +10,7 @@ type Usuario struct {
     Nombre       string         `gorm:"column:Nombre" json:"nombre"`
     Apellido     string         `gorm:"column:Apellido" json:"apellido"`
     Email        string         `gorm:"column:Email" json:"email"`
-    Password     string         `gorm:"column:Password" json:"password,omitempty"`
+    Password     string         `gorm:"column:Password" json:"-"`
     Activo       bool           `gorm:"column:Activo" json:"activo"`
     Ciudad       string         `gorm:"column:Ciudad" json:"ciudad"`
     RadioTrabajo int            `gorm:"column:RadioTrabajo" json:"radioTrabajo"`

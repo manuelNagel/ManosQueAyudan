@@ -7,7 +7,15 @@ const ProfileForm = ({ user, onSubmit, onCancel }) => {
 
   useEffect(() => {
     if (user) {
-      setEditedUser(user);
+      setEditedUser({
+        id: user.id,
+        nombre: user.nombre,
+        apellido: user.apellido,
+        email: user.email,
+        activo: user.activo,
+        ciudad: user.ciudad,
+        radioTrabajo: user.radioTrabajo
+      });
     }
   }, [user]);
 
@@ -28,8 +36,8 @@ const ProfileForm = ({ user, onSubmit, onCancel }) => {
         <Form.Label>Nombre</Form.Label>
         <Form.Control
           type="text"
-          name="Nombre"
-          value={editedUser.Nombre || ''}
+          name="nombre"  
+          value={editedUser.nombre || ''}
           onChange={handleChange}
           disabled={!isEditing}
         />
@@ -38,8 +46,8 @@ const ProfileForm = ({ user, onSubmit, onCancel }) => {
         <Form.Label>Apellido</Form.Label>
         <Form.Control
           type="text"
-          name="Apellido"
-          value={editedUser.Apellido || ''}
+          name="apellido"  
+          value={editedUser.apellido || ''}
           onChange={handleChange}
           disabled={!isEditing}
         />
@@ -48,8 +56,8 @@ const ProfileForm = ({ user, onSubmit, onCancel }) => {
         <Form.Label>Email</Form.Label>
         <Form.Control
           type="email"
-          name="Email"
-          value={editedUser.Email || ''}
+          name="email"  
+          value={editedUser.email || ''}
           onChange={handleChange}
           disabled={!isEditing}
         />
@@ -58,8 +66,8 @@ const ProfileForm = ({ user, onSubmit, onCancel }) => {
         <Form.Label>Ciudad</Form.Label>
         <Form.Control
           type="text"
-          name="Ciudad"
-          value={editedUser.Ciudad || ''}
+          name="ciudad"  
+          value={editedUser.ciudad || ''}
           onChange={handleChange}
           disabled={!isEditing}
         />
@@ -68,8 +76,8 @@ const ProfileForm = ({ user, onSubmit, onCancel }) => {
         <Form.Label>Radio de Trabajo (km)</Form.Label>
         <Form.Control
           type="number"
-          name="RadioTrabajo"
-          value={editedUser.RadioTrabajo || ''}
+          name="radioTrabajo"  
+          value={editedUser.radioTrabajo || ''}
           onChange={handleChange}
           disabled={!isEditing}
         />
@@ -77,10 +85,17 @@ const ProfileForm = ({ user, onSubmit, onCancel }) => {
       {isEditing ? (
         <>
           <Button variant="primary" type="submit">Guardar Cambios</Button>
-          <Button variant="secondary" onClick={() => {
-            setIsEditing(false);
-            onCancel();
-          }} className="ml-2">Cancelar</Button>
+          <Button 
+            variant="secondary" 
+            onClick={() => {
+              setIsEditing(false);
+              setEditedUser(user);
+              onCancel();
+            }} 
+            className="ms-2"
+          >
+            Cancelar
+          </Button>
         </>
       ) : (
         <Button variant="primary" onClick={() => setIsEditing(true)}>Editar Perfil</Button>

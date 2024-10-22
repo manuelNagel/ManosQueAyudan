@@ -58,6 +58,7 @@ func (c *UsuarioController) GetCurrentUser(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, user)
 }
 
+
 func (c *UsuarioController) UpdateProfile(ctx echo.Context) error {
     user := ctx.Get("user").(*models.Usuario)
     
