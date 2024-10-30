@@ -28,6 +28,7 @@ func main() {
 	// Initialize services
 	userService := services.NewUsuarioService(db)
     proyectoService := services.NewProyectoService(db)
+    countryService := services.NewCountryService()
 
 
 	// Initialize Echo
@@ -39,7 +40,7 @@ func main() {
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"http://localhost:3000"},
 		AllowMethods: []string{echo.GET, echo.PUT, echo.POST, echo.DELETE},
-		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept,"Accept",},
 		AllowCredentials: true,
 	}))
 
@@ -47,6 +48,7 @@ func main() {
 	authController := controllers.NewAuthController(userService, store)
 	userController := controllers.NewUsuarioController(userService)
     proyectoController := controllers.NewProyectoController(proyectoService)
+    countryController := controllers.NewCountryController(countryService)
 
 
 	// Rutas publicas
@@ -54,6 +56,7 @@ func main() {
 	e.POST("/api/logout", authController.Logout)
 	e.POST("/api/register", authController.Register)
 	e.GET("/api/current-user", authController.GetCurrentUser)
+    e.GET("/api/countries", countryController.GetCountries)
 
 	// Rutas protegidas
 	r := e.Group("/api")
