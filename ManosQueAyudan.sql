@@ -31,7 +31,7 @@ CREATE TABLE `Actividad` (
   PRIMARY KEY (`NumeroActividad`),
   KEY `fk_actividad_proyecto` (`ProyectoID`),
   CONSTRAINT `fk_actividad_proyecto` FOREIGN KEY (`ProyectoID`) REFERENCES `Proyecto` (`IdProyecto`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -85,6 +85,23 @@ CREATE TABLE `Denuncia_Usuario` (
   KEY `fk_Denuncia_Usuario_Usuario` (`UsuarioDenunciado`),
   CONSTRAINT `fk_Denuncia_Usuario_Denuncia` FOREIGN KEY (`IdDenuncia`) REFERENCES `Denuncia` (`IdDenuncia`),
   CONSTRAINT `fk_Denuncia_Usuario_Usuario` FOREIGN KEY (`UsuarioDenunciado`) REFERENCES `Usuario` (`Id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `denuncia_usuarios`
+--
+
+DROP TABLE IF EXISTS `denuncia_usuarios`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `denuncia_usuarios` (
+  `id_denuncia` int unsigned NOT NULL,
+  `usuario_denunciado` int unsigned NOT NULL,
+  PRIMARY KEY (`id_denuncia`,`usuario_denunciado`),
+  KEY `fk_denuncia_usuarios_usuario` (`usuario_denunciado`),
+  CONSTRAINT `fk_denuncia_usuarios_denuncia` FOREIGN KEY (`id_denuncia`) REFERENCES `Denuncia` (`IdDenuncia`),
+  CONSTRAINT `fk_denuncia_usuarios_usuario` FOREIGN KEY (`usuario_denunciado`) REFERENCES `Usuario` (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -189,7 +206,7 @@ CREATE TABLE `Proyecto` (
   `Horario` datetime(3) DEFAULT NULL,
   `Habilitado` tinyint(1) NOT NULL,
   PRIMARY KEY (`IdProyecto`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -274,7 +291,7 @@ CREATE TABLE `Usuario` (
   `Email` longtext,
   `Password` longtext,
   `Activo` tinyint(1) DEFAULT NULL,
-  `Ciudad` longtext,
+  `EncryptedLocalizacion` text,
   `RadioTrabajo` bigint DEFAULT NULL,
   `created_at` datetime(3) DEFAULT CURRENT_TIMESTAMP(3),
   `updated_at` datetime(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
@@ -282,9 +299,28 @@ CREATE TABLE `Usuario` (
   `CreatedAt` datetime(3) DEFAULT NULL,
   `UpdatedAt` datetime(3) DEFAULT NULL,
   `DeletedAt` datetime(3) DEFAULT NULL,
+  `EncryptedLatitud` text,
+  `EncryptedLongitud` text,
   PRIMARY KEY (`Id`),
   KEY `idx_Usuario_deleted_at` (`DeletedAt`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `usuario_habilidades`
+--
+
+DROP TABLE IF EXISTS `usuario_habilidades`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `usuario_habilidades` (
+  `habilidad_id_habilidades` int unsigned NOT NULL,
+  `usuario_id` int unsigned NOT NULL,
+  PRIMARY KEY (`habilidad_id_habilidades`,`usuario_id`),
+  KEY `fk_usuario_habilidades_usuario` (`usuario_id`),
+  CONSTRAINT `fk_usuario_habilidades_habilidad` FOREIGN KEY (`habilidad_id_habilidades`) REFERENCES `Habilidad` (`IdHabilidades`),
+  CONSTRAINT `fk_usuario_habilidades_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `Usuario` (`Id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -313,4 +349,4 @@ CREATE TABLE `UsuarioHabilidades` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-10-22 18:29:46
+-- Dump completed on 2024-11-01 19:05:38
