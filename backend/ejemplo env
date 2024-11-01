@@ -1,0 +1,9 @@
+# Application Settings
+PORT=8080
+DB_DSN="usuario:contraseña@tcp(localhost:3306)/basededatos?charset=utf8mb4&parseTime=True&loc=Local"
+
+# Security
+ENCRYPTION_KEY="your-32-byte-secret-key-here-12345"
+SESSION_KEY="your-session-secret-key-here-12345"
+
+#renombar arcivo a .env después de modificar

@@ -7,14 +7,20 @@ import (
 )
 
 type Usuario struct {
-	Id                 uint                `gorm:"column:Id;primaryKey;autoIncrement;type:int unsigned" json:"id"`
-	Nombre             string              `gorm:"column:Nombre" json:"nombre"`
-	Apellido           string              `gorm:"column:Apellido" json:"apellido"`
-	Email              string              `gorm:"column:Email" json:"email"`
-	Password           string              `gorm:"column:Password" json:"password,omitempty"`
-	Activo             bool                `gorm:"column:Activo" json:"activo"`
-	Ciudad             string              `gorm:"column:Ciudad" json:"ciudad"`
-	RadioTrabajo       int                 `gorm:"column:RadioTrabajo" json:"radioTrabajo"`
+	Id                    uint    `gorm:"column:Id;primaryKey;autoIncrement;type:int unsigned" json:"id"`
+	Nombre                string  `gorm:"column:Nombre" json:"nombre"`
+	Apellido              string  `gorm:"column:Apellido" json:"apellido"`
+	Email                 string  `gorm:"column:Email" json:"email"`
+	Password              string  `gorm:"column:Password" json:"password,omitempty"`
+	Activo                bool    `gorm:"column:Activo" json:"activo"`
+	Localizacion          string  `gorm:"column:Localizacion" json:"Localizacion"`
+	RadioTrabajo          int     `gorm:"column:RadioTrabajo" json:"radioTrabajo"`
+	Latitud               float64 `gorm:"-" json:"Latitud"`
+	Longitud              float64 `gorm:"-" json:"Longitud"`
+	EncryptedLatitud      string  `gorm:"column:EncryptedLatitud" json:"-"`
+	EncryptedLongitud     string  `gorm:"column:EncryptedLongitud" json:"-"`
+	EncryptedLocalizacion string  `gorm:"column:EncryptedLocalizacion" json:"-"`
+
 	CreatedAt          time.Time           `gorm:"column:CreatedAt" json:"createdAt"`
 	UpdatedAt          time.Time           `gorm:"column:UpdatedAt" json:"updatedAt"`
 	DeletedAt          gorm.DeletedAt      `gorm:"column:DeletedAt;index" json:"-"`

@@ -69,7 +69,7 @@ func (c *UsuarioController) UpdateProfile(ctx echo.Context) error {
 
     user.Nombre = updatedUser.Nombre
     user.Apellido = updatedUser.Apellido
-    user.Ciudad = updatedUser.Ciudad
+    user.Localizacion = updatedUser.Localizacion
     user.RadioTrabajo = updatedUser.RadioTrabajo
 
     if user.Email != updatedUser.Email {

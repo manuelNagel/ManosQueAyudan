@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Button, Alert } from 'react-bootstrap';
+import { Form, Button } from 'react-bootstrap';
+import LocationPicker from '../LocationPicker/LocationPicker';
 
 const ProfileForm = ({ user, onSubmit, onCancel }) => {
   const [editedUser, setEditedUser] = useState({});
@@ -13,8 +14,10 @@ const ProfileForm = ({ user, onSubmit, onCancel }) => {
         apellido: user.apellido,
         email: user.email,
         activo: user.activo,
-        ciudad: user.ciudad,
-        radioTrabajo: user.radioTrabajo
+        localizacion: user.localizacion,
+        radioTrabajo: user.radioTrabajo,
+        latitud: user.latitud || -34.603722,
+        longitud: user.longitud || -58.381592,
       });
     }
   }, [user]);
@@ -24,9 +27,24 @@ const ProfileForm = ({ user, onSubmit, onCancel }) => {
     setEditedUser(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleLocationChange = (location) => {
+    setEditedUser(prev => ({
+      ...prev,
+      latitud: location.latitud,
+      longitud: location.longitud,
+      localizacion: location.localizacion,
+    }));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(editedUser);
+    const userToSubmit = {
+      ...editedUser,
+      latitud: parseFloat(editedUser.latitud),
+      longitud: parseFloat(editedUser.longitud),
+      radioTrabajo: parseInt(editedUser.radioTrabajo, 10)
+    };
+    onSubmit(userToSubmit);
     setIsEditing(false);
   };
 
@@ -42,6 +60,7 @@ const ProfileForm = ({ user, onSubmit, onCancel }) => {
           disabled={!isEditing}
         />
       </Form.Group>
+
       <Form.Group className="mb-3">
         <Form.Label>Apellido</Form.Label>
         <Form.Control
@@ -52,6 +71,7 @@ const ProfileForm = ({ user, onSubmit, onCancel }) => {
           disabled={!isEditing}
         />
       </Form.Group>
+
       <Form.Group className="mb-3">
         <Form.Label>Email</Form.Label>
         <Form.Control
@@ -62,16 +82,21 @@ const ProfileForm = ({ user, onSubmit, onCancel }) => {
           disabled={!isEditing}
         />
       </Form.Group>
-      <Form.Group className="mb-3">
-        <Form.Label>Ciudad</Form.Label>
-        <Form.Control
-          type="text"
-          name="ciudad"  
-          value={editedUser.ciudad || ''}
-          onChange={handleChange}
-          disabled={!isEditing}
-        />
-      </Form.Group>
+      
+      {isEditing && (
+        <Form.Group className="mb-3">
+          <Form.Label>Location</Form.Label>
+          <LocationPicker
+            initialLocation={{
+              lat: editedUser.latitud,
+              lng: editedUser.longitud
+            }}
+            onLocationChange={handleLocationChange}
+            radioTrabajo={parseInt(editedUser.radioTrabajo, 10)}
+          />
+        </Form.Group>
+      )}
+      
       <Form.Group className="mb-3">
         <Form.Label>Radio de Trabajo (km)</Form.Label>
         <Form.Control
@@ -82,6 +107,7 @@ const ProfileForm = ({ user, onSubmit, onCancel }) => {
           disabled={!isEditing}
         />
       </Form.Group>
+      
       {isEditing ? (
         <>
           <Button variant="primary" type="submit">Guardar Cambios</Button>

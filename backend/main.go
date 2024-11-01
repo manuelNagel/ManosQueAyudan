@@ -19,14 +19,17 @@ var (
 )
 
 func main() {
-	// Initialize database
-	db, err := config.InitDB()
-	if err != nil {
-		log.Fatalf("Failed to initialize database: %v", err)
-	}
+    cfg := config.LoadConfig()
+
+    // Initialize database with configuration
+    db, err := config.InitDB(cfg)
+    if err != nil {
+        log.Fatalf("Failed to initialize database: %v", err)
+    }
+
 
 	// Initialize services
-	userService := services.NewUsuarioService(db)
+    userService := services.NewUsuarioService(db, cfg.EncryptionKey)
     proyectoService := services.NewProyectoService(db)
     countryService := services.NewCountryService()
 
