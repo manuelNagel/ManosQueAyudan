@@ -5,7 +5,7 @@ import L from 'leaflet';
 import { useLocationPicker } from '../../hooks/useLocationPicker';
 import 'leaflet/dist/leaflet.css';
 
-// Fix for default marker icon using CDN URLs
+
 const defaultIcon = L.icon({
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
@@ -37,18 +37,18 @@ const MapUpdater = ({ center }) => {
   return null;
 };
 
-const LocationPicker = ({ initialLocation, onLocationChange, radioTrabajo }) => {
-  const {
-    position,
-    cities,
-    loading,
-    searchQuery,
-    localizacion,
-    handleCityChange,
-    handleMapClick,
-    handleSearchQueryChange,
-  } = useLocationPicker(initialLocation);
-
+const LocationPicker = ({ initialLocation, initialLocalizacion, onLocationChange, radioTrabajo }) => {
+    const {
+      position,
+      cities,
+      loading,
+      searchQuery,
+      localizacion,
+      handleCityChange,
+      handleMapClick,
+      handleSearchQueryChange,
+    } = useLocationPicker(initialLocation, initialLocalizacion);
+  
   const handleLocationSelect = async (latlng) => {
     const locationData = await handleMapClick(latlng);
     if (locationData) {
@@ -63,6 +63,7 @@ const LocationPicker = ({ initialLocation, onLocationChange, radioTrabajo }) => 
     }
   };
 
+  
   return (
     <div>
       <Row className="mb-3">

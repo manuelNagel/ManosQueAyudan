@@ -14,10 +14,10 @@ const ProfileForm = ({ user, onSubmit, onCancel }) => {
         apellido: user.apellido,
         email: user.email,
         activo: user.activo,
-        localizacion: user.localizacion,
+        localizacion: user.Localizacion,
         radioTrabajo: user.radioTrabajo,
-        latitud: user.latitud || -34.603722,
-        longitud: user.longitud || -58.381592,
+        latitud: user.Latitud || -34.603722,
+        longitud: user.Longitud || -58.381592,
       });
     }
   }, [user]);
@@ -91,11 +91,13 @@ const ProfileForm = ({ user, onSubmit, onCancel }) => {
               lat: editedUser.latitud,
               lng: editedUser.longitud
             }}
+            initialLocalizacion={editedUser.localizacion}
             onLocationChange={handleLocationChange}
             radioTrabajo={parseInt(editedUser.radioTrabajo, 10)}
           />
         </Form.Group>
       )}
+      
       
       <Form.Group className="mb-3">
         <Form.Label>Radio de Trabajo (km)</Form.Label>

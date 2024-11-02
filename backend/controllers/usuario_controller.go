@@ -71,6 +71,8 @@ func (c *UsuarioController) UpdateProfile(ctx echo.Context) error {
     user.Apellido = updatedUser.Apellido
     user.Localizacion = updatedUser.Localizacion
     user.RadioTrabajo = updatedUser.RadioTrabajo
+	user.Longitud = updatedUser.Longitud
+	user.Latitud = updatedUser.Latitud
 
     if user.Email != updatedUser.Email {
         // IMPLEMENTAR LOGICA DE MAIL
