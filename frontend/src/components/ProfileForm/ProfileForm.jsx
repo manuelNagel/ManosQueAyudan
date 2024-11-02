@@ -85,7 +85,7 @@ const ProfileForm = ({ user, onSubmit, onCancel }) => {
       
       {isEditing && (
         <Form.Group className="mb-3">
-          <Form.Label>Location</Form.Label>
+          <Form.Label>Buscar Ciudad</Form.Label>
           <LocationPicker
             initialLocation={{
               lat: editedUser.latitud,

@@ -69,7 +69,6 @@ const LocationPicker = ({ initialLocation, initialLocalizacion, onLocationChange
       <Row className="mb-3">
         <Col md={12}>
           <Form.Group>
-            <Form.Label>Buscar ciudad</Form.Label>
             <InputGroup>
               <FormControl
                 placeholder="Escribe para buscar una ciudad..."

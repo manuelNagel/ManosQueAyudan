@@ -95,31 +95,6 @@ func (s *UsuarioService) CreateUsuario(usuario *models.Usuario) error {
     }
     usuario.Password = string(hashedPassword)
 
-    // Encrypt location data
-    if usuario.Latitud != 0 || usuario.Longitud != 0 {
-        encLat, err := s.encryptLocation(usuario.Latitud)
-        if err != nil {
-            return err
-        }
-        encLong, err := s.encryptLocation(usuario.Longitud)
-        if err != nil {
-            return err
-        }
-        encLoc, err := s.encrypt(usuario.Localizacion)
-        if err != nil {
-            return err
-        }
-
-        usuario.EncryptedLatitud = encLat
-        usuario.EncryptedLongitud = encLong
-        usuario.EncryptedLocalizacion = encLoc
-        
-        // Clear unencrypted fields
-        usuario.Latitud = 0
-        usuario.Longitud = 0
-        usuario.Localizacion = ""
-    }
-
     return s.DB.Create(usuario).Error
 }
 
