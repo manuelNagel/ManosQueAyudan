@@ -13,7 +13,7 @@ type Usuario struct {
 	Email                 string  `gorm:"column:Email" json:"email"`
 	Password              string  `gorm:"column:Password" json:"password,omitempty"`
 	Activo                bool    `gorm:"column:Activo" json:"activo"`
-	Localizacion          string  `gorm:"column:Localizacion" json:"Localizacion"`
+	Localizacion          string  `gorm:"-" json:"Localizacion"`
 	RadioTrabajo          int     `gorm:"column:RadioTrabajo" json:"radioTrabajo"`
 	Latitud               float64 `gorm:"-" json:"Latitud"`
 	Longitud              float64 `gorm:"-" json:"Longitud"`

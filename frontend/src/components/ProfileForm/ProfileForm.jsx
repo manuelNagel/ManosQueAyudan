@@ -20,8 +20,8 @@ const ProfileForm = ({ user, onSubmit, onCancel }) => {
         pais: user.pais,
         localizacion: user.localizacion,
         radioTrabajo: user.radioTrabajo,
-        latitud: user.latitud || -34.603722,
-        longitud: user.longitud || -58.381592,
+        latitud: user.Latitud || -34.603722,
+        longitud: user.Longitud || -58.381592,
       });
     }
   }, [user]);
@@ -106,17 +106,19 @@ const ProfileForm = ({ user, onSubmit, onCancel }) => {
       
       {isEditing && (
         <Form.Group className="mb-3">
-          <Form.Label>Location</Form.Label>
+          <Form.Label>Buscar Ciudad</Form.Label>
           <LocationPicker
             initialLocation={{
               lat: editedUser.latitud,
               lng: editedUser.longitud
             }}
+            initialLocalizacion={editedUser.localizacion}
             onLocationChange={handleLocationChange}
             radioTrabajo={parseInt(editedUser.radioTrabajo, 10)}
           />
         </Form.Group>
       )}
+      
       
       <Form.Group className="mb-3">
         <Form.Label>Radio de Trabajo (km)</Form.Label>

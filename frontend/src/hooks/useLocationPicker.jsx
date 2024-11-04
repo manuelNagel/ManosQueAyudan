@@ -1,11 +1,17 @@
 import { useState, useEffect, useCallback } from 'react';
 
-export const useLocationPicker = (initialLocation) => {
-  const [position, setPosition] = useState(initialLocation || { lat: -34.603722, lng: -58.381592 });
-  const [cities, setCities] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [localizacion, setLocalizacion] = useState('');
+export const useLocationPicker = (initialLocation, initialLocalizacion) => {
+    const [position, setPosition] = useState(initialLocation || { lat: -34.603722, lng: -58.381592 });
+    const [cities, setCities] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [localizacion, setLocalizacion] = useState(initialLocalizacion || '');
+
+  useEffect(() => {
+    if (initialLocalizacion) {
+      setLocalizacion(initialLocalizacion);
+    }
+  }, [initialLocalizacion]);
 
   const searchCities = useCallback(async (query) => {
     if (query.length < 3) return;
