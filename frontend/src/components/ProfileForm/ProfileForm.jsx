@@ -27,7 +27,7 @@ const ProfileForm = ({ user, onSubmit, onCancel }) => {
   }, [user]);
 
   const handleChange = (field, value) => {
-    alert(value)
+    // alert(value)
     setEditedUser((prevUser) => ({
       ...prevUser,
       [field]: value,
@@ -96,9 +96,8 @@ const ProfileForm = ({ user, onSubmit, onCancel }) => {
         <ComboBox
           options={countries}
           defaultTitle="Elige un País"
-          value={editedUser.country}
-          //onChange={handleChange("country")}
-          onChange={(value) => handleChange("country", value)}
+          value={editedUser.pais}
+          onChange={(value) => handleChange("pais", value)}
 
           disabled={!isEditing}
         />

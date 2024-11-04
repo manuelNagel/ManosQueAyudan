@@ -20,7 +20,7 @@ type Usuario struct {
 	EncryptedLatitud      string  `gorm:"column:EncryptedLatitud" json:"-"`
 	EncryptedLongitud     string  `gorm:"column:EncryptedLongitud" json:"-"`
 	EncryptedLocalizacion string  `gorm:"column:EncryptedLocalizacion" json:"-"`
-	Pais                  string  `gorm:"-" json:"Pais"`
+	Pais                  string  `gorm:"column:Pais" json:"pais"`
 
 	CreatedAt          time.Time           `gorm:"column:CreatedAt" json:"createdAt"`
 	UpdatedAt          time.Time           `gorm:"column:UpdatedAt" json:"updatedAt"`
