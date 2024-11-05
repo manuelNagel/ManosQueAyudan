@@ -9,6 +9,7 @@ import Perfil from './pages/Perfil/Perfil';
 import Project from './pages/Project/Project';
 import Countries from './pages/Countries/Countries'
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
+import LocationTestPage from './components/LocationPicker/LocationPicker.test';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Registro />} />
           <Route path="/countries" element={<Countries/>} />
+          <Route path="/LocationPickerTest" element={<LocationTestPage/>}/>
           <Route element={<PrivateRoute />}>
             <Route path="/perfil" element={<Perfil />} />
             <Route path="/projects" element={<ProjectList />} />
