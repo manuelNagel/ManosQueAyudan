@@ -6,125 +6,163 @@ export const useLocationPicker = (initialLocation, initialLocalizacion) => {
     const [loading, setLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [localizacion, setLocalizacion] = useState(initialLocalizacion || '');
+    const [error, setError] = useState('');
 
-  useEffect(() => {
-    if (initialLocalizacion) {
-      setLocalizacion(initialLocalizacion);
-    }
-  }, [initialLocalizacion]);
+    useEffect(() => {
+        if (initialLocalizacion) {
+            setLocalizacion(initialLocalizacion);
+        }
+    }, [initialLocalizacion]);
 
-  const searchCities = useCallback(async (query) => {
-    if (query.length < 3) return;
-    
-    setLoading(true);
-    try {
-      // Using only the q parameter with country filter in the query
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?` + 
-        new URLSearchParams({
-          q: `${query}, Argentina`,
-          format: 'json',
-          limit: 10,
-          addressdetails: 1,
-          countrycodes: 'ar'
-        })
-      );
-      
-      const data = await response.json();
-      
-      if (!Array.isArray(data)) {
-        console.error('Unexpected response format:', data);
-        return;
-      }
+    const searchCities = useCallback(async (query) => {
+        if (query.length < 3) {
+            setCities([]);
+            return;
+        }
 
-      // Filter results to include only cities and localities
-      const filteredResults = data.filter(item => 
-        item.address && 
-        (item.type === "city" || 
-         item.type === "town" || 
-         item.type === "village" || 
-         item.type === "administrative")
-      ).map(item => ({
-        name: item.address.city || item.address.town || item.address.village || item.name,
-        lat: item.lat,
-        lon: item.lon,
-        display_name: item.display_name
-      }));
+        setLoading(true);
+        setError('');
 
-      setCities(filteredResults);
-    } catch (error) {
-      console.error('Error searching cities:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
-  // Debounce the search
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (searchQuery) {
-        searchCities(searchQuery);
-      } else {
-        setCities([]);
-      }
-    }, 300); // 300ms delay
+            const response = await fetch(
+                `https://nominatim.openstreetmap.org/search?` +
+                new URLSearchParams({
+                    q: `${query}, Argentina`,
+                    format: 'json',
+                    limit: 10,
+                    addressdetails: 1,
+                    countrycodes: 'ar'
+                }),
+                { signal: controller.signal }
+            );
 
-    return () => clearTimeout(timeoutId);
-  }, [searchQuery, searchCities]);
+            clearTimeout(timeoutId);
 
-  const handleMapClick = async (latlng) => {
-    setPosition(latlng);
-    try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?` +
-        new URLSearchParams({
-          lat: latlng.lat,
-          lon: latlng.lng,
-          format: 'json'
-        })
-      );
-      const data = await response.json();
-      setLocalizacion(data.display_name);
-      return {
-        latitud: latlng.lat,
-        longitud: latlng.lng,
-        localizacion: data.display_name
-      };
-    } catch (error) {
-      console.error('Error fetching address:', error);
-      return null;
-    }
-  };
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
 
-  const handleCityChange = async (cityData) => {
-    if (cityData) {
-      const newPosition = {
-        lat: parseFloat(cityData.lat),
-        lng: parseFloat(cityData.lon)
-      };
-      setPosition(newPosition);
-      setLocalizacion(cityData.display_name);
-      return {
-        latitud: newPosition.lat,
-        longitud: newPosition.lng,
-        localizacion: cityData.display_name
-      };
-    }
-    return null;
-  };
+            const data = await response.json();
 
-  const handleSearchQueryChange = (query) => {
-    setSearchQuery(query);
-  };
+            if (!Array.isArray(data)) {
+                throw new Error('Formato de respuesta inválido');
+            }
 
-  return {
-    position,
-    cities,
-    loading,
-    searchQuery,
-    localizacion,
-    handleCityChange,
-    handleMapClick,
-    handleSearchQueryChange,
-  };
+            const filteredResults = data.filter(item =>
+                item.address &&
+                (item.type === "city" ||
+                    item.type === "town" ||
+                    item.type === "village" ||
+                    item.type === "administrative")
+            ).map(item => ({
+                name: item.address.city || item.address.town || item.address.village || item.name,
+                lat: item.lat,
+                lon: item.lon,
+                display_name: item.display_name
+            }));
+
+            if (filteredResults.length === 0) {
+                setError('No se encontraron ciudades que coincidan con la búsqueda');
+            }
+
+            setCities(filteredResults);
+        } catch (error) {
+            setCities([]);
+            if (error.name === 'AbortError') {
+                setError('La búsqueda tardó demasiado tiempo. Por favor, intente nuevamente.');
+            } else if (!navigator.onLine) {
+                setError('No hay conexión a internet. Por favor, verifique su conexión.');
+            } else {
+                setError('Error al buscar ciudades. Por favor, intente nuevamente.');
+            }
+            console.error('Error searching cities:', error);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    const handleMapClick = async (latlng) => {
+        setPosition(latlng);
+        setError('');
+
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+            const response = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?` +
+                new URLSearchParams({
+                    lat: latlng.lat,
+                    lon: latlng.lng,
+                    format: 'json'
+                }),
+                { signal: controller.signal }
+            );
+
+            clearTimeout(timeoutId);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            setLocalizacion(data.display_name);
+            return {
+                latitud: latlng.lat,
+                longitud: latlng.lng,
+                localizacion: data.display_name
+            };
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                setError('La búsqueda de ubicación tardó demasiado tiempo. Por favor, intente nuevamente.');
+            } else if (!navigator.onLine) {
+                setError('No hay conexión a internet. Por favor, verifique su conexión.');
+            } else {
+                setError('Error al obtener la dirección. Por favor, intente nuevamente.');
+            }
+            console.error('Error fetching address:', error);
+            return null;
+        }
+    };
+
+    const handleCityChange = async (cityData) => {
+        if (cityData) {
+            const newPosition = {
+                lat: parseFloat(cityData.lat),
+                lng: parseFloat(cityData.lon)
+            };
+            setPosition(newPosition);
+            setLocalizacion(cityData.display_name);
+            return {
+                latitud: newPosition.lat,
+                longitud: newPosition.lng,
+                localizacion: cityData.display_name
+            };
+        }
+        return null;
+    };
+
+    const handleSearchQueryChange = (query) => {
+        setSearchQuery(query);
+        if (query.length < 3) {
+            setError('Ingrese al menos 3 caracteres para buscar');
+        } else {
+            setError('');
+        }
+    };
+
+    return {
+        position,
+        cities,
+        loading,
+        searchQuery,
+        localizacion,
+        error,
+        handleCityChange,
+        handleMapClick,
+        handleSearchQueryChange,
+    };
 };
