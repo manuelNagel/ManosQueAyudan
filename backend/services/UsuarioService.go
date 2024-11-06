@@ -172,3 +172,24 @@ func (s *UsuarioService) AuthenticateUser(email, password string) (*models.Usuar
 
 	return &usuario, nil
 }
+
+func (s *UsuarioService) GetUserByEmail(email string) (*models.Usuario, error) {
+	var user models.Usuario
+	if err := s.DB.Where("email = ?", email).First(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil // Retorna nil si no se encuentra el usuario
+		}
+		return nil, err // Retorna el error si ocurrió un problema en la consulta
+	}
+	return &user, nil
+}
+
+func (s *UsuarioService) UpdatePassword(email string, newPassword string) error {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	// Actualizar solo el campo de la contraseña
+	return s.DB.Model(&models.Usuario{}).Where("email = ?", email).Update("password", hashedPassword).Error
+}

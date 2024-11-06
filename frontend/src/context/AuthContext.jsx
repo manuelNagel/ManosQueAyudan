@@ -93,11 +93,30 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  /**
+   * Metodo para updater datos del usuario
+   * @param {*} updatedUserData 
+   * @returns 
+   */
+  const resetPassword = async (email) => {
+    try {
+      const response = await axios.put('/api/reset-password', { email }, { withCredentials: false });
+      setUser(response.data);
+      return { success: true };
+    } catch (error) {
+      console.error('Error al resetear la contaseña:', error);
+      return { success: false, error: error.response?.data?.error || 'An error occurred while updating the profile' };
+    }
+  };
+
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, register, loading,updateUserProfile }}>
+    <AuthContext.Provider value={{ user, login, logout, register, loading,updateUserProfile, resetPassword }}>
       {children}
     </AuthContext.Provider>
   );
 };
+
+
 
 export const useAuth = () => useContext(AuthContext);

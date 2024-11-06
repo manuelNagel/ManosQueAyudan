@@ -19,20 +19,19 @@ var (
 )
 
 func main() {
-    cfg := config.LoadConfig()
+	cfg := config.LoadConfig()
 
-    // Initialize database with configuration
-    db, err := config.InitDB(cfg)
-    if err != nil {
-        log.Fatalf("Failed to initialize database: %v", err)
-    }
-
+	// Initialize database with configuration
+	db, err := config.InitDB(cfg)
+	if err != nil {
+		log.Fatalf("Failed to initialize database: %v", err)
+	}
 
 	// Initialize services
-    userService := services.NewUsuarioService(db, cfg.EncryptionKey)
-    proyectoService := services.NewProyectoService(db)
-    countryService := services.NewCountryService()
-
+	userService := services.NewUsuarioService(db, cfg.EncryptionKey)
+	proyectoService := services.NewProyectoService(db)
+	countryService := services.NewCountryService()
+	emailService := services.NewEmailService("smtp.gmail.com", "587", "praa.nqn@gmail.com", "wzwmvpdmwcvsfuut")
 
 	// Initialize Echo
 	e := echo.New()
@@ -41,39 +40,39 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://localhost:3000"},
-		AllowMethods: []string{echo.GET, echo.PUT, echo.POST, echo.DELETE},
-		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept,"Accept",},
+		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowMethods:     []string{echo.GET, echo.PUT, echo.POST, echo.DELETE},
+		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, "Accept"},
 		AllowCredentials: true,
 	}))
 
 	// Inicializa controllers
-	authController := controllers.NewAuthController(userService, store)
+	authController := controllers.NewAuthController(userService, store, emailService)
 	userController := controllers.NewUsuarioController(userService)
-    proyectoController := controllers.NewProyectoController(proyectoService)
-    countryController := controllers.NewCountryController(countryService)
-
+	proyectoController := controllers.NewProyectoController(proyectoService)
+	countryController := controllers.NewCountryController(countryService)
 
 	// Rutas publicas
 	e.POST("/api/login", authController.Login)
 	e.POST("/api/logout", authController.Logout)
 	e.POST("/api/register", authController.Register)
 	e.GET("/api/current-user", authController.GetCurrentUser)
-    e.GET("/api/countries", countryController.GetCountries)
+	e.GET("/api/countries", countryController.GetCountries)
+	e.POST("/api/reset-password", authController.ResetPassword)
 
 	// Rutas protegidas
 	r := e.Group("/api")
 	r.Use(requireAuth(store, userService))
 	r.GET("/users/:id", userController.GetUsuario)
-    r.PUT("/update-profile", userController.UpdateProfile)
+	r.PUT("/update-profile", userController.UpdateProfile)
 
-    r.POST("/projects", proyectoController.CreateProyecto)
+	r.POST("/projects", proyectoController.CreateProyecto)
 	r.GET("/projects/:id", proyectoController.GetProyecto)
 	r.PUT("/projects/:id", proyectoController.UpdateProyecto)
 	r.DELETE("/projects/:id", proyectoController.DeleteProyecto)
 	r.GET("/projects", proyectoController.ListProyectos)
-    r.PUT("/projects/:id/actividades", proyectoController.UpdateActividad)
-    r.DELETE("/projects/:id/actividades/:actividadId", proyectoController.DeleteActividad)
+	r.PUT("/projects/:id/actividades", proyectoController.UpdateActividad)
+	r.DELETE("/projects/:id/actividades/:actividadId", proyectoController.DeleteActividad)
 	// Comenzar server
 	e.Logger.Fatal(e.Start(":8080"))
 }

@@ -40,7 +40,7 @@ func LoadConfig() *Config {
 	dbDSN := os.Getenv("DB_DSN")
 	if dbDSN == "" {
 		// Use your existing default DSN if environment variable is not set
-		dbDSN = "root:Stroppierdoor13@tcp(localhost:3306)/manosqueayudan?charset=utf8mb4&parseTime=True&loc=Local"
+		dbDSN = "root:@tcp(localhost:3306)/manosqqayudan?charset=utf8mb4&parseTime=True&loc=Local"
 	}
 
 	return &Config{
