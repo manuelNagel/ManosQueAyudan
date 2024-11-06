@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import LocationPicker from '../LocationPicker/LocationPicker';
+import ComboBox from '../ComboBox/ComboBox';
+import useCountries from '../../hooks/useCountries';
 
 const ProfileForm = ({ user, onSubmit, onCancel }) => {
   const [editedUser, setEditedUser] = useState({});
   const [isEditing, setIsEditing] = useState(false);
+  const { countries, loading, error, refetch } = useCountries();
 
   useEffect(() => {
     if (user) {
@@ -14,7 +17,8 @@ const ProfileForm = ({ user, onSubmit, onCancel }) => {
         apellido: user.apellido,
         email: user.email,
         activo: user.activo,
-        localizacion: user.Localizacion,
+        pais: user.pais,
+        localizacion: user.localizacion,
         radioTrabajo: user.radioTrabajo,
         latitud: user.Latitud || -34.603722,
         longitud: user.Longitud || -58.381592,
@@ -22,9 +26,13 @@ const ProfileForm = ({ user, onSubmit, onCancel }) => {
     }
   }, [user]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setEditedUser(prev => ({ ...prev, [name]: value }));
+  const handleChange = (field, value) => {
+    // alert(value)
+    setEditedUser((prevUser) => ({
+      ...prevUser,
+      [field]: value,
+      
+    }));
   };
 
   const handleLocationChange = (location) => {
@@ -79,6 +87,18 @@ const ProfileForm = ({ user, onSubmit, onCancel }) => {
           name="email"  
           value={editedUser.email || ''}
           onChange={handleChange}
+          disabled={!isEditing}
+        />
+      </Form.Group>
+
+      <Form.Group className="mb-3">
+        <Form.Label>País</Form.Label>
+        <ComboBox
+          options={countries}
+          defaultTitle="Elige un País"
+          value={editedUser.pais}
+          onChange={(value) => handleChange("pais", value)}
+
           disabled={!isEditing}
         />
       </Form.Group>

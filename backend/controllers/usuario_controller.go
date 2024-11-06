@@ -4,9 +4,10 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/labstack/echo/v4"
 	"backend/models"
 	"backend/services"
+
+	"github.com/labstack/echo/v4"
 )
 
 type UsuarioController struct {
@@ -21,17 +22,16 @@ func (c *UsuarioController) GetUsuario(ctx echo.Context) error {
 	idStr := ctx.Param("id")
 
 	id64, err := strconv.ParseUint(idStr, 10, 32)
-    if err != nil {
-        return ctx.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid user ID"})
-    }
-    
-    id := uint(id64)
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid user ID"})
+	}
 
-    usuario, err := c.Service.GetUsuario(id)
-    if err != nil {
-        return ctx.JSON(http.StatusNotFound, map[string]string{"error": "User not found"})
-    }
+	id := uint(id64)
 
+	usuario, err := c.Service.GetUsuario(id)
+	if err != nil {
+		return ctx.JSON(http.StatusNotFound, map[string]string{"error": "User not found"})
+	}
 
 	return ctx.JSON(http.StatusOK, usuario)
 }
@@ -58,31 +58,31 @@ func (c *UsuarioController) GetCurrentUser(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, user)
 }
 
-
 func (c *UsuarioController) UpdateProfile(ctx echo.Context) error {
-    user := ctx.Get("user").(*models.Usuario)
-    
-    var updatedUser models.Usuario
-    if err := ctx.Bind(&updatedUser); err != nil {
-        return ctx.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request payload"})
-    }
+	user := ctx.Get("user").(*models.Usuario)
 
-    user.Nombre = updatedUser.Nombre
-    user.Apellido = updatedUser.Apellido
-    user.Localizacion = updatedUser.Localizacion
-    user.RadioTrabajo = updatedUser.RadioTrabajo
+	var updatedUser models.Usuario
+	if err := ctx.Bind(&updatedUser); err != nil {
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request payload"})
+	}
+
+	user.Nombre = updatedUser.Nombre
+	user.Apellido = updatedUser.Apellido
+	user.Localizacion = updatedUser.Localizacion
+	user.RadioTrabajo = updatedUser.RadioTrabajo
 	user.Longitud = updatedUser.Longitud
 	user.Latitud = updatedUser.Latitud
+	user.Pais = updatedUser.Pais
 
-    if user.Email != updatedUser.Email {
-        // IMPLEMENTAR LOGICA DE MAIL
-        user.Email = updatedUser.Email
-    }
+	if user.Email != updatedUser.Email {
+		// IMPLEMENTAR LOGICA DE MAIL
+		user.Email = updatedUser.Email
+	}
 
-    err := c.Service.UpdateUsuario(user)
-    if err != nil {
-        return ctx.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to update user"})
-    }
+	err := c.Service.UpdateUsuario(user)
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to update user"})
+	}
 
-    return ctx.JSON(http.StatusOK, user)
+	return ctx.JSON(http.StatusOK, user)
 }
