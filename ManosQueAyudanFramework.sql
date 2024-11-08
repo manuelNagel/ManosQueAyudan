@@ -301,9 +301,10 @@ CREATE TABLE `Usuario` (
   `DeletedAt` datetime(3) DEFAULT NULL,
   `EncryptedLatitud` text,
   `EncryptedLongitud` text,
+  `Pais` text,
   PRIMARY KEY (`Id`),
   KEY `idx_Usuario_deleted_at` (`DeletedAt`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -349,4 +350,4 @@ CREATE TABLE `UsuarioHabilidades` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-11-01 19:05:38
+-- Dump completed on 2024-11-08 10:33:35

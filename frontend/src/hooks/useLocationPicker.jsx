@@ -25,7 +25,7 @@ export const useLocationPicker = (initialLocation, initialLocalizacion) => {
 
         try {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
 
             const response = await fetch(
                 `https://nominatim.openstreetmap.org/search?` +
@@ -83,6 +83,32 @@ export const useLocationPicker = (initialLocation, initialLocalizacion) => {
             setLoading(false);
         }
     }, []);
+
+    // Restore the debounce effect
+    useEffect(() => {
+        let timeoutId;
+        
+        if (searchQuery) {
+            if (searchQuery.length < 3) {
+                setError('Ingrese al menos 3 caracteres para buscar');
+                setCities([]);
+            } else {
+                setError('');
+                timeoutId = setTimeout(() => {
+                    searchCities(searchQuery);
+                }, 300);
+            }
+        } else {
+            setCities([]);
+            setError('');
+        }
+
+        return () => {
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+            }
+        };
+    }, [searchQuery, searchCities]);
 
     const handleMapClick = async (latlng) => {
         setPosition(latlng);
@@ -147,11 +173,6 @@ export const useLocationPicker = (initialLocation, initialLocalizacion) => {
 
     const handleSearchQueryChange = (query) => {
         setSearchQuery(query);
-        if (query.length < 3) {
-            setError('Ingrese al menos 3 caracteres para buscar');
-        } else {
-            setError('');
-        }
     };
 
     return {
