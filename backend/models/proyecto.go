@@ -12,7 +12,10 @@ type Proyecto struct {
     CantidadParticipantes int       `gorm:"column:CantidadParticipantes" json:"cantidadParticipantes"`
     Nombre                string    `gorm:"column:Nombre" json:"nombre"`
     Descripcion           string    `gorm:"column:Descripcion" json:"descripcion"`
-    Horario               time.Time `gorm:"column:Horario" json:"horario"`
+    HorarioInicio         time.Time `gorm:"column:HorarioInicio" json:"horarioInicio"`
+    HorarioFinal          time.Time `gorm:"column:HorarioFinal" json:"horarioFinal"`
+    Latitud               float64   `gorm:"column:Latitud" json:"latitud"`
+    Longitud              float64   `gorm:"column:Longitud" json:"longitud"`
     Habilitado            bool      `gorm:"column:Habilitado" json:"habilitado"`
     Usuarios              []Usuario `gorm:"many2many:Proyectos_Usuarios;foreignKey:IdProyecto;joinForeignKey:IdProyecto;References:Id;joinReferences:IdUsuario" json:"usuarios"`
     Roles                 []RolProyecto `gorm:"many2many:Proyectos_Usuarios;foreignKey:IdProyecto;joinForeignKey:IdProyecto;References:IdRol;joinReferences:IdRol" json:"roles"`

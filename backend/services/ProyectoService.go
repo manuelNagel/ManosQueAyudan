@@ -3,6 +3,7 @@ package services
 import (
 	"backend/models"
 	"errors"
+	"fmt"
 	"log"
 
 	"gorm.io/gorm"
@@ -136,4 +137,92 @@ func (s *ProyectoService) DeleteActividad(proyectoID uint, actividadID uint) err
 
         return nil
     })
+}
+
+// Magía de la haversine formula para la busqueda de proyectos
+
+
+/*
+*Metodo que busca los proyectos por la localización y radio del usuario
+*/
+func (s *ProyectoService) SearchProyectosByLocation(lat, lon float64, radiusKm float64) ([]models.Proyecto, error) {
+    var proyectos []models.Proyecto
+    
+    // MySQL Haversine formula optimizada
+    query := `
+        SELECT *,
+        (
+            111.111 *
+            DEGREES(ACOS(
+                LEAST(1.0, COS(RADIANS(?)) * COS(RADIANS(Latitud)) * 
+                COS(RADIANS(?) - RADIANS(Longitud)) +
+                SIN(RADIANS(?)) * SIN(RADIANS(Latitud)))
+            )
+        ) AS distance
+        FROM Proyecto
+        WHERE 
+            Latitud BETWEEN ? - (?/111.111) AND ? + (?/111.111) AND
+            Longitud BETWEEN ? - (?/(111.111 * COS(RADIANS(?)))) AND ? + (?/(111.111 * COS(RADIANS(?)))) AND
+            Habilitado = true
+        HAVING distance <= ?
+        ORDER BY distance;`
+
+    //  Calcula la "caja" de limites para el filtrado inicial
+    // Esto hace la query mas eficiente al eliminar desaciertos obvios
+    err := s.DB.Raw(
+        query,
+        lat, lon, lat,
+        lat, radiusKm, lat, radiusKm,
+        lon, radiusKm, lat, lon, radiusKm, lat,
+        radiusKm,
+    ).Scan(&proyectos).Error
+
+    if err != nil {
+        return nil, fmt.Errorf("error searching projects: %v", err)
+    }
+
+    // Load related data
+    for i := range proyectos {
+        if err := s.DB.Preload("Actividades").First(&proyectos[i], proyectos[i].IdProyecto).Error; err != nil {
+            return nil, fmt.Errorf("error loading project details: %v", err)
+        }
+    }
+
+    return proyectos, nil
+}
+
+func (s *ProyectoService) GetProyectoWithDistance(id uint, userLat, userLon float64) (*models.Proyecto, float64, error) {
+    var proyecto models.Proyecto
+    var distance float64
+
+    query := `
+        SELECT *,
+        (
+            111.111 *
+            DEGREES(ACOS(
+                LEAST(1.0, COS(RADIANS(?)) * COS(RADIANS(Latitud)) * 
+                COS(RADIANS(?) - RADIANS(Longitud)) +
+                SIN(RADIANS(?)) * SIN(RADIANS(Latitud)))
+            )
+        ) AS distance
+        FROM Proyecto
+        WHERE IdProyecto = ?`
+
+    err := s.DB.Raw(query, userLat, userLon, userLat, id).Scan(&proyecto).Error
+    if err != nil {
+        return nil, 0, err
+    }
+
+    // Conside la distancia calculada de la query
+    err = s.DB.Raw("SELECT @distance AS distance").Scan(&distance).Error
+    if err != nil {
+        distance = 0 
+    }
+
+    // carga data relacionada
+    if err := s.DB.Preload("Actividades").First(&proyecto, id).Error; err != nil {
+        return nil, 0, err
+    }
+
+    return &proyecto, distance, nil
 }

@@ -17,6 +17,8 @@ type Usuario struct {
 	RadioTrabajo          int     `gorm:"column:RadioTrabajo" json:"radioTrabajo"`
 	Latitud               float64 `gorm:"-" json:"Latitud"`
 	Longitud              float64 `gorm:"-" json:"Longitud"`
+	HorarioInicio 		  time.Time `gorm:"column:HorarioInicio" json:"horarioInicio"`
+	HorarioFinal		  time.Time `gorm:"column:HorarioFinal" json:"horarioFinal"`
 	EncryptedLatitud      string  `gorm:"column:EncryptedLatitud" json:"-"`
 	EncryptedLongitud     string  `gorm:"column:EncryptedLongitud" json:"-"`
 	EncryptedLocalizacion string  `gorm:"column:EncryptedLocalizacion" json:"-"`
