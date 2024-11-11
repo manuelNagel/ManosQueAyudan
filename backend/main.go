@@ -58,8 +58,9 @@ func main() {
 	e.POST("/api/register", authController.Register)
 	e.GET("/api/current-user", authController.GetCurrentUser)
 	e.GET("/api/countries", countryController.GetCountries)
+	e.GET("/api/projects/search", proyectoController.SearchProyectosByLocation)
 	e.POST("/api/reset-password", authController.ResetPassword)
-
+	
 	// Rutas protegidas
 	r := e.Group("/api")
 	r.Use(requireAuth(store, userService))

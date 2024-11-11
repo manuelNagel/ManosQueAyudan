@@ -14,6 +14,10 @@ type ProyectoController struct {
 	Service *services.ProyectoService
 }
 
+const (
+    PUBLIC_SEARCH_RADIUS  = 20.0 // km
+)
+
 func NewProyectoController(service *services.ProyectoService) *ProyectoController {
 	return &ProyectoController{Service: service}
 }
@@ -108,4 +112,89 @@ func (c *ProyectoController) ListProyectos(ctx echo.Context) error {
 		return ctx.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to list projects"})
 	}
 	return ctx.JSON(http.StatusOK, proyectos)
+}
+
+func (c *ProyectoController) SearchProyectosByLocation(ctx echo.Context) error {
+    var lat, lon, radius float64
+    var err error
+
+    
+    user, ok := ctx.Get("user").(*models.Usuario)
+
+    if ok && user != nil {
+       
+        if user.Latitud == 0 && user.Longitud == 0 {
+            return ctx.JSON(http.StatusBadRequest, map[string]string{
+                "error": "User location not set. Please update your profile with your location.",
+            })
+        }
+
+        lat = user.Latitud
+        lon = user.Longitud
+        radius = float64(user.RadioTrabajo) 
+    } else {
+        // validación para usuario no logueado 
+        lat, err = strconv.ParseFloat(ctx.QueryParam("lat"), 64)
+        if err != nil {
+            return ctx.JSON(http.StatusBadRequest, map[string]string{
+                "error": "Invalid or missing latitude parameter",
+            })
+        }
+
+        lon, err = strconv.ParseFloat(ctx.QueryParam("lon"), 64)
+        if err != nil {
+            return ctx.JSON(http.StatusBadRequest, map[string]string{
+                "error": "Invalid or missing longitude parameter",
+            })
+        }
+
+        // Valida rangos de coordenadas
+        if lat < -90 || lat > 90 {
+            return ctx.JSON(http.StatusBadRequest, map[string]string{
+                "error": "Latitude must be between -90 and 90 degrees",
+            })
+        }
+        if lon < -180 || lon > 180 {
+            return ctx.JSON(http.StatusBadRequest, map[string]string{
+                "error": "Longitude must be between -180 and 180 degrees",
+            })
+        }
+
+        radius = PUBLIC_SEARCH_RADIUS 
+    }
+
+    // Busqueda de proyectos
+    proyectos, err := c.Service.SearchProyectosByLocation(lat, lon, radius)
+    if err != nil {
+        log.Printf("Error searching projects: %v", err)
+        return ctx.JSON(http.StatusInternalServerError, map[string]string{
+            "error": "Failed to search projects",
+        })
+    }
+
+    //respuesta con contexto del search
+    response := struct {
+        Projects        []models.Proyecto `json:"projects"`
+        SearchLocation struct {
+            Latitude  float64 `json:"latitude"`
+            Longitude float64 `json:"longitude"`
+            Radius    float64 `json:"radius"`
+            IsAuth    bool    `json:"isAuthenticated"`
+        } `json:"searchLocation"`
+    }{
+        Projects: proyectos,
+        SearchLocation: struct {
+            Latitude  float64 `json:"latitude"`
+            Longitude float64 `json:"longitude"`
+            Radius    float64 `json:"radius"`
+            IsAuth    bool    `json:"isAuthenticated"`
+        }{
+            Latitude:  lat,
+            Longitude: lon,
+            Radius:    radius,
+            IsAuth:    ok && user != nil,
+        },
+    }
+
+    return ctx.JSON(http.StatusOK, response)
 }
