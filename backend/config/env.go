@@ -11,6 +11,8 @@ type Config struct {
 	EncryptionKey []byte
 	SessionKey    []byte
 	DBConfig      DatabaseConfig
+	CuentaMail    []byte
+	PassMail      string
 }
 
 type DatabaseConfig struct {
@@ -43,11 +45,26 @@ func LoadConfig() *Config {
 		dbDSN = "root:@tcp(localhost:3306)/manosqqayudan?charset=utf8mb4&parseTime=True&loc=Local"
 	}
 
+	// Get Email SMTP data
+	cuentaMail := os.Getenv("CUENTA_MAIL")
+
+	if cuentaMail == "" {
+		log.Fatal("Cuenta_Mail environment variable is required")
+	}
+
+	//Get password Email smtp data
+	passMail := os.Getenv("MAIL_KEY")
+	if passMail == "" {
+		log.Fatal("Contraseña de servidor smtp es requerida")
+	}
+
 	return &Config{
 		EncryptionKey: []byte(encKey),
 		SessionKey:    []byte(sessKey),
 		DBConfig: DatabaseConfig{
 			DSN: dbDSN,
 		},
+		CuentaMail: []byte(cuentaMail),
+		PassMail:   passMail,
 	}
 }

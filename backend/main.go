@@ -31,8 +31,8 @@ func main() {
 	userService := services.NewUsuarioService(db, cfg.EncryptionKey)
 	proyectoService := services.NewProyectoService(db)
 	countryService := services.NewCountryService()
-	emailService := services.NewEmailService("smtp.gmail.com", "587", "praa.nqn@gmail.com", "wzwmvpdmwcvsfuut")
-
+	//emailService := services.NewEmailService("smtp.gmail.com", "587", "praa.nqn@gmail.com", "wzwmvpdmwcvsfuut")
+	emailService := services.NewEmailService("smtp.gmail.com", "587", string(cfg.CuentaMail), cfg.PassMail)
 	// Initialize Echo
 	e := echo.New()
 
