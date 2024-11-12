@@ -31,7 +31,7 @@ CREATE TABLE `Actividad` (
   PRIMARY KEY (`NumeroActividad`),
   KEY `fk_actividad_proyecto` (`ProyectoID`),
   CONSTRAINT `fk_actividad_proyecto` FOREIGN KEY (`ProyectoID`) REFERENCES `Proyecto` (`IdProyecto`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -199,14 +199,19 @@ CREATE TABLE `Proyecto` (
   `IdProyecto` int unsigned NOT NULL AUTO_INCREMENT,
   `FechaInicio` datetime(3) DEFAULT NULL,
   `Localizacion` longtext,
+  `Latitud` decimal(10,8) DEFAULT NULL,
+  `Longitud` decimal(11,8) DEFAULT NULL,
   `FechaFinalizacion` datetime(3) DEFAULT NULL,
   `CantidadParticipantes` bigint DEFAULT NULL,
   `Nombre` longtext,
   `Descripcion` longtext,
-  `Horario` datetime(3) DEFAULT NULL,
+  `HorarioInicio` datetime(3) DEFAULT NULL,
+  `HorarioFinal` datetime(3) DEFAULT NULL,
   `Habilitado` tinyint(1) NOT NULL,
-  PRIMARY KEY (`IdProyecto`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `Eliminado` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`IdProyecto`),
+  KEY `idx_proyecto_location` (`Latitud`,`Longitud`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -245,7 +250,7 @@ CREATE TABLE `Rol_Proyecto` (
   `FechaInicioRol` datetime(3) DEFAULT NULL,
   `FechaFinRol` datetime(3) DEFAULT NULL,
   PRIMARY KEY (`IdRol`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -301,9 +306,13 @@ CREATE TABLE `Usuario` (
   `DeletedAt` datetime(3) DEFAULT NULL,
   `EncryptedLatitud` text,
   `EncryptedLongitud` text,
+  `Pais` text,
+  `HorarioInicio` datetime(3) DEFAULT NULL,
+  `HorarioFinal` datetime(3) DEFAULT NULL,
+  `Eliminado` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`Id`),
   KEY `idx_Usuario_deleted_at` (`DeletedAt`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -349,4 +358,4 @@ CREATE TABLE `UsuarioHabilidades` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-11-01 19:05:38
+-- Dump completed on 2024-11-11 21:56:29
