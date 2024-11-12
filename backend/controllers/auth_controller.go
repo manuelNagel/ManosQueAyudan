@@ -142,3 +142,30 @@ func (c *AuthController) ResetPassword(ctx echo.Context) error {
 
 	return ctx.JSON(http.StatusOK, map[string]string{"message": "Email de restablecimiento de contrasena enviado"})
 }
+
+func (c *AuthController) UpdateHabilidad(ctx echo.Context) error {
+	// Obtener el ID del usuario desde los parámetros de la URL
+	idStr := ctx.Param("id")
+
+	userID, err := strconv.ParseUint(idStr, 10, 32)
+	//userID, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid user ID")
+	}
+
+	// Parsear las habilidades enviadas en la solicitud
+	var request struct {
+		Habilidades []uint `json:"habilidades"`
+	}
+	if err := ctx.Bind(&request); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid request payload")
+	}
+
+	// Llamar al servicio para actualizar las habilidades
+	if err := c.UserService.UpdateUserSkills(uint(userID), request.Habilidades); err != nil {
+		log.Printf("Failed to update skills: %v", err)
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to update skills")
+	}
+
+	return ctx.JSON(http.StatusOK, map[string]string{"message": "Skills updated successfully"})
+}

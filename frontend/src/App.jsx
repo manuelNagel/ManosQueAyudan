@@ -23,6 +23,7 @@ function App() {
           <Route path="/passwordReset"element={<PasswordReset/>} />
           <Route element={<PrivateRoute />}>
             <Route path="/perfil" element={<Perfil />} />
+            <Route path='/habilidades' element={<Habilidades />} />
             <Route path="/projects" element={<ProjectList />} />
             <Route path="/projects/new" element={<Project />} />
             <Route path="/projects/edit/:id" element={<Project />} />

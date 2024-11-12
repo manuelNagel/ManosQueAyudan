@@ -31,6 +31,7 @@ func main() {
 	userService := services.NewUsuarioService(db, cfg.EncryptionKey)
 	proyectoService := services.NewProyectoService(db)
 	countryService := services.NewCountryService()
+	habilidadService := services.NewHabilidadService(db)
 	//emailService := services.NewEmailService("smtp.gmail.com", "587", "praa.nqn@gmail.com", "wzwmvpdmwcvsfuut")
 	emailService := services.NewEmailService("smtp.gmail.com", "587", string(cfg.CuentaMail), cfg.PassMail)
 	// Initialize Echo
@@ -49,6 +50,7 @@ func main() {
 	// Inicializa controllers
 	authController := controllers.NewAuthController(userService, store, emailService)
 	userController := controllers.NewUsuarioController(userService)
+	skillController := controllers.NewHabilidadController(habilidadService)
 	proyectoController := controllers.NewProyectoController(proyectoService)
 	countryController := controllers.NewCountryController(countryService)
 
@@ -60,12 +62,20 @@ func main() {
 	e.GET("/api/countries", countryController.GetCountries)
 	e.GET("/api/projects/search", proyectoController.SearchProyectosByLocation)
 	e.POST("/api/reset-password", authController.ResetPassword)
-	
+
+	e.PUT("/api/users/:id/habilidades", authController.UpdateHabilidad)
+
 	// Rutas protegidas
 	r := e.Group("/api")
 	r.Use(requireAuth(store, userService))
 	r.GET("/users/:id", userController.GetUsuario)
 	r.PUT("/update-profile", userController.UpdateProfile)
+
+	// r.PUT("/users/:id/habilidades", authController.UpdateHabilidad)
+	r.POST("/users/:userId/skills", skillController.AddSkill)
+	r.GET("/users/:userId/skills", skillController.GetSkills)
+	r.DELETE("/users/:userId/skills/:skillId", skillController.RemoveSkill)
+	r.PUT("/users/:userId/skills/:skillId/level", skillController.UpdateSkillLevel)
 
 	r.POST("/projects", proyectoController.CreateProyecto)
 	r.GET("/projects/:id", proyectoController.GetProyecto)

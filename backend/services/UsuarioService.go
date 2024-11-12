@@ -193,3 +193,20 @@ func (s *UsuarioService) UpdatePassword(email string, newPassword string) error 
 	// Actualizar solo el campo de la contraseña
 	return s.DB.Model(&models.Usuario{}).Where("email = ?", email).Update("password", hashedPassword).Error
 }
+
+func (s *UsuarioService) UpdateUserSkills(userID uint, skillIDs []uint) error {
+	var user models.Usuario
+	if err := s.DB.Preload("Habilidades").First(&user, userID).Error; err != nil {
+		return err
+	}
+
+	// Actualizar las habilidades asociadas al usuario
+	var habilidades []models.Habilidad
+	if len(skillIDs) > 0 {
+		if err := s.DB.Where("id IN ?", skillIDs).Find(&habilidades).Error; err != nil {
+			return err
+		}
+	}
+
+	return s.DB.Model(&user).Association("Habilidades").Replace(habilidades)
+}
