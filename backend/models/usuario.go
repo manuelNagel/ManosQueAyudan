@@ -15,6 +15,7 @@ type Usuario struct {
 	Activo                bool    `gorm:"column:Activo" json:"activo"`
 	Localizacion          string  `gorm:"-" json:"Localizacion"`
 	RadioTrabajo          int     `gorm:"column:RadioTrabajo" json:"radioTrabajo"`
+	Eliminado             bool    `gorm:"column:Eliminado" json:"eliminado"`
 	Latitud               float64 `gorm:"-" json:"Latitud"`
 	Longitud              float64 `gorm:"-" json:"Longitud"`
 	HorarioInicio 		  time.Time `gorm:"column:HorarioInicio" json:"horarioInicio"`

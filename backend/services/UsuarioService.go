@@ -27,6 +27,10 @@ func NewUsuarioService(db *gorm.DB, encryptionKey []byte) *UsuarioService {
 	}
 }
 
+func (s *UsuarioService) DeleteUsuario(id uint) error {
+    return s.DB.Model(&models.Usuario{}).Where("Id = ?", id).Update("Eliminado", true).Error
+}
+
 func (s *UsuarioService) encrypt(text string) (string, error) {
 	block, err := aes.NewCipher(s.encryptionKey)
 	if err != nil {
@@ -131,32 +135,32 @@ func (s *UsuarioService) UpdateUsuario(usuario *models.Usuario) error {
 }
 
 func (s *UsuarioService) GetUsuario(id uint) (*models.Usuario, error) {
-	var usuario models.Usuario
-	if err := s.DB.First(&usuario, id).Error; err != nil {
-		return nil, err
-	}
+    var usuario models.Usuario
+    if err := s.DB.Where("Id = ? AND Eliminado = ?", id, false).First(&usuario).Error; err != nil {
+        return nil, err
+    }
 
-	// Decrypt location data if present
-	if usuario.EncryptedLatitud != "" && usuario.EncryptedLongitud != "" {
-		lat, err := s.decryptLocation(usuario.EncryptedLatitud)
-		if err != nil {
-			return nil, err
-		}
-		long, err := s.decryptLocation(usuario.EncryptedLongitud)
-		if err != nil {
-			return nil, err
-		}
-		loc, err := s.decrypt(usuario.EncryptedLocalizacion)
-		if err != nil {
-			return nil, err
-		}
+    if usuario.EncryptedLatitud != "" && usuario.EncryptedLongitud != "" {
+        lat, err := s.decryptLocation(usuario.EncryptedLatitud)
+        if err != nil {
+            return nil, err
+        }
+        long, err := s.decryptLocation(usuario.EncryptedLongitud)
+        if err != nil {
+            return nil, err
+        }
+        loc, err := s.decrypt(usuario.EncryptedLocalizacion)
+        if err != nil {
+            return nil, err
+        }
 
-		usuario.Latitud = lat
-		usuario.Longitud = long
-		usuario.Localizacion = loc
-	}
+        usuario.Latitud = lat
+        usuario.Longitud = long
+        usuario.Localizacion = loc
+		usuario.Password=""
+    }
 
-	return &usuario, nil
+    return &usuario, nil
 }
 
 // Authentication method remains unchanged, using bcrypt

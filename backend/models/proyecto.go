@@ -16,6 +16,7 @@ type Proyecto struct {
     HorarioFinal          time.Time `gorm:"column:HorarioFinal" json:"horarioFinal"`
     Latitud               float64   `gorm:"column:Latitud" json:"latitud"`
     Longitud              float64   `gorm:"column:Longitud" json:"longitud"`
+    Eliminado             bool      `gorm:"column:Eliminado" json:"eliminado"`
     Habilitado            bool      `gorm:"column:Habilitado" json:"habilitado"`
     Usuarios              []Usuario `gorm:"many2many:Proyectos_Usuarios;foreignKey:IdProyecto;joinForeignKey:IdProyecto;References:Id;joinReferences:IdUsuario" json:"usuarios"`
     Roles                 []RolProyecto `gorm:"many2many:Proyectos_Usuarios;foreignKey:IdProyecto;joinForeignKey:IdProyecto;References:IdRol;joinReferences:IdRol" json:"roles"`

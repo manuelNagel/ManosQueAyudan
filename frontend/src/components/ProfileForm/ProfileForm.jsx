@@ -7,31 +7,37 @@ import useCountries from '../../hooks/useCountries';
 const ProfileForm = ({ user, onSubmit, onCancel }) => {
   const [editedUser, setEditedUser] = useState({});
   const [isEditing, setIsEditing] = useState(false);
-  const { countries, loading, error, refetch } = useCountries();
+  const { countries, loading, error } = useCountries();
 
   useEffect(() => {
     if (user) {
       setEditedUser({
         id: user.id,
-        nombre: user.nombre,
-        apellido: user.apellido,
-        email: user.email,
-        activo: user.activo,
-        pais: user.pais,
-        localizacion: user.localizacion,
-        radioTrabajo: user.radioTrabajo,
+        nombre: user.nombre || '',
+        apellido: user.apellido || '',
+        email: user.email || '',
+        activo: user.activo || false,
+        pais: user.pais || '',
+        localizacion: user.localizacion || '',
+        radioTrabajo: user.radioTrabajo || '',
         latitud: user.Latitud || -34.603722,
         longitud: user.Longitud || -58.381592,
       });
     }
   }, [user]);
 
-  const handleChange = (field, value) => {
-    // alert(value)
-    setEditedUser((prevUser) => ({
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setEditedUser(prevUser => ({
       ...prevUser,
-      [field]: value,
-      
+      [name]: value,
+    }));
+  };
+
+  const handleComboBoxChange = (value) => {
+    setEditedUser(prevUser => ({
+      ...prevUser,
+      pais: value
     }));
   };
 
@@ -56,13 +62,32 @@ const ProfileForm = ({ user, onSubmit, onCancel }) => {
     setIsEditing(false);
   };
 
+  const handleCancel = () => {
+    if (user) {
+      setEditedUser({
+        id: user.id,
+        nombre: user.nombre || '',
+        apellido: user.apellido || '',
+        email: user.email || '',
+        activo: user.activo || false,
+        pais: user.pais || '',
+        localizacion: user.localizacion || '',
+        radioTrabajo: user.radioTrabajo || '',
+        latitud: user.Latitud || -34.603722,
+        longitud: user.Longitud || -58.381592,
+      });
+    }
+    setIsEditing(false);
+    if (onCancel) onCancel();
+  };
+
   return (
     <Form onSubmit={handleSubmit}>
       <Form.Group className="mb-3">
         <Form.Label>Nombre</Form.Label>
         <Form.Control
           type="text"
-          name="nombre"  
+          name="nombre"
           value={editedUser.nombre || ''}
           onChange={handleChange}
           disabled={!isEditing}
@@ -73,7 +98,7 @@ const ProfileForm = ({ user, onSubmit, onCancel }) => {
         <Form.Label>Apellido</Form.Label>
         <Form.Control
           type="text"
-          name="apellido"  
+          name="apellido"
           value={editedUser.apellido || ''}
           onChange={handleChange}
           disabled={!isEditing}
@@ -84,7 +109,7 @@ const ProfileForm = ({ user, onSubmit, onCancel }) => {
         <Form.Label>Email</Form.Label>
         <Form.Control
           type="email"
-          name="email"  
+          name="email"
           value={editedUser.email || ''}
           onChange={handleChange}
           disabled={!isEditing}
@@ -97,15 +122,25 @@ const ProfileForm = ({ user, onSubmit, onCancel }) => {
           options={countries}
           defaultTitle="Elige un País"
           value={editedUser.pais}
-          onChange={(value) => handleChange("pais", value)}
+          onChange={handleComboBoxChange}
+          disabled={!isEditing}
+        />
+      </Form.Group>
 
+      <Form.Group className="mb-3">
+        <Form.Label>Radio de Trabajo (km)</Form.Label>
+        <Form.Control
+          type="number"
+          name="radioTrabajo"
+          value={editedUser.radioTrabajo || ''}
+          onChange={handleChange}
           disabled={!isEditing}
         />
       </Form.Group>
       
       {isEditing && (
         <Form.Group className="mb-3">
-          <Form.Label>Buscar Ciudad</Form.Label>
+          <Form.Label>Ubicación</Form.Label>
           <LocationPicker
             initialLocation={{
               lat: editedUser.latitud,
@@ -117,36 +152,23 @@ const ProfileForm = ({ user, onSubmit, onCancel }) => {
           />
         </Form.Group>
       )}
-      
-      
-      <Form.Group className="mb-3">
-        <Form.Label>Radio de Trabajo (km)</Form.Label>
-        <Form.Control
-          type="number"
-          name="radioTrabajo"  
-          value={editedUser.radioTrabajo || ''}
-          onChange={handleChange}
-          disabled={!isEditing}
-        />
-      </Form.Group>
-      
+
       {isEditing ? (
-        <>
-          <Button variant="primary" type="submit">Guardar Cambios</Button>
+        <div className="d-flex gap-2">
+          <Button variant="primary" type="submit">
+            Guardar Cambios
+          </Button>
           <Button 
             variant="secondary" 
-            onClick={() => {
-              setIsEditing(false);
-              setEditedUser(user);
-              onCancel();
-            }} 
-            className="ms-2"
+            onClick={handleCancel}
           >
             Cancelar
           </Button>
-        </>
+        </div>
       ) : (
-        <Button variant="primary" onClick={() => setIsEditing(true)}>Editar Perfil</Button>
+        <Button variant="primary" onClick={() => setIsEditing(true)}>
+          Editar Perfil
+        </Button>
       )}
     </Form>
   );

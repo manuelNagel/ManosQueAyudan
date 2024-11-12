@@ -21,18 +21,24 @@ const Navbar = () => {
           ManosQueAyudan
         </Link>
         <Nav className="ml-auto">
-          {user && (
-            <Dropdown>
-              <Dropdown.Toggle variant="success" id="dropdown-basic">
-                Actions
-              </Dropdown.Toggle>
-              <Dropdown.Menu>
-                <Dropdown.Item as={Link} to="/projects/new">Crear Proyecto</Dropdown.Item>
-                <Dropdown.Item as={Link} to="/projects">Mis Proyectos</Dropdown.Item>
-                <Dropdown.Item as={Link} to="/projects/search">Buscar Proyectos</Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
-          )}
+        <Dropdown>
+            <Dropdown.Toggle variant="success" id="dropdown-basic">
+              Actions
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              {/* Show these items only when user is logged in */}
+              {user && (
+                <>
+                  <Dropdown.Item as={Link} to="/projects/new">Crear Proyecto</Dropdown.Item>
+                  <Dropdown.Item as={Link} to="/projects">Mis Proyectos</Dropdown.Item>
+                  <Dropdown.Item as={Link} to="/projects/joined">Proyectos Unidos</Dropdown.Item>
+
+                </>
+              )}
+              {/* This item is always visible */}
+              <Dropdown.Item as={Link} to="/projects/search">Buscar Proyectos</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
           
           <Dropdown>
             <Dropdown.Toggle variant="outline-primary" id="dropdown-user">

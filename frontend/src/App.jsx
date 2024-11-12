@@ -10,6 +10,7 @@ import Project from './pages/Project/Project';
 import Countries from './pages/Countries/Countries'
 import PasswordReset from './pages/PasswordReset/PasswordReset';
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
+import ProjectSearch from './pages/ProjectSearch/ProjectSearch';
 
 function App() {
   return (
@@ -21,11 +22,14 @@ function App() {
           <Route path="/register" element={<Registro />} />
           <Route path="/countries" element={<Countries/>} />
           <Route path="/passwordReset"element={<PasswordReset/>} />
+          <Route path="/projects/search" element={<ProjectSearch />} />
           <Route element={<PrivateRoute />}>
             <Route path="/perfil" element={<Perfil />} />
-            <Route path="/projects" element={<ProjectList />} />
+            <Route path="/projects" element={<ProjectList mode="owned"/>} />
             <Route path="/projects/new" element={<Project />} />
             <Route path="/projects/edit/:id" element={<Project />} />
+            <Route path="/projects/joined" element={<ProjectList mode="joined" />} />
+            <Route path="/projects/joined/:id" element={<Project mode="view" />} />
           </Route>
         </Routes>
       </Router>

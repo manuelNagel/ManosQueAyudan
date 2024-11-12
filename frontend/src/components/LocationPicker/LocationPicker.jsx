@@ -15,6 +15,10 @@ const defaultIcon = L.icon({
   popupAnchor: [1, -34],
   shadowSize: [41, 41]
 });
+const defaultLocation = {
+  lat: -34.603722,
+  lng: -58.381592
+};
 
 L.Marker.prototype.options.icon = defaultIcon;
 
@@ -49,6 +53,8 @@ const LocationPicker = ({ initialLocation, initialLocalizacion, onLocationChange
       handleSearchQueryChange,
     } = useLocationPicker(initialLocation, initialLocalizacion);
   
+    const location = initialLocation?.lat && initialLocation?.lng ? 
+    initialLocation : defaultLocation;
   const handleLocationSelect = async (latlng) => {
     const locationData = await handleMapClick(latlng);
     if (locationData) {
