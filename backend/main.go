@@ -60,7 +60,8 @@ func main() {
 	e.GET("/api/countries", countryController.GetCountries)
 	e.GET("/api/projects/search", proyectoController.SearchProyectosByLocation, optionalAuth(store, userService))
 	e.POST("/api/reset-password", authController.ResetPassword)
-	
+	e.GET("api/proys", proyectoController.ListJoinedProyectos)
+
 	// Rutas protegidas
 	r := e.Group("/api")
 	r.Use(requireAuth(store, userService))
@@ -73,8 +74,7 @@ func main() {
 	r.POST("/projects/:id/leave", proyectoController.LeaveProject)
 	r.DELETE("/projects/:id/participants/:participantId", proyectoController.RemoveParticipant)
 	r.GET("/projects/:id/participants", proyectoController.GetParticipants)
-	r.GET("/api/projects/joined", proyectoController.ListJoinedProyectos)
-
+	r.GET("/projects/joined", proyectoController.ListJoinedProyectos)
 
 	r.POST("/projects", proyectoController.CreateProyecto)
 	r.GET("/projects/:id", proyectoController.GetProyecto)
@@ -112,25 +112,25 @@ func requireAuth(store *sessions.CookieStore, userService *services.UsuarioServi
 }
 
 func optionalAuth(store *sessions.CookieStore, userService *services.UsuarioService) echo.MiddlewareFunc {
-    return func(next echo.HandlerFunc) echo.HandlerFunc {
-        return func(c echo.Context) error {
-            session, err := store.Get(c.Request(), "session-name")
-            if err != nil {
-                return next(c)
-            }
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			session, err := store.Get(c.Request(), "session-name")
+			if err != nil {
+				return next(c)
+			}
 
-            userID, ok := session.Values["user_id"]
-            if !ok {
-                return next(c)
-            }
+			userID, ok := session.Values["user_id"]
+			if !ok {
+				return next(c)
+			}
 
-            user, err := userService.GetUsuario(userID.(uint))
-            if err != nil {
-                return next(c)
-            }
+			user, err := userService.GetUsuario(userID.(uint))
+			if err != nil {
+				return next(c)
+			}
 
-            c.Set("user", user)
-            return next(c)
-        }
-    }
+			c.Set("user", user)
+			return next(c)
+		}
+	}
 }

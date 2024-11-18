@@ -23,7 +23,7 @@ const Navbar = () => {
         <Nav className="ml-auto">
         <Dropdown>
             <Dropdown.Toggle variant="success" id="dropdown-basic">
-              Actions
+              Quiero
             </Dropdown.Toggle>
             <Dropdown.Menu>
               {/* Show these items only when user is logged in */}
