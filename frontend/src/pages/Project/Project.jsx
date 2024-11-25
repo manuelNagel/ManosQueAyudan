@@ -49,10 +49,12 @@ const Project = () => {
   const fetchProject = async () => {
     try {
       setLoading(true);
+      setError(null);
       const response = await axios.get(`/api/projects/${id}`);
       const fetchedProject = response.data;
       setProject({
         ...fetchedProject,
+        actividades: fetchedProject.actividades || [], 
         fechaInicio: fetchedProject.fechaInicio ? fetchedProject.fechaInicio.split('T')[0] : '',
         fechaFinalizacion: fetchedProject.fechaFinalizacion ? fetchedProject.fechaFinalizacion.split('T')[0] : '',
         horarioInicio: fetchedProject.horarioInicio ? new Date(fetchedProject.horarioInicio).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '',
@@ -203,9 +205,10 @@ const Project = () => {
   );
 
   const renderActivities = () => (
-    <>
+    <div className="mt-4">
+      <h2>Actividades</h2>
       <ActividadList 
-        activities={project.actividades} 
+        activities={project?.actividades || []}
         editActivity={!isViewMode ? editActivity : undefined}
         deleteActivity={!isViewMode ? deleteActivity : undefined}
       />
@@ -219,7 +222,7 @@ const Project = () => {
           />
         </>
       )}
-    </>
+    </div>
   );
 
   return (

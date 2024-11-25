@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Table, Button, Alert } from 'react-bootstrap';
+import { Container, Table, Button, Alert, Modal } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../Navbar/Navbar';
@@ -9,6 +9,7 @@ const ProjectList = ({ mode = 'owned' }) => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showLeaveModal, setShowLeaveModal] = useState(false);
   const [showDenunciaModal, setShowDenunciaModal] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
 
@@ -47,6 +48,39 @@ const ProjectList = ({ mode = 'owned' }) => {
       }
     }
   };
+
+  const handleLeaveProject = async () => {
+    if (!selectedProject) return;
+    
+    try {
+      await axios.post(`/api/projects/${selectedProject.idProyecto}/leave`);
+      setShowLeaveModal(false);
+      setSelectedProject(null);
+      fetchProjects();
+    } catch (error) {
+      setError('Error al abandonar el proyecto: ' + 
+        (error.response?.data?.error || error.message));
+    }
+  };
+
+  const LeaveProjectModal = () => (
+    <Modal show={showLeaveModal} onHide={() => setShowLeaveModal(false)}>
+      <Modal.Header closeButton>
+        <Modal.Title>Abandonar Proyecto</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        ¿Estás seguro que deseas abandonar el proyecto "{selectedProject?.nombre}"?
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={() => setShowLeaveModal(false)}>
+          Cancelar
+        </Button>
+        <Button variant="danger" onClick={handleLeaveProject}>
+          Abandonar
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  );
 
   if (loading) {
     return (
@@ -144,16 +178,30 @@ const ProjectList = ({ mode = 'owned' }) => {
                       </Button>
                     )}
                     {mode === 'joined' && (
-                      <Button
-                        variant="warning"
-                        size="sm"
-                        onClick={() => {
-                          setSelectedProject(project);
-                          setShowDenunciaModal(true);
-                        }}
-                      >
-                        Reportar
-                      </Button>
+                      <>
+                        <Button
+                          variant="warning"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedProject(project);
+                            setShowDenunciaModal(true);
+                          }}
+                        >
+                          Reportar
+                        </Button>
+                        {project.userRole !== 'Administrador' && (
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedProject(project);
+                              setShowLeaveModal(true);
+                            }}
+                          >
+                            Abandonar
+                          </Button>
+                        )}
+                      </>
                     )}
                   </div>
                 </td>
@@ -163,6 +211,8 @@ const ProjectList = ({ mode = 'owned' }) => {
         </Table>
       )}
 
+      <LeaveProjectModal />
+      
       <DenunciaModal
         show={showDenunciaModal}
         handleClose={() => {

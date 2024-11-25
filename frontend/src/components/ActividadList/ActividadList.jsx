@@ -1,54 +1,75 @@
 import React from 'react';
-import { Table, Button } from 'react-bootstrap';
+import { Table, Button, Badge, Alert } from 'react-bootstrap';
 
 const ActividadList = ({ activities, editActivity, deleteActivity }) => {
-  const isEditable = !!editActivity && !!deleteActivity;
+  // Defensive check for null/undefined activities
+  if (!activities) {
+    return (
+      <Alert variant="info">
+        No hay actividades disponibles
+      </Alert>
+    );
+  }
+
+  // Ensure activities is treated as an array
+  const ActividadList = Array.isArray(activities) ? activities : [];
+
+  if (ActividadList.length === 0) {
+    return (
+      <Alert variant="info">
+        No hay actividades registradas para este proyecto
+      </Alert>
+    );
+  }
 
   return (
-    <Table striped bordered hover>
+    <Table responsive striped bordered hover>
       <thead>
         <tr>
+          <th>#</th>
           <th>Nombre</th>
           <th>Descripción</th>
           <th>Estado</th>
-          {isEditable && <th>Acciones</th>}
+          {(editActivity || deleteActivity) && <th>Acciones</th>}
         </tr>
       </thead>
       <tbody>
-        {activities.map((activity) => {
-          const key = activity.NumeroActividad || activity.id || `${activity.nombre}-${activity.descripcion}`;
-          
-          return (
-            <tr key={key}>
-              <td>{activity.nombre}</td>
-              <td>{activity.descripcion}</td>
+        {ActividadList.map((activity) => (
+          <tr key={activity.NumeroActividad || activity.numeroActividad}>
+            <td>{activity.NumeroActividad || activity.numeroActividad}</td>
+            <td>{activity.Nombre || activity.nombre}</td>
+            <td>{activity.Descripcion || activity.descripcion}</td>
+            <td>
+              <Badge bg={activity.Estado || activity.estado ? 'success' : 'warning'}>
+                {(activity.Estado || activity.estado) ? 'Completada' : 'Pendiente'}
+              </Badge>
+            </td>
+            {(editActivity || deleteActivity) && (
               <td>
-                <span className={`badge ${activity.estado ? 'bg-success' : 'bg-warning'}`}>
-                  {activity.estado ? 'Completada' : 'Pendiente'}
-                </span>
+                <div className="d-flex gap-2">
+                  {editActivity && (
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onClick={() => editActivity(activity.NumeroActividad || activity.numeroActividad, activity)}
+                    >
+                      Editar
+                    </Button>
+                  )}
+                  {deleteActivity && (
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={() => deleteActivity(activity.NumeroActividad || activity.numeroActividad)}
+                    >
+                      Eliminar
+                    </Button>
+                  )}
+                </div>
               </td>
-              {isEditable && (
-                <td>
-                  <Button 
-                    variant="primary" 
-                    size="sm" 
-                    className="me-2"
-                    onClick={() => editActivity(activity.NumeroActividad || activity.id, activity)}
-                  >
-                    Editar
-                  </Button>
-                  <Button 
-                    variant="danger" 
-                    size="sm"
-                    onClick={() => deleteActivity(activity.NumeroActividad || activity.id)}
-                  >
-                    Eliminar
-                  </Button>
-                </td>
-              )}
-            </tr>
-          );
-        })}
+            )}
+          </tr>
+        ))}
       </tbody>
     </Table>
   );

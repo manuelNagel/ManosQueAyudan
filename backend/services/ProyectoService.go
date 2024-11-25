@@ -247,32 +247,44 @@ func (s *ProyectoService) DeleteProyecto(id uint) error {
 }
 
 func (s *ProyectoService) JoinProject(proyectoID, usuarioID uint) error {
-	return s.DB.Transaction(func(tx *gorm.DB) error {
+    return s.DB.Transaction(func(tx *gorm.DB) error {
+        // chequeo de habilitación y existencia
+        var proyecto models.Proyecto
+        if err := tx.Where("IdProyecto = ? AND Habilitado = ? AND Eliminado = ?",
+            proyectoID, true, false).First(&proyecto).Error; err != nil {
+            return fmt.Errorf("proyecto no encontrado o no habilitado")
+        }
 
-		var proyecto models.Proyecto
-		if err := tx.Where("IdProyecto = ? AND Habilitado = ? AND Eliminado = ?", proyectoID, true, false).First(&proyecto).Error; err != nil {
-			return fmt.Errorf("proyecto no encontrado o no habilitado")
-		}
+        // chequeo de kickeo
+        var kickRecord models.KickedUser
+        err := tx.Where("IdProyecto = ? AND IdUsuario = ?", proyectoID, usuarioID).
+            First(&kickRecord).Error
+        if err == nil {
+            return fmt.Errorf("no puedes unirte a este proyecto porque fuiste expulsado")
+        }
 
-		var existing models.ProyectosUsuarios
-		err := tx.Where("IdProyecto = ? AND IdUsuario = ? AND FechaFin IS NULL", proyectoID, usuarioID).First(&existing).Error
-		if err == nil {
-			return fmt.Errorf("usuario ya está participando en este proyecto")
-		}
+        //creación de participación
+        proyectoUsuario := models.ProyectosUsuarios{
+            IdProyecto:  proyectoID,
+            IdUsuario:   usuarioID,
+            IdRol:       RolParticipante,
+            FechaInicio: time.Now(),
+        }
 
-		proyectoUsuario := models.ProyectosUsuarios{
-			IdProyecto:  proyectoID,
-			IdUsuario:   usuarioID,
-			IdRol:       RolParticipante,
-			FechaInicio: time.Now(),
-		}
+        if err := tx.Create(&proyectoUsuario).Error; err != nil {
+            return fmt.Errorf("error al unir al proyecto: %v", err)
+        }
 
-		if err := tx.Create(&proyectoUsuario).Error; err != nil {
-			return fmt.Errorf("error al unir al proyecto: %v", "No puedes unirte al proyecto")
-		}
+        return nil
+    })
+}
 
-		return nil
-	})
+func (s *ProyectoService) WasUserKicked(proyectoID, usuarioID uint) (bool, error) {
+    var count int64
+    err := s.DB.Model(&models.KickedUser{}).
+        Where("IdProyecto = ? AND IdUsuario = ?", proyectoID, usuarioID).
+        Count(&count).Error
+    return count > 0, err
 }
 
 func (s *ProyectoService) LeaveProject(proyectoID, usuarioID uint) error {
@@ -385,38 +397,51 @@ func (s *ProyectoService) IsProjectAdmin(proyectoID, usuarioID uint) (bool, erro
 	return count > 0, err
 }
 
-func (s *ProyectoService) RemoveParticipant(proyectoID, adminID, participantID uint) error {
-	return s.DB.Transaction(func(tx *gorm.DB) error {
-		// Verify admin status
-		var adminRole models.ProyectosUsuarios
-		err := tx.Where("IdProyecto = ? AND IdUsuario = ? AND IdRol = ? AND FechaFin IS NULL",
-			proyectoID, adminID, RolAdmin).First(&adminRole).Error
-		if err != nil {
-			return fmt.Errorf("no tienes permisos de administrador para este proyecto")
-		}
+func (s *ProyectoService) RemoveParticipant(proyectoID, adminID, participantID uint, reason string) error {
+    return s.DB.Transaction(func(tx *gorm.DB) error {
+        // Verificación admin
+        var adminRole models.ProyectosUsuarios
+        err := tx.Where("IdProyecto = ? AND IdUsuario = ? AND IdRol = ? AND FechaFin IS NULL",
+            proyectoID, adminID, RolAdmin).First(&adminRole).Error
+        if err != nil {
+            return fmt.Errorf("no tienes permisos de administrador para este proyecto")
+        }
 
-		// Prevent self-removal as admin
-		if adminID == participantID {
-			return fmt.Errorf("no puedes removerte a ti mismo como administrador")
-		}
+        // validación para evitar al admin que se auto-remueva
+        if adminID == participantID {
+            return fmt.Errorf("no puedes removerte a ti mismo como administrador")
+        }
 
-		// Set FechaFin to current time for the participant
-		now := time.Now()
-		result := tx.Model(&models.ProyectosUsuarios{}).
-			Where("IdProyecto = ? AND IdUsuario = ? AND FechaFin IS NULL",
-				proyectoID, participantID).
-			Update("FechaFin", now)
+        // kickeo
+        now := time.Now()
+        result := tx.Model(&models.ProyectosUsuarios{}).
+            Where("IdProyecto = ? AND IdUsuario = ? AND FechaFin IS NULL",
+                proyectoID, participantID).
+            Update("FechaFin", now)
 
-		if result.Error != nil {
-			return fmt.Errorf("error al remover participante: %v", result.Error)
-		}
+        if result.Error != nil {
+            return fmt.Errorf("error al remover participante: %v", result.Error)
+        }
 
-		if result.RowsAffected == 0 {
-			return fmt.Errorf("participante no encontrado o ya removido")
-		}
+        if result.RowsAffected == 0 {
+            return fmt.Errorf("participante no encontrado o ya removido")
+        }
 
-		return nil
-	})
+        // guardar el kick
+        kickRecord := models.KickedUser{
+            IdProyecto: proyectoID,
+            IdUsuario:  participantID,
+            KickedBy:   adminID,
+            KickDate:   now,
+            Reason:     reason,
+        }
+
+        if err := tx.Create(&kickRecord).Error; err != nil {
+            return fmt.Errorf("error al registrar expulsión: %v", err)
+        }
+
+        return nil
+    })
 }
 
 // Get detailed participant information
