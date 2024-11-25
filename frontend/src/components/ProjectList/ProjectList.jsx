@@ -1,14 +1,16 @@
-// components/ProjectList/ProjectList.js
 import React, { useState, useEffect } from 'react';
 import { Container, Table, Button, Alert } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../Navbar/Navbar';
+import DenunciaModal from '../DenunciaModal/DenunciaModal';
 
 const ProjectList = ({ mode = 'owned' }) => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showDenunciaModal, setShowDenunciaModal] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
 
   useEffect(() => {
     fetchProjects();
@@ -19,7 +21,6 @@ const ProjectList = ({ mode = 'owned' }) => {
       setLoading(true);
       setError(null);
       
-      // Use different endpoints based on mode
       const endpoint = mode === 'joined' ? '/api/projects/joined' : '/api/projects';
       const response = await axios.get(endpoint);
       
@@ -124,30 +125,54 @@ const ProjectList = ({ mode = 'owned' }) => {
                   </td>
                 )}
                 <td>
-                  <Link to={`/projects/${mode === 'joined' ? 'joined/' : 'edit/'}${project.idProyecto}`}>
-                    <Button 
-                      variant="primary" 
-                      size="sm" 
-                      className="me-2"
-                    >
-                      {mode === 'joined' ? 'Ver' : 'Editar'}
-                    </Button>
-                  </Link>
-                  {mode === 'owned' && (
-                    <Button 
-                      variant="danger" 
-                      size="sm" 
-                      onClick={() => handleDelete(project.idProyecto)}
-                    >
-                      Eliminar
-                    </Button>
-                  )}
+                  <div className="d-flex gap-2">
+                    <Link to={`/projects/${mode === 'joined' ? 'joined/' : 'edit/'}${project.idProyecto}`}>
+                      <Button 
+                        variant="primary" 
+                        size="sm"
+                      >
+                        {mode === 'joined' ? 'Ver' : 'Editar'}
+                      </Button>
+                    </Link>
+                    {mode === 'owned' && (
+                      <Button 
+                        variant="danger" 
+                        size="sm" 
+                        onClick={() => handleDelete(project.idProyecto)}
+                      >
+                        Eliminar
+                      </Button>
+                    )}
+                    {mode === 'joined' && (
+                      <Button
+                        variant="warning"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedProject(project);
+                          setShowDenunciaModal(true);
+                        }}
+                      >
+                        Reportar
+                      </Button>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </Table>
       )}
+
+      <DenunciaModal
+        show={showDenunciaModal}
+        handleClose={() => {
+          setShowDenunciaModal(false);
+          setSelectedProject(null);
+        }}
+        tipo="Proyecto"
+        targetId={selectedProject?.idProyecto}
+        targetName={selectedProject?.nombre}
+      />
     </Container>
   );
 };

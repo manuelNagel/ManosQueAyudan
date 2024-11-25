@@ -35,6 +35,16 @@ CREATE TABLE `Actividad` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `Actividad`
+--
+
+LOCK TABLES `Actividad` WRITE;
+/*!40000 ALTER TABLE `Actividad` DISABLE KEYS */;
+INSERT INTO `Actividad` VALUES (1,'barrer','barrer',0,6),(2,'asdfasd','fdsa',0,3),(3,'comprar birras','ir al kiosco ',0,4),(4,'hdfg','ghdf',1,5);
+/*!40000 ALTER TABLE `Actividad` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `Denuncia`
 --
 
@@ -44,15 +54,26 @@ DROP TABLE IF EXISTS `Denuncia`;
 CREATE TABLE `Denuncia` (
   `IdDenuncia` int unsigned NOT NULL AUTO_INCREMENT,
   `Fecha` datetime(3) DEFAULT NULL,
-  `Descripcion` longtext,
-  `Habilitado` tinyint(1) NOT NULL,
+  `Descripcion` text NOT NULL,
+  `Habilitado` tinyint(1) NOT NULL DEFAULT '1',
   `IdUsuario` int unsigned DEFAULT NULL,
-  `Estado` longtext,
+  `Estado` enum('Pendiente','En Revisión','Resuelta','Desestimada') NOT NULL DEFAULT 'Pendiente',
+  `TipoDenuncia` enum('Usuario','Proyecto') NOT NULL,
   PRIMARY KEY (`IdDenuncia`),
   KEY `fk_Denuncia_Usuario` (`IdUsuario`),
   CONSTRAINT `fk_Denuncia_Usuario` FOREIGN KEY (`IdUsuario`) REFERENCES `Usuario` (`Id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `Denuncia`
+--
+
+LOCK TABLES `Denuncia` WRITE;
+/*!40000 ALTER TABLE `Denuncia` DISABLE KEYS */;
+INSERT INTO `Denuncia` VALUES (1,'2024-11-25 16:56:01.043','algo',1,6,'Pendiente','Usuario'),(2,'2024-11-25 16:56:13.690','algo2',1,6,'Pendiente','Usuario'),(3,'2024-11-25 17:04:32.720','una denuncia',1,6,'Pendiente','Usuario'),(4,'2024-11-25 17:04:40.467','otra denuncia',1,6,'Pendiente','Usuario');
+/*!40000 ALTER TABLE `Denuncia` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `Denuncia_Proyecto`
@@ -72,6 +93,16 @@ CREATE TABLE `Denuncia_Proyecto` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `Denuncia_Proyecto`
+--
+
+LOCK TABLES `Denuncia_Proyecto` WRITE;
+/*!40000 ALTER TABLE `Denuncia_Proyecto` DISABLE KEYS */;
+INSERT INTO `Denuncia_Proyecto` VALUES (4,5),(3,6);
+/*!40000 ALTER TABLE `Denuncia_Proyecto` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `Denuncia_Usuario`
 --
 
@@ -87,6 +118,16 @@ CREATE TABLE `Denuncia_Usuario` (
   CONSTRAINT `fk_Denuncia_Usuario_Usuario` FOREIGN KEY (`UsuarioDenunciado`) REFERENCES `Usuario` (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `Denuncia_Usuario`
+--
+
+LOCK TABLES `Denuncia_Usuario` WRITE;
+/*!40000 ALTER TABLE `Denuncia_Usuario` DISABLE KEYS */;
+INSERT INTO `Denuncia_Usuario` VALUES (1,13),(2,13);
+/*!40000 ALTER TABLE `Denuncia_Usuario` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `denuncia_usuarios`
@@ -106,6 +147,15 @@ CREATE TABLE `denuncia_usuarios` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `denuncia_usuarios`
+--
+
+LOCK TABLES `denuncia_usuarios` WRITE;
+/*!40000 ALTER TABLE `denuncia_usuarios` DISABLE KEYS */;
+/*!40000 ALTER TABLE `denuncia_usuarios` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `Feedback`
 --
 
@@ -114,16 +164,38 @@ DROP TABLE IF EXISTS `Feedback`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Feedback` (
   `IdFeedback` int unsigned NOT NULL AUTO_INCREMENT,
+  `IdProyecto` int unsigned NOT NULL,
+  `IdAutor` int unsigned NOT NULL,
+  `IdDestinatario` int unsigned NOT NULL,
   `Fecha` datetime DEFAULT CURRENT_TIMESTAMP,
   `Puntuacion` int NOT NULL,
-  `Descripcion` varchar(255) NOT NULL,
-  `RolAutor` tinyint(1) NOT NULL,
-  `RolDestinatario` tinyint(1) NOT NULL,
-  `Habilitado` tinyint(1) NOT NULL,
-  `Respuesta` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`IdFeedback`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `Descripcion` text,
+  `RolAutor` int unsigned NOT NULL,
+  `RolDestinatario` int unsigned NOT NULL,
+  `Habilitado` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`IdFeedback`),
+  KEY `fk_Feedback_Proyecto` (`IdProyecto`),
+  KEY `fk_Feedback_Autor` (`IdAutor`),
+  KEY `fk_Feedback_Destinatario` (`IdDestinatario`),
+  KEY `fk_Feedback_RolAutor` (`RolAutor`),
+  KEY `fk_Feedback_RolDestinatario` (`RolDestinatario`),
+  CONSTRAINT `fk_Feedback_Autor` FOREIGN KEY (`IdAutor`) REFERENCES `Usuario` (`Id`),
+  CONSTRAINT `fk_Feedback_Destinatario` FOREIGN KEY (`IdDestinatario`) REFERENCES `Usuario` (`Id`),
+  CONSTRAINT `fk_Feedback_Proyecto` FOREIGN KEY (`IdProyecto`) REFERENCES `Proyecto` (`IdProyecto`),
+  CONSTRAINT `fk_Feedback_RolAutor` FOREIGN KEY (`RolAutor`) REFERENCES `Rol_Proyecto` (`IdRol`),
+  CONSTRAINT `fk_Feedback_RolDestinatario` FOREIGN KEY (`RolDestinatario`) REFERENCES `Rol_Proyecto` (`IdRol`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `Feedback`
+--
+
+LOCK TABLES `Feedback` WRITE;
+/*!40000 ALTER TABLE `Feedback` DISABLE KEYS */;
+INSERT INTO `Feedback` VALUES (1,5,13,6,'2024-11-25 14:29:45',5,'fadsf',2,1,1);
+/*!40000 ALTER TABLE `Feedback` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `Habilidad`
@@ -141,6 +213,15 @@ CREATE TABLE `Habilidad` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `Habilidad`
+--
+
+LOCK TABLES `Habilidad` WRITE;
+/*!40000 ALTER TABLE `Habilidad` DISABLE KEYS */;
+/*!40000 ALTER TABLE `Habilidad` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `Habilidades`
 --
 
@@ -156,19 +237,13 @@ CREATE TABLE `Habilidades` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `Inscripcion`
+-- Dumping data for table `Habilidades`
 --
 
-DROP TABLE IF EXISTS `Inscripcion`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Inscripcion` (
-  `IdInscripcion` int unsigned NOT NULL AUTO_INCREMENT,
-  `FechaInscripcion` datetime DEFAULT CURRENT_TIMESTAMP,
-  `FechaFinalizacion` datetime DEFAULT NULL,
-  PRIMARY KEY (`IdInscripcion`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+LOCK TABLES `Habilidades` WRITE;
+/*!40000 ALTER TABLE `Habilidades` DISABLE KEYS */;
+/*!40000 ALTER TABLE `Habilidades` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `Notificacion`
@@ -187,6 +262,15 @@ CREATE TABLE `Notificacion` (
   CONSTRAINT `fk_Notificacion_Usuario` FOREIGN KEY (`UsuarioNotificado`) REFERENCES `Usuario` (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `Notificacion`
+--
+
+LOCK TABLES `Notificacion` WRITE;
+/*!40000 ALTER TABLE `Notificacion` DISABLE KEYS */;
+/*!40000 ALTER TABLE `Notificacion` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `Proyecto`
@@ -211,8 +295,18 @@ CREATE TABLE `Proyecto` (
   `Eliminado` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`IdProyecto`),
   KEY `idx_proyecto_location` (`Latitud`,`Longitud`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `Proyecto`
+--
+
+LOCK TABLES `Proyecto` WRITE;
+/*!40000 ALTER TABLE `Proyecto` DISABLE KEYS */;
+INSERT INTO `Proyecto` VALUES (3,'2024-10-24 00:00:00.000','Neuquen',0.00000000,0.00000000,'2024-12-09 00:00:00.000',1,'Un Proyecto','asdfsdfa','2024-10-24 17:44:00.000','2024-10-24 20:53:00.000',1,0),(4,'2024-10-20 21:00:00.000','Neuquen',NULL,NULL,'2024-10-21 21:00:00.000',1,'Toma de la facultad','toma vigilia actica','1970-01-01 13:16:00.000',NULL,1,0),(5,'2024-11-10 00:00:00.000','Avenida Corrientes, Microcentro, San Nicolás, Buenos Aires, Comuna 1, Autonomous City of Buenos Aires, C1010, Argentina',-34.60382392,-58.38186264,'2025-12-10 00:00:00.000',1,'otro proyecto','fdasfd','2024-11-10 18:06:00.000','2024-11-10 20:08:00.000',1,0),(6,'2024-11-23 00:00:00.000','997, Tucumán, Microcentro, San Nicolás, Buenos Aires, Comuna 1, Autonomous City of Buenos Aires, C1043AAA, Argentina',-34.60128058,-58.38091850,'2024-11-27 00:00:00.000',1,'un proyecto cualquiera','esta bueno el proyecto','2024-11-23 17:57:00.000','2024-11-23 19:57:00.000',1,0);
+/*!40000 ALTER TABLE `Proyecto` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `Proyectos_Usuarios`
@@ -237,6 +331,16 @@ CREATE TABLE `Proyectos_Usuarios` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `Proyectos_Usuarios`
+--
+
+LOCK TABLES `Proyectos_Usuarios` WRITE;
+/*!40000 ALTER TABLE `Proyectos_Usuarios` DISABLE KEYS */;
+INSERT INTO `Proyectos_Usuarios` VALUES (5,6,1,'2024-11-11 19:46:53',NULL),(5,13,2,'2024-11-11 20:42:50',NULL),(6,13,1,'2024-11-25 16:57:59',NULL);
+/*!40000 ALTER TABLE `Proyectos_Usuarios` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `Rol_Proyecto`
 --
 
@@ -254,6 +358,16 @@ CREATE TABLE `Rol_Proyecto` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `Rol_Proyecto`
+--
+
+LOCK TABLES `Rol_Proyecto` WRITE;
+/*!40000 ALTER TABLE `Rol_Proyecto` DISABLE KEYS */;
+INSERT INTO `Rol_Proyecto` VALUES (1,'Administrador','Administrador del proyecto con todos los permisos',NULL,NULL),(2,'Participante','Participante regular del proyecto',NULL,NULL);
+/*!40000 ALTER TABLE `Rol_Proyecto` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `Rol_Sistema`
 --
 
@@ -269,6 +383,15 @@ CREATE TABLE `Rol_Sistema` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `Rol_Sistema`
+--
+
+LOCK TABLES `Rol_Sistema` WRITE;
+/*!40000 ALTER TABLE `Rol_Sistema` DISABLE KEYS */;
+/*!40000 ALTER TABLE `Rol_Sistema` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `schema_migrations`
 --
 
@@ -281,6 +404,16 @@ CREATE TABLE `schema_migrations` (
   PRIMARY KEY (`version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `schema_migrations`
+--
+
+LOCK TABLES `schema_migrations` WRITE;
+/*!40000 ALTER TABLE `schema_migrations` DISABLE KEYS */;
+INSERT INTO `schema_migrations` VALUES (1,0);
+/*!40000 ALTER TABLE `schema_migrations` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `Usuario`
@@ -316,6 +449,16 @@ CREATE TABLE `Usuario` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `Usuario`
+--
+
+LOCK TABLES `Usuario` WRITE;
+/*!40000 ALTER TABLE `Usuario` DISABLE KEYS */;
+INSERT INTO `Usuario` VALUES (6,'manu','nagel','juanmanage@gmail.com','$2a$10$3u7hEx2CF8ovWjLpUwEPku4bQ3MP33x5josBPIAqGbs9L./I3.lb6',0,'F9HQ97Z3l1MpXs7UauhFyiwoLNUtlQD+OSoXri3vqYqSNwQC4bgcxxGGcIGmQO8YBXAt+WtQIv+QX5hJ2af9mU0os9WS/PfkSteqXPlapECe2DCzEPmaH4YmDtMDyoDK+D0tFTeD2jRCl9S8gzY4zyA1sxiz5jPD4lZrCmEAlq3i4IhsfvyVsE4V5anUpoep9/602PWZHVzyskw=',2,'2024-10-07 19:58:06.243','2024-11-11 19:47:17.884',NULL,'2024-10-07 19:58:06.243','2024-11-11 19:47:17.884',NULL,'j5e474k0cMFKJKlH8lk+4Lqpt0g/Ech4XihzUpD1UIP1HGxA4OiKWoPO','UruhjrZJiRir+QyM8CbgeuDuaV4tj3EF+S5jj02UnOCvVDd+glWpmkW3','AR',NULL,NULL,0),(7,'juan','nagel','manu_nael@outlook.com','$2a$10$eBOkiLAj27Q1njh/My3Fxe1C8TAL.8xEQP5uYmzm4kA/ygY7Xo6G2',0,NULL,0,'2024-10-09 15:55:26.761','2024-10-09 15:55:26.761',NULL,'2024-10-09 15:55:26.760','2024-10-09 15:55:26.760',NULL,NULL,NULL,NULL,NULL,NULL,0),(8,'juan','Nagel','juan.nagel@est.fi.uncoma.edu.ar','$2a$10$DhTpxiEv4LPBiXxujqKesuE5KIRfZvytGO0cuIgnvz4W97H8DQk6S',0,NULL,0,'2024-10-09 16:19:40.499','2024-10-09 16:19:40.499',NULL,'2024-10-09 16:19:40.495','2024-10-09 16:19:40.495',NULL,NULL,NULL,NULL,NULL,NULL,0),(9,'Daniel','Dolz','ddolz@est.fi.uncoma.edu.ar','$2a$10$mWdb8pEFow1xXOrkwUBdtOFu/MB2.Vmqsxs7wWfEytRyRlE4OCCRW',0,NULL,0,'2024-10-22 19:08:09.215','2024-10-22 19:08:09.215',NULL,'2024-10-22 19:08:09.212','2024-10-22 19:08:09.212',NULL,NULL,NULL,NULL,NULL,NULL,0),(10,'dan','dolz','dan@hotmail.com','$2a$10$IONSdFkL2w359gKmfhw63er8VdWYqrp1J4/iEEBIUUUt5hSpg6B92',0,NULL,0,'2024-10-22 19:09:21.496','2024-10-22 19:09:21.496',NULL,'2024-10-22 19:09:21.495','2024-10-22 19:09:21.495',NULL,NULL,NULL,NULL,NULL,NULL,0),(11,'percy','alvarez','perc@hotmail.com','$2a$10$vkliQ2VDhRvuIp7RQeMCEu8ZGE515xnz0mZPJZfsA7utfS3BwwJsC',0,NULL,0,'2024-10-22 19:10:46.994','2024-10-22 19:10:46.994',NULL,'2024-10-22 19:10:46.995','2024-10-22 19:10:46.995',NULL,NULL,NULL,NULL,NULL,NULL,0),(12,'manu','nagel','juanmanage@gmail.com','$2a$10$KbWbVK4YQq8Z.zQqvSvelOJIzam96x7EVPylcmO8MpHBBFP16owoq',0,'csSAO4MbHO/HsD5a0rXZ6qwuVUoBEfSYbM82JE7+T0ZyVg7uHt+GWsz7m946/p8hJJS/ptxmfNiBCuCH5aSGx1DKUqicPSRcd0qtf+34rXTvShIZUphR1KqcqT1EH7x++ZEK0KfTi/3wOy7siFqkqyPdS8IDDTf8BxNjI49mcnMVitFcsZvO+rfUVIghN3AMZki4OYHoaeYoM2ru7rekSx7HaCWcJeba',4,'2024-11-02 15:21:01.567','2024-11-02 15:21:37.103',NULL,'2024-11-02 15:21:01.567','2024-11-02 15:21:37.103',NULL,'8QJGSFn0q+MKHmCSTKz16+tSEyNAKYdSyGgjmyvnzZM+SMw1U/6i2a7g','1qBEmUJYqwpmd5VBOaFPMFUwNQ1Cwy+gme6H4uTSh1h2u+TcCfkqLtLh',NULL,NULL,NULL,0),(13,'manu','nagel','juan@gmail.com','$2a$10$5rVHAaxbRV7WG18wtBbQ6.8NxNr./Fj4xvrGXw4mo9vYly0eAwaOu',0,'8cW17rb1Y7g0hwhN3Tl3OAXnnuRdfHxJhVrvthwzbtf5BRhQdoy/OwaE4Hnq+3UFnUZ7SW0lHG2j9+nY99s2o7zCvFpFP9hNpviFL+amPgXEejf9vFN1W7ULQEIO7Q2oVydYeQZxVB9ECzR+WxfKVu/OkgrB9+BDG5Zvha2HgP7NazIkrlHTPLYy9xNJEt+UUAPJBsVE2REFHkZSQ4EsC7VjDDrFK9uDUE8=',4,'2024-11-02 15:28:15.510','2024-11-11 20:42:46.773',NULL,'2024-11-02 15:28:15.510','2024-11-11 20:42:46.774',NULL,'o6Jfp1tty6ELdU4I6HuQgkd6jP4xHbzXGjqE1SNaM6O6wTE93VI9Tm+C','X+swGaYmgoRQq29OxA2TDq6YPWvnZ2nLpjgRvcV+9VQkpOyB+lE+0xhd','AR',NULL,NULL,0);
+/*!40000 ALTER TABLE `Usuario` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `usuario_habilidades`
 --
 
@@ -333,6 +476,15 @@ CREATE TABLE `usuario_habilidades` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `usuario_habilidades`
+--
+
+LOCK TABLES `usuario_habilidades` WRITE;
+/*!40000 ALTER TABLE `usuario_habilidades` DISABLE KEYS */;
+/*!40000 ALTER TABLE `usuario_habilidades` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `UsuarioHabilidades`
 --
 
@@ -348,6 +500,15 @@ CREATE TABLE `UsuarioHabilidades` (
   CONSTRAINT `fk_UsuarioHabilidades_Usuario` FOREIGN KEY (`IdUsuario`) REFERENCES `Usuario` (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `UsuarioHabilidades`
+--
+
+LOCK TABLES `UsuarioHabilidades` WRITE;
+/*!40000 ALTER TABLE `UsuarioHabilidades` DISABLE KEYS */;
+/*!40000 ALTER TABLE `UsuarioHabilidades` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -358,4 +519,4 @@ CREATE TABLE `UsuarioHabilidades` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-11-11 21:56:29
+-- Dump completed on 2024-11-25 17:07:51

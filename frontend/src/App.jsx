@@ -11,6 +11,7 @@ import Countries from './pages/Countries/Countries'
 import PasswordReset from './pages/PasswordReset/PasswordReset';
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 import ProjectSearch from './pages/ProjectSearch/ProjectSearch';
+import Feedback from './pages/Feedback/Feedback';
 
 function App() {
   return (
@@ -30,6 +31,9 @@ function App() {
             <Route path="/projects/edit/:id" element={<Project />} />
             <Route path="/projects/joined" element={<ProjectList mode="joined" />} />
             <Route path="/projects/joined/:id" element={<Project mode="view" />} />
+            <Route path="/feedback" element={<Feedback/>} />
+
+
           </Route>
         </Routes>
       </Router>

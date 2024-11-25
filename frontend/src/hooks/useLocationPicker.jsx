@@ -18,7 +18,7 @@ export const useLocationPicker = (initialLocation, initialLocalizacion) => {
     
     setLoading(true);
     try {
-      // Using only the q parameter with country filter in the query
+      
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?` + 
         new URLSearchParams({

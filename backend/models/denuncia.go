@@ -3,16 +3,17 @@ import (
 	"time"
 )
 type Denuncia struct {
-    IdDenuncia  uint      `gorm:"column:IdDenuncia;primaryKey;type:int unsigned" json:"idDenuncia"`
-    Fecha       time.Time `gorm:"column:Fecha" json:"fecha"`
-    Descripcion string    `gorm:"column:Descripcion" json:"descripcion"`
-    Habilitado  bool      `gorm:"column:Habilitado" json:"habilitado"`
-    IdUsuario   uint      `gorm:"column:IdUsuario;type:int unsigned" json:"idUsuario"`
-    Estado      string    `gorm:"column:Estado" json:"estado"`
-    Usuario     Usuario   `gorm:"foreignKey:IdUsuario" json:"usuario"`
-    UsuariosDenunciados []Usuario `gorm:"many2many:Denuncia_Usuario;joinForeignKey:IdDenuncia;joinReferences:UsuarioDenunciado" json:"usuariosDenunciados"`
-    ProyectosDenunciados []Proyecto `gorm:"many2many:Denuncia_Proyecto;joinForeignKey:IdDenuncia;joinReferences:IdProyecto" json:"proyectosDenunciados"`
+    IdDenuncia  uint      `gorm:"column:IdDenuncia;primaryKey;autoIncrement" json:"idDenuncia"`
+    Fecha       time.Time `gorm:"column:Fecha;default:CURRENT_TIMESTAMP" json:"fecha"`
+    Descripcion string    `gorm:"column:Descripcion;type:text" json:"descripcion"`
+    Estado      string    `gorm:"column:Estado;type:ENUM('Pendiente','En Revisión','Resuelta','Desestimada');default:Pendiente" json:"estado"`
+    Habilitado  bool      `gorm:"column:Habilitado;default:true" json:"habilitado"`
+    IdUsuario   uint      `gorm:"column:IdUsuario" json:"idUsuario"` // Usuario que realiza la denuncia
 
+    // Relaciones
+    Usuario           Usuario   `gorm:"foreignKey:IdUsuario" json:"usuario"`
+    DenunciasUsuario  []DenunciaUsuario  `gorm:"foreignKey:IdDenuncia" json:"denunciasUsuario,omitempty"`
+    DenunciasProyecto []DenunciaProyecto `gorm:"foreignKey:IdDenuncia" json:"denunciasProyecto,omitempty"`
 }
 
 

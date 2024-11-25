@@ -1,14 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Container, Card, Button, Row, Col, Alert } from 'react-bootstrap';
 import { useAuth } from '../../context/AuthContext';
 import Navbar from '../../components/Navbar/Navbar';
 import LocationPicker from '../../components/LocationPicker/LocationPicker';
 import { useProjectSearch } from '../../hooks/useProjectSearch';
 import { useProjectParticipation } from '../../hooks/useProjectParticipation';
+import DenunciaModal from '../../components/DenunciaModal/DenunciaModal';
 
 const ProjectSearch = () => {
   const { user } = useAuth();
   const { joinProject, loading: joinLoading, error: joinError } = useProjectParticipation();
+  const [showDenunciaModal, setShowDenunciaModal] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
 
   const {
     projects,
@@ -113,31 +116,45 @@ const ProjectSearch = () => {
                           <strong>Participantes:</strong> {project.cantidadParticipantes}
                         </Card.Text>
                         <div className="d-flex justify-content-between align-items-center">
-                          {isAuthenticated ? (
-                            project.isMember ? (
-                              <Button 
-                                variant="secondary" 
-                                disabled
-                              >
-                                Ya eres miembro
-                              </Button>
+                          <div className="d-flex gap-2">
+                            {isAuthenticated ? (
+                              project.isMember ? (
+                                <Button 
+                                  variant="secondary" 
+                                  disabled
+                                >
+                                  Ya eres miembro
+                                </Button>
+                              ) : (
+                                <Button 
+                                  variant="primary"
+                                  onClick={() => handleJoinProject(project.idProyecto)}
+                                  disabled={joinLoading}
+                                >
+                                  {joinLoading ? 'Uniéndose...' : 'Unirse al Proyecto'}
+                                </Button>
+                              )
                             ) : (
                               <Button 
-                                variant="primary"
-                                onClick={() => handleJoinProject(project.idProyecto)}
-                                disabled={joinLoading}
+                                variant="primary" 
+                                href="/login"
                               >
-                                {joinLoading ? 'Uniéndose...' : 'Unirse al Proyecto'}
+                                Iniciar sesión para unirse
                               </Button>
-                            )
-                          ) : (
-                            <Button 
-                              variant="primary" 
-                              href="/login"
-                            >
-                              Iniciar sesión para unirse
-                            </Button>
-                          )}
+                            )}
+                            {isAuthenticated && (
+                              <Button
+                                variant="warning"
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedProject(project);
+                                  setShowDenunciaModal(true);
+                                }}
+                              >
+                                Reportar Proyecto
+                              </Button>
+                            )}
+                          </div>
                           <small className="text-muted">
                             {project.distance ? `${project.distance.toFixed(1)} km` : ''}
                           </small>
@@ -151,6 +168,17 @@ const ProjectSearch = () => {
           </>
         )}
       </Container>
+
+      <DenunciaModal
+        show={showDenunciaModal}
+        handleClose={() => {
+          setShowDenunciaModal(false);
+          setSelectedProject(null);
+        }}
+        tipo="Proyecto"
+        targetId={selectedProject?.idProyecto}
+        targetName={selectedProject?.nombre}
+      />
     </div>
   );
 };

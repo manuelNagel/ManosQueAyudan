@@ -26,7 +26,6 @@ const Navbar = () => {
               Quiero
             </Dropdown.Toggle>
             <Dropdown.Menu>
-              {/* Show these items only when user is logged in */}
               {user && (
                 <>
                   <Dropdown.Item as={Link} to="/projects/new">Crear Proyecto</Dropdown.Item>
@@ -48,6 +47,7 @@ const Navbar = () => {
               {user ? (
                 <>
                   <Dropdown.Item as={Link} to="/perfil">Ver Perfil</Dropdown.Item>
+                  <Dropdown.Item as={Link} to="/feedback">Mi Feedback</Dropdown.Item>
                   <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
                 </>
               ) : (

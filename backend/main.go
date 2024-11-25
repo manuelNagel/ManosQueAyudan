@@ -21,19 +21,22 @@ var (
 func main() {
 	cfg := config.LoadConfig()
 
-	// Initialize database with configuration
+	// Inicializa db con configuración
 	db, err := config.InitDB(cfg)
 	if err != nil {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
 
-	// Initialize services
+	// Inicializa services
 	userService := services.NewUsuarioService(db, cfg.EncryptionKey)
 	proyectoService := services.NewProyectoService(db)
 	countryService := services.NewCountryService()
+	feedbackService := services.NewFeedbackService(db)
+	denunciaService := services.NewDenunciaService(db)
+
 	//emailService := services.NewEmailService("smtp.gmail.com", "587", "praa.nqn@gmail.com", "wzwmvpdmwcvsfuut")
 	emailService := services.NewEmailService("smtp.gmail.com", "587", string(cfg.CuentaMail), cfg.PassMail)
-	// Initialize Echo
+	// Inicializa Echo
 	e := echo.New()
 
 	// Middleware
@@ -51,6 +54,10 @@ func main() {
 	userController := controllers.NewUsuarioController(userService)
 	proyectoController := controllers.NewProyectoController(proyectoService)
 	countryController := controllers.NewCountryController(countryService)
+	feedbackController := controllers.NewFeedbackController(feedbackService)
+	denunciaController := controllers.NewDenunciaController(denunciaService)
+
+
 
 	// Rutas publicas
 	e.POST("/api/login", authController.Login)
@@ -75,6 +82,15 @@ func main() {
 	r.DELETE("/projects/:id/participants/:participantId", proyectoController.RemoveParticipant)
 	r.GET("/projects/:id/participants", proyectoController.GetParticipants)
 	r.GET("/projects/joined", proyectoController.ListJoinedProyectos)
+	
+	r.POST("/feedback", feedbackController.CreateFeedback)
+	r.GET("/feedback/users/:userId/stats", feedbackController.GetUserFeedbackStats)
+	r.GET("/feedback/projects/:projectId", feedbackController.GetProjectFeedback)
+	r.GET("/feedback/users/:userId/given", feedbackController.GetUserGivenFeedback)
+
+	r.POST("/denuncias", denunciaController.CreateDenuncia)
+
+
 
 	r.POST("/projects", proyectoController.CreateProyecto)
 	r.GET("/projects/:id", proyectoController.GetProyecto)
