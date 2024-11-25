@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { Container, Form, Button, Alert } from 'react-bootstrap';
+import { Container, Form, Button, Alert,Tab,Tabs } from 'react-bootstrap';
 import axios from 'axios';
 
 import ProjectForm from '../../components/ProjectForm/ProjectForm';
@@ -9,6 +9,7 @@ import ActividadForm from '../../components/ActividadForm/ActividadForm';
 import Navbar from '../../components/Navbar/Navbar';
 import ParticipantList from '../../components/ParticipantList/ParticipantList';
 import ShareButton from '../../components/ShareButton/ShareButton';
+import StatsContainer from '../../components/StatsContainer/StatsContainer';
 import { AlignLeft } from 'lucide-react';
 
 const Project = () => {
@@ -30,6 +31,7 @@ const Project = () => {
   const [newActivity, setNewActivity] = useState({ nombre: '', descripcion: '', estado: false });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState('details'); 
   
   const { id } = useParams();
   const navigate = useNavigate();
@@ -174,18 +176,8 @@ const Project = () => {
     );
   }
 
-  return (
-    <Container>
-      <Navbar />
-      <div className="d-flex align-items-center justify-content-between mb-4">
-
-      <h1 className="mb-0">
-        {isViewMode ? 'Ver Proyecto' : id ? 'Editar Proyecto' : 'Crear Nuevo Proyecto'}
-      </h1>
-      <ShareButton />
-      </div>
-      {error && <Alert variant="danger" className="mb-4">{error}</Alert>}
-
+  const renderProjectForm = () => (
+    <>
       <ProjectForm 
         project={project} 
         handleChange={handleChange} 
@@ -195,46 +187,77 @@ const Project = () => {
         readOnly={isViewMode}
       />
       
-      {id && (
+      {!isViewMode && (
+        <Form.Group className="mt-3">
+          <Form.Check 
+            type="checkbox" 
+            label="Habilitado" 
+            name="habilitado" 
+            checked={project.habilitado} 
+            onChange={(e) => setProject(prev => ({ ...prev, habilitado: e.target.checked }))}
+            disabled={project.actividades.length === 0}
+          />
+        </Form.Group>
+      )}
+    </>
+  );
+
+  const renderActivities = () => (
+    <>
+      <ActividadList 
+        activities={project.actividades} 
+        editActivity={!isViewMode ? editActivity : undefined}
+        deleteActivity={!isViewMode ? deleteActivity : undefined}
+      />
+      {!isViewMode && (
         <>
-          <div className="mt-4 mb-4">
-            <h2>Participantes</h2>
-            <ParticipantList projectId={id} />
-          </div>
-
-          <div className="mt-4">
-            <h2>Actividades</h2>
-            <ActividadList 
-              activities={project.actividades} 
-              editActivity={!isViewMode ? editActivity : undefined}
-              deleteActivity={!isViewMode ? deleteActivity : undefined}
-            />
-            {!isViewMode && (
-              <>
-                <h3 className="mt-4">Agregar Nueva Actividad</h3>
-                <ActividadForm 
-                  newActivity={newActivity} 
-                  handleActivityChange={handleActivityChange} 
-                  addActivity={addActivity}
-                />
-              </>
-            )}
-          </div>
-
-          {!isViewMode && (
-            <Form.Group className="mt-3">
-              <Form.Check 
-                type="checkbox" 
-                label="Habilitado" 
-                name="habilitado" 
-                checked={project.habilitado} 
-                onChange={(e) => setProject(prev => ({ ...prev, habilitado: e.target.checked }))}
-                disabled={project.actividades.length === 0}
-              />
-            </Form.Group>
-          )}
-          
+          <h3 className="mt-4">Agregar Nueva Actividad</h3>
+          <ActividadForm 
+            newActivity={newActivity} 
+            handleActivityChange={handleActivityChange} 
+            addActivity={addActivity}
+          />
         </>
+      )}
+    </>
+  );
+
+  return (
+    <Container>
+      <Navbar />
+      <h1 className="mb-4">
+        {isViewMode ? 'Ver Proyecto' : id ? 'Editar Proyecto' : 'Crear Nuevo Proyecto'}
+      </h1>
+
+      {error && <Alert variant="danger" className="mb-4">{error}</Alert>}
+
+      {id ? (
+        <Tabs
+          activeKey={activeTab}
+          onSelect={(k) => setActiveTab(k)}
+          className="mb-3"
+        >
+          <Tab eventKey="details" title="Detalles">
+            {renderProjectForm()}
+          </Tab>
+          
+          <Tab eventKey="activities" title="Actividades">
+            {renderActivities()}
+          </Tab>
+          
+          <Tab eventKey="participants" title="Participantes">
+            <ParticipantList projectId={id} />
+          </Tab>
+
+          {isViewMode && (
+            <Tab eventKey="stats" title="Estadísticas">
+              <StatsContainer type="project" id={id} />
+            </Tab>
+          )}
+        </Tabs>
+      ) : (
+        // Show only the form for new projects
+        renderProjectForm()
       )}
     </Container>
   );

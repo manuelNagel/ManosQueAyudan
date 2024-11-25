@@ -33,6 +33,8 @@ func main() {
 	countryService := services.NewCountryService()
 	feedbackService := services.NewFeedbackService(db)
 	denunciaService := services.NewDenunciaService(db)
+	reportingService := services.NewProjectReportingService(db)
+
 
 	//emailService := services.NewEmailService("smtp.gmail.com", "587", "praa.nqn@gmail.com", "wzwmvpdmwcvsfuut")
 	emailService := services.NewEmailService("smtp.gmail.com", "587", string(cfg.CuentaMail), cfg.PassMail)
@@ -56,6 +58,8 @@ func main() {
 	countryController := controllers.NewCountryController(countryService)
 	feedbackController := controllers.NewFeedbackController(feedbackService)
 	denunciaController := controllers.NewDenunciaController(denunciaService)
+	reportingController := controllers.NewReportingController(reportingService)
+
 
 
 
@@ -82,7 +86,7 @@ func main() {
 	r.DELETE("/projects/:id/participants/:participantId", proyectoController.RemoveParticipant)
 	r.GET("/projects/:id/participants", proyectoController.GetParticipants)
 	r.GET("/projects/joined", proyectoController.ListJoinedProyectos)
-	
+
 	r.POST("/feedback", feedbackController.CreateFeedback)
 	r.GET("/feedback/users/:userId/stats", feedbackController.GetUserFeedbackStats)
 	r.GET("/feedback/projects/:projectId", feedbackController.GetProjectFeedback)
@@ -99,6 +103,9 @@ func main() {
 	r.GET("/projects", proyectoController.ListProyectos)
 	r.PUT("/projects/:id/actividades", proyectoController.UpdateActividad)
 	r.DELETE("/projects/:id/actividades/:actividadId", proyectoController.DeleteActividad)
+
+	r.GET("/reports/users/:userId/stats", reportingController.GetUserProjectStats)
+	r.GET("/reports/projects/:projectId/stats", reportingController.GetProjectDetailedStats)
 	// Comenzar server
 	e.Logger.Fatal(e.Start(":8080"))
 }
