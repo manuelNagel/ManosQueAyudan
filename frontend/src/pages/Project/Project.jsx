@@ -8,6 +8,8 @@ import ActividadList from '../../components/ActividadList/ActividadList';
 import ActividadForm from '../../components/ActividadForm/ActividadForm';
 import Navbar from '../../components/Navbar/Navbar';
 import ParticipantList from '../../components/ParticipantList/ParticipantList';
+import ShareButton from '../../components/ShareButton/ShareButton';
+import { AlignLeft } from 'lucide-react';
 
 const Project = () => {
   const [project, setProject] = useState({
@@ -175,10 +177,13 @@ const Project = () => {
   return (
     <Container>
       <Navbar />
-      <h1 className="mb-4">
+      <div className="d-flex align-items-center justify-content-between mb-4">
+
+      <h1 className="mb-0">
         {isViewMode ? 'Ver Proyecto' : id ? 'Editar Proyecto' : 'Crear Nuevo Proyecto'}
       </h1>
-
+      <ShareButton />
+      </div>
       {error && <Alert variant="danger" className="mb-4">{error}</Alert>}
 
       <ProjectForm 
@@ -228,6 +233,7 @@ const Project = () => {
               />
             </Form.Group>
           )}
+          
         </>
       )}
     </Container>

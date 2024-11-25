@@ -23,7 +23,7 @@ const Navbar = () => {
         <Nav className="ml-auto">
         <Dropdown>
             <Dropdown.Toggle variant="success" id="dropdown-basic">
-              Quiero
+              Quiero...
             </Dropdown.Toggle>
             <Dropdown.Menu>
               {user && (
