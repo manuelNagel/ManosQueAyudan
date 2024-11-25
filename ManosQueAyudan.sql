@@ -40,7 +40,7 @@ CREATE TABLE `Actividad` (
 
 LOCK TABLES `Actividad` WRITE;
 /*!40000 ALTER TABLE `Actividad` DISABLE KEYS */;
-INSERT INTO `Actividad` VALUES (1,'barrer','barrer',0,6),(2,'asdfasd','fdsa',0,3),(3,'comprar birras','ir al kiosco ',0,4),(4,'hdfg','ghdf',1,5);
+INSERT INTO `Actividad` VALUES (1,'fdasfd','fdsafda',1,5),(2,'asdfasd','fdsa',0,3),(3,'comprar birras','ir al kiosco ',0,4),(4,'hdfg','ghdf',1,5);
 /*!40000 ALTER TABLE `Actividad` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -246,6 +246,38 @@ LOCK TABLES `Habilidades` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `KickedUsers`
+--
+
+DROP TABLE IF EXISTS `KickedUsers`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `KickedUsers` (
+  `IdProyecto` int unsigned NOT NULL,
+  `IdUsuario` int unsigned NOT NULL,
+  `KickedBy` int unsigned NOT NULL,
+  `KickDate` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `Reason` text,
+  PRIMARY KEY (`IdProyecto`,`IdUsuario`),
+  KEY `fk_kicked_users_user` (`IdUsuario`),
+  KEY `fk_kicked_users_admin` (`KickedBy`),
+  CONSTRAINT `fk_kicked_users_admin` FOREIGN KEY (`KickedBy`) REFERENCES `Usuario` (`Id`),
+  CONSTRAINT `fk_kicked_users_project` FOREIGN KEY (`IdProyecto`) REFERENCES `Proyecto` (`IdProyecto`),
+  CONSTRAINT `fk_kicked_users_user` FOREIGN KEY (`IdUsuario`) REFERENCES `Usuario` (`Id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `KickedUsers`
+--
+
+LOCK TABLES `KickedUsers` WRITE;
+/*!40000 ALTER TABLE `KickedUsers` DISABLE KEYS */;
+INSERT INTO `KickedUsers` VALUES (5,13,6,'2024-11-25 20:14:39','sdfs');
+/*!40000 ALTER TABLE `KickedUsers` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `Notificacion`
 --
 
@@ -304,7 +336,7 @@ CREATE TABLE `Proyecto` (
 
 LOCK TABLES `Proyecto` WRITE;
 /*!40000 ALTER TABLE `Proyecto` DISABLE KEYS */;
-INSERT INTO `Proyecto` VALUES (3,'2024-10-24 00:00:00.000','Neuquen',0.00000000,0.00000000,'2024-12-09 00:00:00.000',1,'Un Proyecto','asdfsdfa','2024-10-24 17:44:00.000','2024-10-24 20:53:00.000',1,0),(4,'2024-10-20 21:00:00.000','Neuquen',NULL,NULL,'2024-10-21 21:00:00.000',1,'Toma de la facultad','toma vigilia actica','1970-01-01 13:16:00.000',NULL,1,0),(5,'2024-11-10 00:00:00.000','Avenida Corrientes, Microcentro, San Nicolás, Buenos Aires, Comuna 1, Autonomous City of Buenos Aires, C1010, Argentina',-34.60382392,-58.38186264,'2025-12-10 00:00:00.000',1,'otro proyecto','fdasfd','2024-11-10 18:06:00.000','2024-11-10 20:08:00.000',1,0),(6,'2024-11-23 00:00:00.000','997, Tucumán, Microcentro, San Nicolás, Buenos Aires, Comuna 1, Autonomous City of Buenos Aires, C1043AAA, Argentina',-34.60128058,-58.38091850,'2024-11-27 00:00:00.000',1,'un proyecto cualquiera','esta bueno el proyecto','2024-11-23 17:57:00.000','2024-11-23 19:57:00.000',1,0);
+INSERT INTO `Proyecto` VALUES (3,'2024-10-24 00:00:00.000','Neuquen',0.00000000,0.00000000,'2024-12-09 00:00:00.000',1,'Un Proyecto','asdfsdfa','2024-10-24 17:44:00.000','2024-10-24 20:53:00.000',1,0),(4,'2024-10-20 21:00:00.000','Neuquen',NULL,NULL,'2024-10-21 21:00:00.000',1,'Toma de la facultad','toma vigilia actica','1970-01-01 13:16:00.000',NULL,1,0),(5,'2024-11-09 00:00:00.000','Avenida Corrientes, Microcentro, San Nicolás, Buenos Aires, Comuna 1, Autonomous City of Buenos Aires, C1010, Argentina',-34.60382392,-58.38186264,'2025-12-09 00:00:00.000',1,'otro proyecto','fdasfd','2024-11-09 18:06:00.000','2024-11-09 20:08:00.000',1,0),(6,'2024-11-23 00:00:00.000','997, Tucumán, Microcentro, San Nicolás, Buenos Aires, Comuna 1, Autonomous City of Buenos Aires, C1043AAA, Argentina',-34.60128058,-58.38091850,'2024-11-27 00:00:00.000',1,'un proyecto cualquiera','esta bueno el proyecto','2024-11-23 17:57:00.000','2024-11-23 19:57:00.000',1,0);
 /*!40000 ALTER TABLE `Proyecto` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -319,9 +351,9 @@ CREATE TABLE `Proyectos_Usuarios` (
   `IdProyecto` int unsigned NOT NULL,
   `IdUsuario` int unsigned NOT NULL,
   `IdRol` int unsigned NOT NULL,
-  `FechaInicio` datetime DEFAULT CURRENT_TIMESTAMP,
+  `FechaInicio` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `FechaFin` datetime DEFAULT NULL,
-  PRIMARY KEY (`IdProyecto`,`IdUsuario`,`IdRol`),
+  PRIMARY KEY (`IdProyecto`,`IdUsuario`,`IdRol`,`FechaInicio`),
   KEY `fk_Proyectos_Usuarios_Usuario` (`IdUsuario`),
   KEY `fk_Proyectos_Usuarios_Rol_proyecto` (`IdRol`),
   CONSTRAINT `fk_Proyectos_Usuarios_Proyecto` FOREIGN KEY (`IdProyecto`) REFERENCES `Proyecto` (`IdProyecto`),
@@ -336,7 +368,7 @@ CREATE TABLE `Proyectos_Usuarios` (
 
 LOCK TABLES `Proyectos_Usuarios` WRITE;
 /*!40000 ALTER TABLE `Proyectos_Usuarios` DISABLE KEYS */;
-INSERT INTO `Proyectos_Usuarios` VALUES (5,6,1,'2024-11-11 19:46:53',NULL),(5,13,2,'2024-11-11 20:42:50',NULL),(6,13,1,'2024-11-25 16:57:59',NULL);
+INSERT INTO `Proyectos_Usuarios` VALUES (5,6,1,'2024-11-11 19:46:53',NULL),(5,13,2,'2024-11-11 20:42:50','2024-11-25 20:14:08'),(5,13,2,'2024-11-25 20:14:15','2024-11-25 20:14:39'),(6,13,1,'2024-11-25 16:57:59',NULL);
 /*!40000 ALTER TABLE `Proyectos_Usuarios` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -519,4 +551,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-11-25 17:07:51
+-- Dump completed on 2024-11-25 20:21:19
