@@ -31,8 +31,14 @@ func main() {
 	userService := services.NewUsuarioService(db, cfg.EncryptionKey)
 	proyectoService := services.NewProyectoService(db)
 	countryService := services.NewCountryService()
+
 	//emailService := services.NewEmailService("smtp.gmail.com", "587", "praa.nqn@gmail.com", "wzwmvpdmwcvsfuut")
 	emailService := services.NewEmailService("smtp.gmail.com", "587", string(cfg.CuentaMail), cfg.PassMail)
+
+	habilidadService := services.NewHabilidadService(db)
+
+	notificacionService := services.NewNotificacionesService(db)
+
 	// Initialize Echo
 	e := echo.New()
 
@@ -52,6 +58,10 @@ func main() {
 	proyectoController := controllers.NewProyectoController(proyectoService)
 	countryController := controllers.NewCountryController(countryService)
 
+	notificacionController := controllers.NewNotificacionController(notificacionService)
+
+	habilidadController := controllers.NewHabilidadController(habilidadService)
+
 	// Rutas publicas
 	e.POST("/api/login", authController.Login)
 	e.POST("/api/logout", authController.Logout)
@@ -60,7 +70,16 @@ func main() {
 	e.GET("/api/countries", countryController.GetCountries)
 	e.GET("/api/projects/search", proyectoController.SearchProyectosByLocation, optionalAuth(store, userService))
 	e.POST("/api/reset-password", authController.ResetPassword)
-	e.GET("api/proys", proyectoController.ListJoinedProyectos)
+	e.GET("/api/proys", proyectoController.ListJoinedProyectos)
+
+	e.GET("/api/habilidades", habilidadController.ObtenerTodasHabilidades)
+	e.GET("/api/usuarios/:usuarioId/habilidades", habilidadController.ObtenerHabilidadesPorUsuario)
+	e.PUT("/api/usuarios/:usuarioId/habilidades", habilidadController.VincularHabilidades)
+
+	e.GET("/api/usuarios/:id/notificaciones", notificacionController.GetNotificaciones)
+	e.GET("/api/notificaciones/:id/unread-count", notificacionController.GetUnreadCount)
+	e.PUT("/api/notificaciones/:notificacionID/mark-as-read", notificacionController.MarkAsRead)
+	e.POST("/api/notificaciones", notificacionController.AddNotificacion)
 
 	// Rutas protegidas
 	r := e.Group("/api")
@@ -83,6 +102,7 @@ func main() {
 	r.GET("/projects", proyectoController.ListProyectos)
 	r.PUT("/projects/:id/actividades", proyectoController.UpdateActividad)
 	r.DELETE("/projects/:id/actividades/:actividadId", proyectoController.DeleteActividad)
+
 	// Comenzar server
 	e.Logger.Fatal(e.Start(":8080"))
 }

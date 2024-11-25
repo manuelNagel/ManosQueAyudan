@@ -1,0 +1,7 @@
+.react-datepicker-wrapper {
+    width: 100% !important; /* Asegura que el contenedor principal ocupe el ancho completo */
+  }
+  
+  .react-datepicker__input-container input {
+    width: 100% !important; /* Asegura que el input interno ocupe el ancho completo */
+  }

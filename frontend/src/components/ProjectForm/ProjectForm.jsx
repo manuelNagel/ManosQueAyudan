@@ -1,8 +1,18 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Form, Button } from 'react-bootstrap';
 import LocationPicker from '../LocationPicker/LocationPicker';
 
+import CustomDatePicker from '../CustomDatePicker/CustomDatePicker';
+
 const ProjectForm = ({ project, handleChange, handleSubmit, handleLocationChange, isEditing }) => {
+
+  const [startDate, setStartDate] = useState(null);
+
+  const handleDateChange = (date) => {
+    setStartDate(date);
+  };
+  
+  
   return (
     <Form onSubmit={handleSubmit}>
     <Form.Group className="mb-3">
@@ -37,6 +47,12 @@ const ProjectForm = ({ project, handleChange, handleSubmit, handleLocationChange
         required
       />
     </Form.Group>
+
+    {/* <Form.Group className='mb-3'>
+      <Form.Label>Fecha de Inicio</Form.Label>
+      <CustomDatePicker id="fechaInicio" value={startDate} onChange={handleDateChange} placeholder='dd-mm-aaaa' />
+    
+    </Form.Group> */}
 
     <Form.Group className="mb-3">
       <Form.Label>Fecha de Finalización</Form.Label>

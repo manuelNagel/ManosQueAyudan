@@ -1,10 +1,11 @@
 package models
 
+// Asociación Usuario-Habilidad
 type UsuarioHabilidades struct {
-    UsuarioId   uint `gorm:"column:IdUsuario;primaryKey;type:int unsigned"`
-    HabilidadId uint `gorm:"column:IdHabilidad;primaryKey;type:int unsigned"`
+	UsuarioID   uint `json:"usuarioId"`
+	HabilidadID uint `json:"habilidadId"`
 }
 
 func (UsuarioHabilidades) TableName() string {
-    return "UsuarioHabilidades"
+	return "Usuario_Habilidades"
 }

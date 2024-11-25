@@ -1,0 +1,22 @@
+.sinLeer {
+    font-weight: bold;
+    background-color: #f8d7da; /* Fondo rojo claro para notificaciones no leídas */
+    color: #721c24; /* Color de texto adecuado */
+  }
+  
+  .sinLeer:hover {
+    background-color: #f1b0b7; /* Fondo ligeramente más claro al pasar el mouse */
+  }
+  
+  .notificacionItem {
+    max-width: 15ch; /* Limitar el ancho a 15 caracteres */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .dropdownMenu {
+    max-height: 300px; /* Opcional: limita la altura del dropdown */
+    overflow-y: auto;
+  }
+  
