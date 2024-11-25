@@ -71,7 +71,16 @@ func main() {
 	e.GET("/api/countries", countryController.GetCountries)
 	e.GET("/api/projects/search", proyectoController.SearchProyectosByLocation, optionalAuth(store, userService))
 	e.POST("/api/reset-password", authController.ResetPassword)
-	e.GET("api/proys", proyectoController.ListJoinedProyectos)
+	e.GET("/api/proys", proyectoController.ListJoinedProyectos)
+
+	e.GET("/api/habilidades", habilidadController.ObtenerTodasHabilidades)
+	e.GET("/api/usuarios/:usuarioId/habilidades", habilidadController.ObtenerHabilidadesPorUsuario)
+	e.PUT("/api/usuarios/:usuarioId/habilidades", habilidadController.VincularHabilidades)
+
+	e.GET("/api/usuarios/:id/notificaciones", notificacionController.GetNotificaciones)
+	e.GET("/api/notificaciones/:id/unread-count", notificacionController.GetUnreadCount)
+	e.PUT("/api/notificaciones/:notificacionID/mark-as-read", notificacionController.MarkAsRead)
+	e.POST("/api/notificaciones", notificacionController.AddNotificacion)
 
 	// Rutas protegidas
 	r := e.Group("/api")

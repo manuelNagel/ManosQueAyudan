@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Dropdown, Nav } from 'react-bootstrap';
 import { useAuth } from '../../context/AuthContext';
 import logo from '../../assets/images/logo.png';
+import Notificaciones from '../Notificaciones/Notificaciones';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -21,6 +22,7 @@ const Navbar = () => {
           ManosQueAyudan
         </Link>
         <Nav className="ml-auto">
+        {user && ( <Notificaciones />)} 
         <Dropdown>
             <Dropdown.Toggle variant="success" id="dropdown-basic">
               Quiero...
@@ -48,6 +50,7 @@ const Navbar = () => {
                 <>
                   <Dropdown.Item as={Link} to="/perfil">Ver Perfil</Dropdown.Item>
                   <Dropdown.Item as={Link} to="/feedback">Mi Feedback</Dropdown.Item>
+                  <Dropdown.Item as={Link} to="/Habilidades">Mis Habilidades</Dropdown.Item>
                   <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
                 </>
               ) : (

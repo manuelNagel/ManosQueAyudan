@@ -1,0 +1,5 @@
+.fechaEstilo {
+    font-style: italic; /* Fuente itálica */
+    text-align: left;   /* Alineación a la izquierda */
+    font-size: 0.8em;   /* Tamaño de fuente más pequeño (90% del original) */
+  }

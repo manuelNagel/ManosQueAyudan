@@ -12,6 +12,7 @@ import PasswordReset from './pages/PasswordReset/PasswordReset';
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 import ProjectSearch from './pages/ProjectSearch/ProjectSearch';
 import Feedback from './pages/Feedback/Feedback';
+import Habilidades from './pages/Habilidades/Habilidades';
 
 function App() {
   return (
@@ -24,6 +25,9 @@ function App() {
           <Route path="/countries" element={<Countries/>} />
           <Route path="/passwordReset"element={<PasswordReset/>} />
           <Route path="/projects/search" element={<ProjectSearch />} />
+          <Route path="/habilidades" element={<Habilidades />} />
+
+
           <Route element={<PrivateRoute />}>
             <Route path="/perfil" element={<Perfil />} />
             <Route path="/projects" element={<ProjectList mode="owned"/>} />
@@ -32,8 +36,7 @@ function App() {
             <Route path="/projects/joined" element={<ProjectList mode="joined" />} />
             <Route path="/projects/joined/:id" element={<Project mode="view" />} />
             <Route path="/feedback" element={<Feedback/>} />
-
-
+            <Route path="/habilidades/:id" element={<Habilidades />} />
           </Route>
         </Routes>
       </Router>

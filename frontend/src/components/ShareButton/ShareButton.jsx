@@ -17,7 +17,7 @@ const ShareButton = () => {
   }, []);
 
   const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
-  const shareTitle = "¡Mira esto!";
+  const shareTitle = "¡Mira esto!, creo que este proyecto podría interesarte...";
 
   const shareViaEmail = () => {
     window.location.href = `mailto:?subject=${encodeURIComponent(shareTitle)}&body=${encodeURIComponent(currentUrl)}`;
