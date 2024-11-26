@@ -32,7 +32,13 @@ func main() {
 	proyectoService := services.NewProyectoService(db)
 	countryService := services.NewCountryService()
 <<<<<<< HEAD
+<<<<<<< HEAD
 	feedbackService := services.NewFeedbackService(db)
+=======
+	feedbackService := services.NewFeedbackService(db)
+	habilidadService := services.NewHabilidadService(db)
+	notificacionService := services.NewNotificacionesService(db)
+>>>>>>> e8daf826b7db28580f3c6c98c249554c2895c4ae
 	denunciaService := services.NewDenunciaService(db)
 	reportingService := services.NewProjectReportingService(db)
 
@@ -40,6 +46,7 @@ func main() {
 	//emailService := services.NewEmailService("smtp.gmail.com", "587", "praa.nqn@gmail.com", "wzwmvpdmwcvsfuut")
 	emailService := services.NewEmailService("smtp.gmail.com", "587", string(cfg.CuentaMail), cfg.PassMail)
 	// Inicializa Echo
+<<<<<<< HEAD
 =======
 
 	//emailService := services.NewEmailService("smtp.gmail.com", "587", "praa.nqn@gmail.com", "wzwmvpdmwcvsfuut")
@@ -51,6 +58,8 @@ func main() {
 
 	// Initialize Echo
 >>>>>>> 689d91835f42de093e0069509f0a31ce6678657d
+=======
+>>>>>>> e8daf826b7db28580f3c6c98c249554c2895c4ae
 	e := echo.New()
 
 	// Middleware
@@ -71,13 +80,11 @@ func main() {
 	feedbackController := controllers.NewFeedbackController(feedbackService)
 	denunciaController := controllers.NewDenunciaController(denunciaService)
 	reportingController := controllers.NewReportingController(reportingService)
-
-
-
-
 	notificacionController := controllers.NewNotificacionController(notificacionService)
-
 	habilidadController := controllers.NewHabilidadController(habilidadService)
+
+
+
 
 	// Rutas publicas
 	e.POST("/api/login", authController.Login)
@@ -130,10 +137,15 @@ func main() {
 	r.DELETE("/projects/:id/actividades/:actividadId", proyectoController.DeleteActividad)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	r.GET("/reports/users/:userId/stats", reportingController.GetUserProjectStats)
 	r.GET("/reports/projects/:projectId/stats", reportingController.GetProjectDetailedStats)
 =======
 >>>>>>> 689d91835f42de093e0069509f0a31ce6678657d
+=======
+	r.GET("/reports/users/:userId/stats", reportingController.GetUserProjectStats)
+	r.GET("/reports/projects/:projectId/stats", reportingController.GetProjectDetailedStats)
+>>>>>>> e8daf826b7db28580f3c6c98c249554c2895c4ae
 	// Comenzar server
 	e.Logger.Fatal(e.Start(":8080"))
 }

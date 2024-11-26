@@ -12,10 +12,14 @@
     "esri-leaflet-geocoder": "^3.1.5",
     "leaflet": "^1.9.4",
 <<<<<<< HEAD
+<<<<<<< HEAD
     "lucide-react": "^0.461.0",
 =======
     "lucide-react": "^0.460.0",
 >>>>>>> 689d91835f42de093e0069509f0a31ce6678657d
+=======
+    "lucide-react": "^0.461.0",
+>>>>>>> e8daf826b7db28580f3c6c98c249554c2895c4ae
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.5",
     "react-datepicker": "^7.5.0",

@@ -12,10 +12,15 @@ import PasswordReset from './pages/PasswordReset/PasswordReset';
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 import ProjectSearch from './pages/ProjectSearch/ProjectSearch';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import Feedback from './pages/Feedback/Feedback';
 =======
 import Habilidades from './pages/Habilidades/Habilidades';
 >>>>>>> 689d91835f42de093e0069509f0a31ce6678657d
+=======
+import Feedback from './pages/Feedback/Feedback';
+import Habilidades from './pages/Habilidades/Habilidades';
+>>>>>>> e8daf826b7db28580f3c6c98c249554c2895c4ae
 
 function App() {
   return (
@@ -39,6 +44,7 @@ function App() {
             <Route path="/projects/joined" element={<ProjectList mode="joined" />} />
             <Route path="/projects/joined/:id" element={<Project mode="view" />} />
 <<<<<<< HEAD
+<<<<<<< HEAD
             <Route path="/feedback" element={<Feedback/>} />
 
 =======
@@ -46,6 +52,10 @@ function App() {
             <Route path="/habilidades/:id" element={<Habilidades />} />
 >>>>>>> 689d91835f42de093e0069509f0a31ce6678657d
 
+=======
+            <Route path="/feedback" element={<Feedback/>} />
+            <Route path="/habilidades/:id" element={<Habilidades />} />
+>>>>>>> e8daf826b7db28580f3c6c98c249554c2895c4ae
           </Route>
         </Routes>
       </Router>

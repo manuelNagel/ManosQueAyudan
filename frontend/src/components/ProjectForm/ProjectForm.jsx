@@ -3,6 +3,7 @@ import { Form, Button } from 'react-bootstrap';
 import LocationPicker from '../LocationPicker/LocationPicker';
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 const ProjectForm = ({ project, handleChange, handleSubmit, handleLocationChange, isEditing, readOnly }) => {
   const inputStyles = readOnly ? {
     backgroundColor: '#f8f9fa',
@@ -23,6 +24,17 @@ const ProjectForm = ({ project, handleChange, handleSubmit, handleLocationChange
   
   
 >>>>>>> 689d91835f42de093e0069509f0a31ce6678657d
+=======
+import CustomDatePicker from '../CustomDatePicker/CustomDatePicker';
+
+const ProjectForm = ({ project, handleChange, handleSubmit, handleLocationChange, isEditing, readOnly }) => {
+  const inputStyles = readOnly ? {
+    backgroundColor: '#f8f9fa',
+    opacity: '0.8',
+    cursor: 'not-allowed'
+  } : {};
+
+>>>>>>> e8daf826b7db28580f3c6c98c249554c2895c4ae
   return (
     <Form onSubmit={handleSubmit}>
       <Form.Group className="mb-3">
@@ -68,6 +80,9 @@ const ProjectForm = ({ project, handleChange, handleSubmit, handleLocationChange
       </Form.Group>
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e8daf826b7db28580f3c6c98c249554c2895c4ae
       <Form.Group className="mb-3">
         <Form.Label>Fecha de Finalización</Form.Label>
         <Form.Control
@@ -81,6 +96,7 @@ const ProjectForm = ({ project, handleChange, handleSubmit, handleLocationChange
           style={inputStyles}
         />
       </Form.Group>
+<<<<<<< HEAD
 =======
     {/* <Form.Group className='mb-3'>
       <Form.Label>Fecha de Inicio</Form.Label>
@@ -99,6 +115,8 @@ const ProjectForm = ({ project, handleChange, handleSubmit, handleLocationChange
       />
     </Form.Group>
 >>>>>>> 689d91835f42de093e0069509f0a31ce6678657d
+=======
+>>>>>>> e8daf826b7db28580f3c6c98c249554c2895c4ae
 
       <Form.Group className="mb-3">
         <Form.Label>Horario de Inicio</Form.Label>
