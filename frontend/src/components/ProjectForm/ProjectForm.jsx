@@ -1,7 +1,8 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Form, Button } from 'react-bootstrap';
 import LocationPicker from '../LocationPicker/LocationPicker';
 
+<<<<<<< HEAD
 const ProjectForm = ({ project, handleChange, handleSubmit, handleLocationChange, isEditing, readOnly }) => {
   const inputStyles = readOnly ? {
     backgroundColor: '#f8f9fa',
@@ -9,6 +10,19 @@ const ProjectForm = ({ project, handleChange, handleSubmit, handleLocationChange
     cursor: 'not-allowed'
   } : {};
 
+=======
+import CustomDatePicker from '../CustomDatePicker/CustomDatePicker';
+
+const ProjectForm = ({ project, handleChange, handleSubmit, handleLocationChange, isEditing }) => {
+
+  const [startDate, setStartDate] = useState(null);
+
+  const handleDateChange = (date) => {
+    setStartDate(date);
+  };
+  
+  
+>>>>>>> 689d91835f42de093e0069509f0a31ce6678657d
   return (
     <Form onSubmit={handleSubmit}>
       <Form.Group className="mb-3">
@@ -53,6 +67,7 @@ const ProjectForm = ({ project, handleChange, handleSubmit, handleLocationChange
         />
       </Form.Group>
 
+<<<<<<< HEAD
       <Form.Group className="mb-3">
         <Form.Label>Fecha de Finalización</Form.Label>
         <Form.Control
@@ -66,6 +81,24 @@ const ProjectForm = ({ project, handleChange, handleSubmit, handleLocationChange
           style={inputStyles}
         />
       </Form.Group>
+=======
+    {/* <Form.Group className='mb-3'>
+      <Form.Label>Fecha de Inicio</Form.Label>
+      <CustomDatePicker id="fechaInicio" value={startDate} onChange={handleDateChange} placeholder='dd-mm-aaaa' />
+    
+    </Form.Group> */}
+
+    <Form.Group className="mb-3">
+      <Form.Label>Fecha de Finalización</Form.Label>
+      <Form.Control
+        type="date"
+        name="fechaFinalizacion"
+        value={project.fechaFinalizacion}
+        onChange={(e) => handleChange(e)}
+        required
+      />
+    </Form.Group>
+>>>>>>> 689d91835f42de093e0069509f0a31ce6678657d
 
       <Form.Group className="mb-3">
         <Form.Label>Horario de Inicio</Form.Label>
