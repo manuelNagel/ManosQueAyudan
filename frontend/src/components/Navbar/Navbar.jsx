@@ -49,16 +49,9 @@ const Navbar = () => {
               {user ? (
                 <>
                   <Dropdown.Item as={Link} to="/perfil">Ver Perfil</Dropdown.Item>
-<<<<<<< HEAD
-<<<<<<< HEAD
-                  <Dropdown.Item as={Link} to="/feedback">Mi Feedback</Dropdown.Item>
-=======
-                  <Dropdown.Item as={Link} to="/Habilidades">Mis Habilidades</Dropdown.Item>
->>>>>>> 689d91835f42de093e0069509f0a31ce6678657d
-=======
+
                   <Dropdown.Item as={Link} to="/feedback">Mi Feedback</Dropdown.Item>
                   <Dropdown.Item as={Link} to="/Habilidades">Mis Habilidades</Dropdown.Item>
->>>>>>> e8daf826b7db28580f3c6c98c249554c2895c4ae
                   <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
                 </>
               ) : (

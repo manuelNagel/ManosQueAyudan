@@ -2,30 +2,6 @@ import React, {useState} from 'react';
 import { Form, Button } from 'react-bootstrap';
 import LocationPicker from '../LocationPicker/LocationPicker';
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-const ProjectForm = ({ project, handleChange, handleSubmit, handleLocationChange, isEditing, readOnly }) => {
-  const inputStyles = readOnly ? {
-    backgroundColor: '#f8f9fa',
-    opacity: '0.8',
-    cursor: 'not-allowed'
-  } : {};
-
-=======
-import CustomDatePicker from '../CustomDatePicker/CustomDatePicker';
-
-const ProjectForm = ({ project, handleChange, handleSubmit, handleLocationChange, isEditing }) => {
-
-  const [startDate, setStartDate] = useState(null);
-
-  const handleDateChange = (date) => {
-    setStartDate(date);
-  };
-  
-  
->>>>>>> 689d91835f42de093e0069509f0a31ce6678657d
-=======
-import CustomDatePicker from '../CustomDatePicker/CustomDatePicker';
 
 const ProjectForm = ({ project, handleChange, handleSubmit, handleLocationChange, isEditing, readOnly }) => {
   const inputStyles = readOnly ? {
@@ -34,7 +10,7 @@ const ProjectForm = ({ project, handleChange, handleSubmit, handleLocationChange
     cursor: 'not-allowed'
   } : {};
 
->>>>>>> e8daf826b7db28580f3c6c98c249554c2895c4ae
+
   return (
     <Form onSubmit={handleSubmit}>
       <Form.Group className="mb-3">
@@ -79,10 +55,7 @@ const ProjectForm = ({ project, handleChange, handleSubmit, handleLocationChange
         />
       </Form.Group>
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> e8daf826b7db28580f3c6c98c249554c2895c4ae
+
       <Form.Group className="mb-3">
         <Form.Label>Fecha de Finalización</Form.Label>
         <Form.Control
@@ -96,27 +69,9 @@ const ProjectForm = ({ project, handleChange, handleSubmit, handleLocationChange
           style={inputStyles}
         />
       </Form.Group>
-<<<<<<< HEAD
-=======
-    {/* <Form.Group className='mb-3'>
-      <Form.Label>Fecha de Inicio</Form.Label>
-      <CustomDatePicker id="fechaInicio" value={startDate} onChange={handleDateChange} placeholder='dd-mm-aaaa' />
-    
-    </Form.Group> */}
 
-    <Form.Group className="mb-3">
-      <Form.Label>Fecha de Finalización</Form.Label>
-      <Form.Control
-        type="date"
-        name="fechaFinalizacion"
-        value={project.fechaFinalizacion}
-        onChange={(e) => handleChange(e)}
-        required
-      />
-    </Form.Group>
->>>>>>> 689d91835f42de093e0069509f0a31ce6678657d
-=======
->>>>>>> e8daf826b7db28580f3c6c98c249554c2895c4ae
+  
+
 
       <Form.Group className="mb-3">
         <Form.Label>Horario de Inicio</Form.Label>
