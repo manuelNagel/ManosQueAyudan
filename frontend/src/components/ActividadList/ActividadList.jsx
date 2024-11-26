@@ -40,9 +40,15 @@ const ActividadList = ({ activities, editActivity, deleteActivity }) => {
             <td>{activity.Nombre || activity.nombre}</td>
             <td>{activity.Descripcion || activity.descripcion}</td>
             <td>
-              <Badge bg={activity.Estado || activity.estado ? 'success' : 'warning'}>
-                {(activity.Estado || activity.estado) ? 'Completada' : 'Pendiente'}
-              </Badge>
+            <Badge bg={
+              (activity.Estado || activity.estado) === 2 ? 'success' : 
+              (activity.Estado || activity.estado) === 1 ? 'primary' : 
+              'warning'
+            }>
+              {(activity.Estado || activity.estado) === 2 ? 'Terminado' : 
+               (activity.Estado || activity.estado) === 1 ? 'En Proceso' : 
+               'Pendiente'}
+            </Badge>
             </td>
             {(editActivity || deleteActivity) && (
               <td>

@@ -217,16 +217,6 @@ const Project = () => {
         editActivity={!isViewMode ? editActivity : undefined}
         deleteActivity={!isViewMode ? deleteActivity : undefined}
       />
-      {!isViewMode && (
-        <>
-          <h3 className="mt-4">Agregar Nueva Actividad</h3>
-          <ActividadForm 
-            newActivity={newActivity} 
-            handleActivityChange={handleActivityChange} 
-            addActivity={addActivity}
-          />
-        </>
-      )}
       <Kanban projectId={ id } />
     </div>
   );
