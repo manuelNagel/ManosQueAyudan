@@ -10,6 +10,16 @@ const ItemTypes = {
   ACTIVITY: 'activity'
 };
 
+// Función para obtener etiqueta de estado
+const getStatusLabel = (status) => {
+  switch (status) {
+    case 0: return 'Nuevo';
+    case 1: return 'En Proceso';
+    case 2: return 'Terminado';
+    default: return 'Desconocido';
+  }
+};
+
 // Componente para una actividad individual
 const Activity = ({ activity, moveActivity, removeActivity }) => {
   const [{ isDragging }, drag] = useDrag({
@@ -23,23 +33,9 @@ const Activity = ({ activity, moveActivity, removeActivity }) => {
     })
   });
 
-  const [, drop] = useDrop({
-    accept: ItemTypes.ACTIVITY,
-    drop: (draggedItem) => {
-      // Solo permitir mover si no está en la misma columna y el estado es válido
-      if (draggedItem.id !== activity.numeroActividad && draggedItem.estado !== activity.estado) {
-        moveActivity(draggedItem.id, draggedItem.estado, activity.estado);
-      }
-    },
-    collect: (monitor) => ({
-      isOver: monitor.isOver(),
-      canDrop: monitor.canDrop()
-    })
-  });
-
   return (
     <Card
-      ref={(node) => drag(drop(node))}
+      ref={drag}
       className={`mb-2 ${isDragging ? 'opacity-50' : ''}`}
     >
       <Card.Body className="d-flex justify-content-between align-items-center">
@@ -61,16 +57,6 @@ const Activity = ({ activity, moveActivity, removeActivity }) => {
   );
 };
 
-// Función para obtener etiqueta de estado
-const getStatusLabel = (status) => {
-  switch (status) {
-    case 0: return 'Nuevo';
-    case 1: return 'En Proceso';
-    case 2: return 'Terminado';
-    default: return 'Desconocido';
-  }
-};
-
 const Kanban = ({ projectId }) => {
   const { actividades, updateActividad, removeActividad, fetchActividades } = useActividades(projectId);
   const [showModal, setShowModal] = useState(false);
@@ -86,28 +72,60 @@ const Kanban = ({ projectId }) => {
     return acc;
   }, { 0: [], 1: [], 2: [] });
 
+  // Componente de columna de estado con drop target
+  const StatusColumn = ({ status }) => {
+    const [, drop] = useDrop({
+      accept: ItemTypes.ACTIVITY,
+      drop: (draggedItem) => {
+        if (draggedItem.estado !== status) {
+          moveActivity(draggedItem.id, draggedItem.estado, status);
+        }
+      },
+      collect: (monitor) => ({
+        isOver: monitor.isOver(),
+        canDrop: monitor.canDrop()
+      })
+    });
+
+    return (
+      <Col>
+        <Card ref={drop}>
+          <Card.Header>
+            {getStatusLabel(status)}
+          </Card.Header>
+          <Card.Body>
+            {groupedActivities[status]?.map((activity) => (
+              <Activity
+                key={activity.numeroActividad}
+                activity={activity}
+                moveActivity={moveActivity}
+                removeActivity={removeActivity}
+              />
+            ))}
+          </Card.Body>
+        </Card>
+      </Col>
+    );
+  };
+
   const removeActivity = async (actividadId) => {
     try {
       await removeActividad(actividadId);
     } catch (error) {
-      // Manejar errores si es necesario
       console.error("Error al eliminar actividad:", error);
     }
   };
 
   const moveActivity = async (activityId, fromStatus, toStatus) => {
-    // Encontrar la actividad que se está moviendo
     const movingActivity = actividades.find(a => a.numeroActividad === activityId);
   
     if (movingActivity) {
-      // Crear nuevo objeto de actividad con estado actualizado
       const updatedActivity = {
         ...movingActivity,
         estado: toStatus
       };
   
       try {
-        // Usar el hook para actualizar la actividad
         await updateActividad(updatedActivity);
       } catch (error) {
         console.error("Error al mover actividad:", error);
@@ -119,22 +137,18 @@ const Kanban = ({ projectId }) => {
     if (!newActivity.nombre.trim()) return;
 
     try {
-      // Modificar la llamada para enviar los datos correctamente
       await axios.post(`/api/projects/${projectId}/actividades`, {
         nombre: newActivity.nombre,
         estado: newActivity.estado,
-        projectId: projectId  // Asegúrate de enviar el projectId si es necesario
+        projectId: projectId
       });
       
-      // Usar fetchActividades para recargar la lista
       await fetchActividades();
       
-      // Cerrar modal y resetear formulario
       setNewActivity({ nombre: '', estado: 0 });
       setShowModal(false);
     } catch (error) {
       console.error("Error al añadir actividad:", error);
-      // Opcional: mostrar un mensaje de error al usuario
     }
   };
 
@@ -151,24 +165,7 @@ const Kanban = ({ projectId }) => {
 
         <Row>
           {[0, 1, 2].map((status) => (
-            <Col key={status}>
-              <Card>
-                <Card.Header>
-                  {getStatusLabel(status)}
-                </Card.Header>
-                <Card.Body>
-                  {groupedActivities[status]?.map((activity) => (
-                    <Activity
-                      key={activity.numeroActividad}
-                      activity={activity}
-                      moveActivity={moveActivity}
-                      // Add this line to pass removeActivity
-                      removeActivity={removeActivity}
-                    />
-                  ))}
-                </Card.Body>
-              </Card>
-            </Col>
+            <StatusColumn key={status} status={status} />
           ))}
         </Row>
 
