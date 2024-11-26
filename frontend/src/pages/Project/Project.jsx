@@ -88,13 +88,16 @@ const Project = () => {
 
   const addActivity = () => {
     if (!isViewMode) {
+      const highestActivityNumber = project.actividades.reduce((max, activity) => {
+        const currentNumber = activity.NumeroActividad || activity.numeroActividad || 0;
+        return currentNumber > max ? currentNumber : max;
+      }, 0);
+  
       const newActivityWithId = {
         ...newActivity,
-        NumeroActividad: project.actividades.length > 0 
-          ? Math.max(...project.actividades.map(a => a.NumeroActividad || 0)) + 1 
-          : 1
+        NumeroActividad: highestActivityNumber + 1
       };
-
+  
       setProject(prev => ({
         ...prev,
         actividades: [...prev.actividades, newActivityWithId],
