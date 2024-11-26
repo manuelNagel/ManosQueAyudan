@@ -32,6 +32,8 @@ func main() {
 	proyectoService := services.NewProyectoService(db)
 	countryService := services.NewCountryService()
 	feedbackService := services.NewFeedbackService(db)
+	habilidadService := services.NewHabilidadService(db)
+	notificacionService := services.NewNotificacionesService(db)
 	denunciaService := services.NewDenunciaService(db)
 	reportingService := services.NewProjectReportingService(db)
 
@@ -59,6 +61,8 @@ func main() {
 	feedbackController := controllers.NewFeedbackController(feedbackService)
 	denunciaController := controllers.NewDenunciaController(denunciaService)
 	reportingController := controllers.NewReportingController(reportingService)
+	notificacionController := controllers.NewNotificacionController(notificacionService)
+	habilidadController := controllers.NewHabilidadController(habilidadService)
 
 
 
