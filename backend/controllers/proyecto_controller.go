@@ -17,7 +17,7 @@ type ProyectoController struct {
 }
 
 type RemoveParticipantRequest struct {
-    Reason string `json:"reason"`
+	Reason string `json:"reason"`
 }
 
 const (
@@ -69,6 +69,29 @@ func (c *ProyectoController) UpdateProyecto(ctx echo.Context) error {
 	}
 
 	return ctx.JSON(http.StatusOK, proyecto)
+}
+
+func (c *ProyectoController) CreateActividad(ctx echo.Context) error {
+	proyectoID, _ := strconv.Atoi(ctx.Param("id"))
+	actividad := new(models.Actividad)
+
+	// Bindear los datos del request a la estructura de Actividad
+	if err := ctx.Bind(actividad); err != nil {
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request payload"})
+	}
+
+	// Establecer el ID del proyecto en la actividad
+	actividad.ProyectoID = uint(proyectoID)
+
+	// Llamar al servicio para crear la actividad
+	nuevaActividad, err := c.Service.CreateActividad(uint(proyectoID), *actividad)
+	if err != nil {
+		log.Printf("Error creating actividad: %v", err)
+		return ctx.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to create actividad"})
+	}
+
+	// Devolver la actividad creada con código 201 (Created)
+	return ctx.JSON(http.StatusCreated, nuevaActividad)
 }
 
 func (c *ProyectoController) UpdateActividad(ctx echo.Context) error {
@@ -131,39 +154,38 @@ func (c *ProyectoController) ListProyectos(ctx echo.Context) error {
 }
 
 func (c *ProyectoController) RemoveParticipant(ctx echo.Context) error {
-    proyectoID, err := strconv.ParseUint(ctx.Param("id"), 10, 32)
-    if err != nil {
-        return ctx.JSON(http.StatusBadRequest, map[string]string{"error": "ID de proyecto inválido"})
-    }
+	proyectoID, err := strconv.ParseUint(ctx.Param("id"), 10, 32)
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": "ID de proyecto inválido"})
+	}
 
-    participantID, err := strconv.ParseUint(ctx.Param("participantId"), 10, 32)
-    if err != nil {
-        return ctx.JSON(http.StatusBadRequest, map[string]string{"error": "ID de participante inválido"})
-    }
+	participantID, err := strconv.ParseUint(ctx.Param("participantId"), 10, 32)
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": "ID de participante inválido"})
+	}
 
-    
-    admin := ctx.Get("user").(*models.Usuario)
-    if admin == nil {
-        return ctx.JSON(http.StatusUnauthorized, map[string]string{"error": "Usuario no autenticado"})
-    }
+	admin := ctx.Get("user").(*models.Usuario)
+	if admin == nil {
+		return ctx.JSON(http.StatusUnauthorized, map[string]string{"error": "Usuario no autenticado"})
+	}
 
-    // adjuntar razón
-    var request RemoveParticipantRequest
-    if err := ctx.Bind(&request); err != nil {
-        return ctx.JSON(http.StatusBadRequest, map[string]string{"error": "Datos inválidos"})
-    }
+	// adjuntar razón
+	var request RemoveParticipantRequest
+	if err := ctx.Bind(&request); err != nil {
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": "Datos inválidos"})
+	}
 
-    // validación razón
-    if request.Reason == "" {
-        return ctx.JSON(http.StatusBadRequest, map[string]string{"error": "Se requiere una razón para la expulsión"})
-    }
+	// validación razón
+	if request.Reason == "" {
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": "Se requiere una razón para la expulsión"})
+	}
 
-    err = c.Service.RemoveParticipant(uint(proyectoID), admin.Id, uint(participantID), request.Reason)
-    if err != nil {
-        return ctx.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
-    }
+	err = c.Service.RemoveParticipant(uint(proyectoID), admin.Id, uint(participantID), request.Reason)
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
 
-    return ctx.JSON(http.StatusOK, map[string]string{"message": "Participante removido exitosamente"})
+	return ctx.JSON(http.StatusOK, map[string]string{"message": "Participante removido exitosamente"})
 }
 
 func (c *ProyectoController) GetParticipants(ctx echo.Context) error {
@@ -316,32 +338,32 @@ func (c *ProyectoController) GetProjectAdmin(ctx echo.Context) error {
 }
 
 func (c *ProyectoController) JoinProject(ctx echo.Context) error {
-    proyectoID, err := strconv.ParseUint(ctx.Param("id"), 10, 32)
-    if err != nil {
-        return ctx.JSON(http.StatusBadRequest, map[string]string{"error": "ID de proyecto inválido"})
-    }
+	proyectoID, err := strconv.ParseUint(ctx.Param("id"), 10, 32)
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": "ID de proyecto inválido"})
+	}
 
-    user := ctx.Get("user").(*models.Usuario)
-    if user == nil {
-        return ctx.JSON(http.StatusUnauthorized, map[string]string{"error": "Usuario no autenticado"})
-    }
+	user := ctx.Get("user").(*models.Usuario)
+	if user == nil {
+		return ctx.JSON(http.StatusUnauthorized, map[string]string{"error": "Usuario no autenticado"})
+	}
 
-    // validación de kickeo
-    wasKicked, err := c.Service.WasUserKicked(uint(proyectoID), user.Id)
-    if err != nil {
-        return ctx.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al verificar estado del usuario"})
-    }
+	// validación de kickeo
+	wasKicked, err := c.Service.WasUserKicked(uint(proyectoID), user.Id)
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, map[string]string{"error": "Error al verificar estado del usuario"})
+	}
 
-    if wasKicked {
-        return ctx.JSON(http.StatusForbidden, map[string]string{"error": "No puedes unirte a este proyecto porque fuiste expulsado"})
-    }
+	if wasKicked {
+		return ctx.JSON(http.StatusForbidden, map[string]string{"error": "No puedes unirte a este proyecto porque fuiste expulsado"})
+	}
 
-    err = c.Service.JoinProject(uint(proyectoID), user.Id)
-    if err != nil {
-        return ctx.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
-    }
+	err = c.Service.JoinProject(uint(proyectoID), user.Id)
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
 
-    return ctx.JSON(http.StatusOK, map[string]string{"message": "Unido al proyecto exitosamente"})
+	return ctx.JSON(http.StatusOK, map[string]string{"message": "Unido al proyecto exitosamente"})
 }
 
 func (c *ProyectoController) LeaveProject(ctx echo.Context) error {

@@ -113,6 +113,7 @@ func main() {
 	r.GET("/projects", proyectoController.ListProyectos)
 	r.PUT("/projects/:id/actividades", proyectoController.UpdateActividad)
 	r.DELETE("/projects/:id/actividades/:actividadId", proyectoController.DeleteActividad)
+	r.POST("/projects/:id/actividades", proyectoController.CreateActividad)
 
 	r.GET("/reports/users/:userId/stats", reportingController.GetUserProjectStats)
 	r.GET("/reports/projects/:projectId/stats", reportingController.GetProjectDetailedStats)

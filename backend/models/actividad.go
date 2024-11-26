@@ -2,14 +2,14 @@
 package models
 
 type Actividad struct {
-  	NumeroActividad int    `gorm:"column:NumeroActividad; primaryKey;autoIncrement" json:"numeroActividad"`
-    Nombre          string `gorm:"column:Nombre" json:"nombre"`
-    Descripcion     string `gorm:"column:Descripcion" json:"descripcion"`
-    Estado          bool   `gorm:"column:Estado" json:"estado"`
-	ProyectoID      uint   `gorm:"column:ProyectoID" json:"proyectoID"`
-	Proyecto 		Proyecto `gorm:"foreignKey:ProyectoID" json:"-"`
+	NumeroActividad int      `gorm:"column:NumeroActividad; primaryKey;autoIncrement" json:"numeroActividad"`
+	Nombre          string   `gorm:"column:Nombre" json:"nombre"`
+	Descripcion     string   `gorm:"column:Descripcion" json:"descripcion"`
+	Estado          uint     `gorm:"column:Estado" json:"estado"`
+	ProyectoID      uint     `gorm:"column:ProyectoID" json:"proyectoID"`
+	Proyecto        Proyecto `gorm:"foreignKey:ProyectoID" json:"-"`
 }
 
 func (Actividad) TableName() string {
-    return "Actividad"
+	return "Actividad"
 }

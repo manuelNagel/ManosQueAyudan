@@ -12,6 +12,8 @@ import ShareButton from '../../components/ShareButton/ShareButton';
 import StatsContainer from '../../components/StatsContainer/StatsContainer';
 import { AlignLeft } from 'lucide-react';
 
+import Kanban from '../../components/Kanban/Kanban';
+
 const Project = () => {
   const [project, setProject] = useState({
     nombre: '',
@@ -225,6 +227,7 @@ const Project = () => {
           />
         </>
       )}
+      <Kanban projectId={ id } />
     </div>
   );
 
