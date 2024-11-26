@@ -1,8 +1,7 @@
 import React from 'react';
 import { Table, Button, Badge, Alert } from 'react-bootstrap';
 
-const ActividadList = ({ activities, editActivity, deleteActivity }) => {
-  // Defensive check for null/undefined activities
+const ActividadList = ({ activities, editActivity, deleteActivity, isAdmin }) => {
   if (!activities) {
     return (
       <Alert variant="info">
@@ -11,7 +10,6 @@ const ActividadList = ({ activities, editActivity, deleteActivity }) => {
     );
   }
 
-  // Ensure activities is treated as an array
   const ActividadList = Array.isArray(activities) ? activities : [];
 
   if (ActividadList.length === 0) {
@@ -62,7 +60,7 @@ const ActividadList = ({ activities, editActivity, deleteActivity }) => {
                       Editar
                     </Button>
                   )}
-                  {deleteActivity && (
+                  {deleteActivity && isAdmin && (
                     <Button
                       variant="danger"
                       size="sm"
