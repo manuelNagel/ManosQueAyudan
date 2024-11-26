@@ -14,9 +14,9 @@ const ItemTypes = {
 const Activity = ({ activity, moveActivity, removeActivity }) => {
   const [{ isDragging }, drag] = useDrag({
     type: ItemTypes.ACTIVITY,
-    item: {
-      id: activity.id,
-      estado: activity.estado
+    item: { 
+      id: activity.numeroActividad, 
+      estado: activity.estado 
     },
     collect: (monitor) => ({
       isDragging: monitor.isDragging()
@@ -27,7 +27,7 @@ const Activity = ({ activity, moveActivity, removeActivity }) => {
     accept: ItemTypes.ACTIVITY,
     drop: (draggedItem) => {
       // Solo permitir mover si no está en la misma columna y el estado es válido
-      if (draggedItem.id !== activity.id && draggedItem.estado !== activity.estado) {
+      if (draggedItem.id !== activity.numeroActividad && draggedItem.estado !== activity.estado) {
         moveActivity(draggedItem.id, draggedItem.estado, activity.estado);
       }
     },
@@ -97,17 +97,21 @@ const Kanban = ({ projectId }) => {
 
   const moveActivity = async (activityId, fromStatus, toStatus) => {
     // Encontrar la actividad que se está moviendo
-    const movingActivity = actividades.find(a => a.id === activityId);
-
+    const movingActivity = actividades.find(a => a.numeroActividad === activityId);
+  
     if (movingActivity) {
       // Crear nuevo objeto de actividad con estado actualizado
       const updatedActivity = {
         ...movingActivity,
         estado: toStatus
       };
-
-      // Usar el hook para actualizar la actividad
-      await updateActividad(updatedActivity);
+  
+      try {
+        // Usar el hook para actualizar la actividad
+        await updateActividad(updatedActivity);
+      } catch (error) {
+        console.error("Error al mover actividad:", error);
+      }
     }
   };
 
@@ -155,7 +159,7 @@ const Kanban = ({ projectId }) => {
                 <Card.Body>
                   {groupedActivities[status]?.map((activity) => (
                     <Activity
-                      key={activity.id}
+                      key={activity.numeroActividad}
                       activity={activity}
                       moveActivity={moveActivity}
                       // Add this line to pass removeActivity
