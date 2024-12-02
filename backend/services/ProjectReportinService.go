@@ -189,12 +189,12 @@ func (s *ProjectReportingService) GetProjectDetailedStats(projectId uint) (*Proj
     // estado de actividades
 	var activities []ActivityStatus
 	err = s.DB.Raw(`
-		SELECT 
-			Nombre as name,
-			Estado as status  
-		FROM Actividad
-		WHERE ProyectoID = ?
-		ORDER BY NumeroActividad
+    	SELECT 
+    	    Nombre as name,
+    	    Estado as status  
+    	FROM Actividad
+    	WHERE ProyectoID = ?
+    	ORDER BY NumeroActividad
 	`, projectId).Scan(&activities).Error
     if err != nil {
         return nil, err

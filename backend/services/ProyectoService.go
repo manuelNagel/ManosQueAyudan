@@ -96,10 +96,12 @@ func (s *ProyectoService) TransferAdminRole(proyectoID, currentAdminID, newAdmin
 func (s *ProyectoService) GetProyecto(id uint) (*models.Proyecto, error) {
 	log.Printf("GetProyecto called with ID: %d", id)
 	var proyecto models.Proyecto
-	if err := s.DB.Preload("Actividades").First(&proyecto, id).Error; err != nil {
-		log.Printf("Error in GetProyecto: %v", err)
-		return nil, err
-	}
+    if err := s.DB.Preload("Actividades", func(db *gorm.DB) *gorm.DB {
+        return db.Order("NumeroActividad ASC")
+    }).First(&proyecto, id).Error; err != nil {
+        log.Printf("Error in GetProyecto: %v", err)
+        return nil, err
+    }
 	return &proyecto, nil
 }
 
@@ -160,10 +162,12 @@ func (s *ProyectoService) ListJoinedProjects(userId uint) ([]models.Proyecto, er
 	}
 
 	var activities []models.Actividad
-	if err := s.DB.Where("ProyectoID IN ?", projectIDs).Find(&activities).Error; err != nil {
-		log.Printf("Error fetching activities: %v", err)
-		return nil, fmt.Errorf("error fetching activities: %v", err)
-	}
+    if err := s.DB.Where("ProyectoID IN ?", projectIDs).
+        Order("ProyectoID, NumeroActividad ASC").
+        Find(&activities).Error; err != nil {
+        log.Printf("Error fetching activities: %v", err)
+        return nil, fmt.Errorf("error fetching activities: %v", err)
+    }
 
 	activityMap := make(map[uint][]models.Actividad)
 	for _, activity := range activities {
@@ -204,15 +208,17 @@ func (s *ProyectoService) UpdateProyecto(proyecto *models.Proyecto) error {
 
 		// Handle Actividades
 		var existingActividades []models.Actividad
-		if err := tx.Where("ProyectoID = ?", proyecto.IdProyecto).Find(&existingActividades).Error; err != nil {
-			return err
-		}
+    if err := tx.Where("ProyectoID = ?", proyecto.IdProyecto).
+        Order("NumeroActividad ASC").
+        Find(&existingActividades).Error; err != nil {
+        return err
+    }
 
 		// Create a map of existing Actividades for easy lookup
 		existingMap := make(map[int]models.Actividad)
-		for _, act := range existingActividades {
-			existingMap[act.NumeroActividad] = act
-		}
+        for _, act := range existingActividades {
+           existingMap[act.NumeroActividad] = act
+        }
 
 		// Update or create Actividades
 		for _, act := range proyecto.Actividades {
@@ -570,17 +576,19 @@ func (s *ProyectoService) GetProjectParticipants(proyectoID uint) ([]ProjectPart
         for _, result := range results {
             projectIds = append(projectIds, result.IdProyecto)
         }
-
+    
         var activities []models.Actividad
-        if err := s.DB.Where("ProyectoID IN ?", projectIds).Find(&activities).Error; err != nil {
+        if err := s.DB.Where("ProyectoID IN ?", projectIds).
+            Order("ProyectoID, NumeroActividad ASC").
+            Find(&activities).Error; err != nil {
             return nil, fmt.Errorf("error fetching activities: %v", err)
         }
-
+    
         activityMap := make(map[uint][]models.Actividad)
         for _, activity := range activities {
             activityMap[activity.ProyectoID] = append(activityMap[activity.ProyectoID], activity)
         }
-
+    
         for i := range results {
             results[i].Actividades = activityMap[results[i].IdProyecto]
         }
