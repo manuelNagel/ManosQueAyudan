@@ -203,87 +203,87 @@ func (c *ProyectoController) GetParticipants(ctx echo.Context) error {
 }
 
 func (c *ProyectoController) SearchProyectosByLocation(ctx echo.Context) error {
-	var lat, lon, radius float64
-	var userId uint = 0 // Default for non-authenticated users
-	var err error
+    var lat, lon, radius float64
+    var userId uint = 0 
+    var err error
 
-	user, ok := ctx.Get("user").(*models.Usuario)
-	if ok && user != nil {
-		userId = user.Id
-		if user.Latitud == 0 && user.Longitud == 0 {
-			return ctx.JSON(http.StatusBadRequest, map[string]string{
-				"error": "User location not set. Please update your profile with your location.",
-			})
-		}
-		lat = user.Latitud
-		lon = user.Longitud
-		radius = float64(user.RadioTrabajo)
-	} else {
-		lat, err = strconv.ParseFloat(ctx.QueryParam("lat"), 64)
-		if err != nil {
-			return ctx.JSON(http.StatusBadRequest, map[string]string{
-				"error": "Invalid or missing latitude parameter",
-			})
-		}
+    user, ok := ctx.Get("user").(*models.Usuario)
+    if ok && user != nil {
+        userId = user.Id
+        if user.Latitud == 0 && user.Longitud == 0 {
+            return ctx.JSON(http.StatusBadRequest, map[string]string{
+                "error": "User location not set. Please update your profile with your location.",
+            })
+        }
+        lat = user.Latitud
+        lon = user.Longitud
+        radius = float64(user.RadioTrabajo)
+    } else {
+        lat, err = strconv.ParseFloat(ctx.QueryParam("lat"), 64)
+        if err != nil {
+            return ctx.JSON(http.StatusBadRequest, map[string]string{
+                "error": "Invalid or missing latitude parameter",
+            })
+        }
 
-		lon, err = strconv.ParseFloat(ctx.QueryParam("lon"), 64)
-		if err != nil {
-			return ctx.JSON(http.StatusBadRequest, map[string]string{
-				"error": "Invalid or missing longitude parameter",
-			})
-		}
+        lon, err = strconv.ParseFloat(ctx.QueryParam("lon"), 64)
+        if err != nil {
+            return ctx.JSON(http.StatusBadRequest, map[string]string{
+                "error": "Invalid or missing longitude parameter",
+            })
+        }
 
-		if lat < -90 || lat > 90 {
-			return ctx.JSON(http.StatusBadRequest, map[string]string{
-				"error": "Latitude must be between -90 and 90 degrees",
-			})
-		}
-		if lon < -180 || lon > 180 {
-			return ctx.JSON(http.StatusBadRequest, map[string]string{
-				"error": "Longitude must be between -180 and 180 degrees",
-			})
-		}
+        if lat < -90 || lat > 90 {
+            return ctx.JSON(http.StatusBadRequest, map[string]string{
+                "error": "Latitude must be between -90 and 90 degrees",
+            })
+        }
+        if lon < -180 || lon > 180 {
+            return ctx.JSON(http.StatusBadRequest, map[string]string{
+                "error": "Longitude must be between -180 and 180 degrees",
+            })
+        }
 
-		radius = PUBLIC_SEARCH_RADIUS
-		log.Printf("Searching with public location: lat=%f, lon=%f, radius=%f", lat, lon, radius)
-	}
+        radius = PUBLIC_SEARCH_RADIUS
+        log.Printf("Searching with public location: lat=%f, lon=%f, radius=%f", lat, lon, radius)
+    }
 
-	proyectos, err := c.Service.SearchProyectosByLocation(lat, lon, radius, userId)
-	if err != nil {
-		log.Printf("Error searching projects: %v", err)
-		return ctx.JSON(http.StatusInternalServerError, map[string]string{
-			"error": "Failed to search projects",
-		})
-	}
+    proyectos, err := c.Service.SearchProyectosByLocation(lat, lon, radius, userId)
+    if err != nil {
+        log.Printf("Error searching projects: %v", err)
+        return ctx.JSON(http.StatusInternalServerError, map[string]string{
+            "error": "Failed to search projects",
+        })
+    }
 
-	response := struct {
-		Projects []struct {
-			models.Proyecto
-			Distance float64 `json:"distance"`
-			IsMember bool    `json:"isMember"`
-		} `json:"projects"`
-		SearchLocation struct {
-			Latitude  float64 `json:"latitude"`
-			Longitude float64 `json:"longitude"`
-			Radius    float64 `json:"radius"`
-			IsAuth    bool    `json:"isAuthenticated"`
-		} `json:"searchLocation"`
-	}{
-		Projects: proyectos,
-		SearchLocation: struct {
-			Latitude  float64 `json:"latitude"`
-			Longitude float64 `json:"longitude"`
-			Radius    float64 `json:"radius"`
-			IsAuth    bool    `json:"isAuthenticated"`
-		}{
-			Latitude:  lat,
-			Longitude: lon,
-			Radius:    radius,
-			IsAuth:    ok && user != nil,
-		},
-	}
+    response := struct {
+        Projects []struct {
+            models.Proyecto
+            Distance float64 `json:"distance"`
+            IsMember bool    `json:"isMember"`
+        } `json:"projects"`
+        SearchLocation struct {
+            Latitude  float64 `json:"latitude"`
+            Longitude float64 `json:"longitude"`
+            Radius    float64 `json:"radius"`
+            IsAuth    bool    `json:"isAuthenticated"`
+        } `json:"searchLocation"`
+    }{
+        Projects: proyectos,
+        SearchLocation: struct {
+            Latitude  float64 `json:"latitude"`
+            Longitude float64 `json:"longitude"`
+            Radius    float64 `json:"radius"`
+            IsAuth    bool    `json:"isAuthenticated"`
+        }{
+            Latitude:  lat,
+            Longitude: lon,
+            Radius:    radius,
+            IsAuth:    ok && user != nil,
+        },
+    }
 
-	return ctx.JSON(http.StatusOK, response)
+    return ctx.JSON(http.StatusOK, response)
 }
 
 func (c *ProyectoController) TransferAdmin(ctx echo.Context) error {

@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import { Form, Button } from 'react-bootstrap';
 import LocationPicker from '../LocationPicker/LocationPicker';
 
+import CustomDatePicker from '../CustomDatePicker/CustomDatePicker';
 
 const ProjectForm = ({ project, handleChange, handleSubmit, handleLocationChange, isEditing, readOnly }) => {
   const inputStyles = readOnly ? {
@@ -9,7 +10,6 @@ const ProjectForm = ({ project, handleChange, handleSubmit, handleLocationChange
     opacity: '0.8',
     cursor: 'not-allowed'
   } : {};
-
 
   return (
     <Form onSubmit={handleSubmit}>
@@ -55,7 +55,6 @@ const ProjectForm = ({ project, handleChange, handleSubmit, handleLocationChange
         />
       </Form.Group>
 
-
       <Form.Group className="mb-3">
         <Form.Label>Fecha de Finalización</Form.Label>
         <Form.Control
@@ -69,9 +68,6 @@ const ProjectForm = ({ project, handleChange, handleSubmit, handleLocationChange
           style={inputStyles}
         />
       </Form.Group>
-
-  
-
 
       <Form.Group className="mb-3">
         <Form.Label>Horario de Inicio</Form.Label>
