@@ -84,13 +84,17 @@ const Notificaciones = () => {
       </Dropdown>
 
       {/* Mostrar ventana emergente */}
-      {selectedNotification && (
+      {selectedNotification  && (
+        
         <VentanaEmergente
           titulo="Notificación"
           texto={selectedNotification.descripcion}
+          fecha={Date(selectedNotification.fecha).toString().split("T")[0]}          
           onClose={() => setSelectedNotification(null)}
         />
-      )}
+        
+      ) }
+     
     </div>
   );
 };

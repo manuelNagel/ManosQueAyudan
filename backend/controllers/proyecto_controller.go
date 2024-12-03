@@ -3,6 +3,7 @@ package controllers
 import (
 	"backend/models"
 	"backend/services"
+
 	"log"
 	"net/http"
 	"strconv"
@@ -10,6 +11,8 @@ import (
 	"fmt"
 
 	"github.com/labstack/echo/v4"
+
+	"backend/config"
 )
 
 type ProyectoController struct {
@@ -42,6 +45,14 @@ func (c *ProyectoController) CreateProyecto(ctx echo.Context) error {
 	if err := c.Service.CreateProyecto(proyecto, user.Id); err != nil {
 		return ctx.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to create project"})
 	}
+
+	cfg := config.LoadConfig()
+	db, err := config.InitDB(cfg)
+	if err != nil {
+		log.Fatalf("Failed to initialize database: %v", err)
+	}
+	u := services.NewUsuarioService(db, cfg.EncryptionKey)
+	u.GetUsariosbyProjectDistance(proyecto.Latitud, proyecto.Longitud, int(proyecto.IdProyecto))
 
 	return ctx.JSON(http.StatusCreated, proyecto)
 }

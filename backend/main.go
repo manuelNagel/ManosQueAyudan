@@ -85,6 +85,8 @@ func main() {
 	e.PUT("/api/notificaciones/:notificacionID/mark-as-read", notificacionController.MarkAsRead)
 	e.POST("/api/notificaciones", notificacionController.AddNotificacion)
 
+	//e.GET("/api/notificaciones/usproy", userController.)
+
 	// Rutas protegidas
 	r := e.Group("/api")
 	r.Use(requireAuth(store, userService))

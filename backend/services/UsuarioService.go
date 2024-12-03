@@ -9,7 +9,9 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math"
 	"strconv"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -28,7 +30,7 @@ func NewUsuarioService(db *gorm.DB, encryptionKey []byte) *UsuarioService {
 }
 
 func (s *UsuarioService) DeleteUsuario(id uint) error {
-    return s.DB.Model(&models.Usuario{}).Where("Id = ?", id).Update("Eliminado", true).Error
+	return s.DB.Model(&models.Usuario{}).Where("Id = ?", id).Update("Eliminado", true).Error
 }
 
 func (s *UsuarioService) encrypt(text string) (string, error) {
@@ -135,32 +137,32 @@ func (s *UsuarioService) UpdateUsuario(usuario *models.Usuario) error {
 }
 
 func (s *UsuarioService) GetUsuario(id uint) (*models.Usuario, error) {
-    var usuario models.Usuario
-    if err := s.DB.Where("Id = ? AND Eliminado = ?", id, false).First(&usuario).Error; err != nil {
-        return nil, err
-    }
+	var usuario models.Usuario
+	if err := s.DB.Where("Id = ? AND Eliminado = ?", id, false).First(&usuario).Error; err != nil {
+		return nil, err
+	}
 
-    if usuario.EncryptedLatitud != "" && usuario.EncryptedLongitud != "" {
-        lat, err := s.decryptLocation(usuario.EncryptedLatitud)
-        if err != nil {
-            return nil, err
-        }
-        long, err := s.decryptLocation(usuario.EncryptedLongitud)
-        if err != nil {
-            return nil, err
-        }
-        loc, err := s.decrypt(usuario.EncryptedLocalizacion)
-        if err != nil {
-            return nil, err
-        }
+	if usuario.EncryptedLatitud != "" && usuario.EncryptedLongitud != "" {
+		lat, err := s.decryptLocation(usuario.EncryptedLatitud)
+		if err != nil {
+			return nil, err
+		}
+		long, err := s.decryptLocation(usuario.EncryptedLongitud)
+		if err != nil {
+			return nil, err
+		}
+		loc, err := s.decrypt(usuario.EncryptedLocalizacion)
+		if err != nil {
+			return nil, err
+		}
 
-        usuario.Latitud = lat
-        usuario.Longitud = long
-        usuario.Localizacion = loc
-		usuario.Password=""
-    }
+		usuario.Latitud = lat
+		usuario.Longitud = long
+		usuario.Localizacion = loc
+		usuario.Password = ""
+	}
 
-    return &usuario, nil
+	return &usuario, nil
 }
 
 // Authentication method remains unchanged, using bcrypt
@@ -196,4 +198,100 @@ func (s *UsuarioService) UpdatePassword(email string, newPassword string) error 
 
 	// Actualizar solo el campo de la contraseña
 	return s.DB.Model(&models.Usuario{}).Where("email = ?", email).Update("password", hashedPassword).Error
+}
+
+func (s *UsuarioService) GetUsariosbyProjectDistance(projectLat, projectLon float64, idproy int) ([]struct {
+	Usuario  *models.Usuario
+	Distance float64
+}, error) {
+	// Fetch all active, non-deleted users
+	var usuarios []models.Usuario
+	err := s.DB.Where("Activo = ? AND Eliminado = ?", false, false).Find(&usuarios).Error
+	if err != nil {
+		return nil, err
+	}
+	// Slice to store users within radius
+	var usersInRadius []struct {
+		Usuario  *models.Usuario
+		Distance float64
+	}
+
+	// Calculate distance for each user
+	for _, usuario := range usuarios {
+		// Decrypt location if encrypted
+		var lat, lon float64
+		var err error
+		if usuario.EncryptedLatitud != "" && usuario.EncryptedLongitud != "" {
+			lat, err = s.decryptLocation(usuario.EncryptedLatitud)
+			if err != nil {
+				continue // Skip user if decryption fails
+			}
+			lon, err = s.decryptLocation(usuario.EncryptedLongitud)
+			if err != nil {
+				continue // Skip user if decryption fails
+			}
+		} else {
+			lat = usuario.Latitud
+			lon = usuario.Longitud
+		}
+
+		// Skip if no valid coordinates
+		if lat == 0 && lon == 0 {
+			continue
+		}
+
+		// Calculate distance using Haversine formula
+		distance := calculateDistance(projectLat, projectLon, lat, lon)
+
+		// Check if distance is within user's work radius
+		if distance <= float64(usuario.RadioTrabajo) {
+			// Create notification for user
+			notificacionesService := NewNotificacionesService(s.DB)
+			notificacion := &models.Notificacion{
+				UsuarioNotificado: usuario.Id,
+				Fecha:             time.Now(),
+				Descripcion:       fmt.Sprintf("Hay un nuevo proyecto que podría interesarte. <a href=\"./projects/view/%d\" >Ir al Proyecto </a>", idproy),
+			}
+			fmt.Println("Hay un nuevo proyecto que podría interesarte. <a href=\"./projects/view/%d\" >Ir al Proyecto </a>", idproy)
+			err = notificacionesService.AddNotificacion(notificacion)
+			if err != nil {
+				// Log error but continue processing other users
+				fmt.Printf("Error creating notification for user %d: %v\n", usuario.Id, err)
+			}
+
+			// Add user to results
+			usersInRadius = append(usersInRadius, struct {
+				Usuario  *models.Usuario
+				Distance float64
+			}{
+				Usuario:  &usuario,
+				Distance: distance,
+			})
+		}
+	}
+
+	return usersInRadius, nil
+}
+
+// calculateDistance calculates the great-circle distance between two points
+func calculateDistance(lat1, lon1, lat2, lon2 float64) float64 {
+	const earthRadius = 6371 // kilometers
+
+	// Convert to radians
+	lat1Rad := lat1 * math.Pi / 180
+	lon1Rad := lon1 * math.Pi / 180
+	lat2Rad := lat2 * math.Pi / 180
+	lon2Rad := lon2 * math.Pi / 180
+
+	// Haversine formula
+	dlat := lat2Rad - lat1Rad
+	dlon := lon2Rad - lon1Rad
+
+	a := math.Sin(dlat/2)*math.Sin(dlat/2) +
+		math.Cos(lat1Rad)*math.Cos(lat2Rad)*
+			math.Sin(dlon/2)*math.Sin(dlon/2)
+
+	c := 2 * math.Atan2(math.Sqrt(a), math.Sqrt(1-a))
+
+	return earthRadius * c
 }

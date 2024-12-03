@@ -39,6 +39,9 @@ func (s *ProyectoService) CreateProyecto(proyecto *models.Proyecto, userID uint)
 			return fmt.Errorf("error creating project: %v", err)
 		}
 
+		
+
+
 		adminRelation := models.ProyectosUsuarios{
 			IdProyecto:  proyecto.IdProyecto,
 			IdUsuario:   userID,
