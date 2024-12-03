@@ -21,7 +21,7 @@ const getStatusLabel = (status) => {
 };
 
 // Componente para una actividad individual
-const Activity = ({ activity, moveActivity, removeActivity }) => {
+const Activity = ({ activity, moveActivity, removeActivity, isAdmin }) => { // Add isAdmin prop
   const [{ isDragging }, drag] = useDrag({
     type: ItemTypes.ACTIVITY,
     item: { 
@@ -45,20 +45,23 @@ const Activity = ({ activity, moveActivity, removeActivity }) => {
             Estado: {getStatusLabel(activity.estado)}
           </small>
         </div>
-        <Button
-          variant="danger"
-          size="sm"
-          onClick={() => removeActivity(activity.numeroActividad)}
-        >
-          Eliminar
-        </Button>
+        {isAdmin && ( 
+          <Button
+            variant="danger"
+            size="sm"
+            onClick={() => removeActivity(activity.numeroActividad)}
+          >
+            Eliminar
+          </Button>
+        )}
       </Card.Body>
     </Card>
   );
 };
 
-const Kanban = ({ projectId }) => {
-  const { actividades, updateActividad, removeActividad, fetchActividades } = useActividades(projectId);
+const Kanban = ({ projectId, onStateChange,isAdmin }) => {
+  const { actividades, updateActividad, removeActividad, fetchActividades } = 
+    useActividades(projectId, onStateChange);
   const [showModal, setShowModal] = useState(false);
   const [newActivity, setNewActivity] = useState({
     nombre: '',
@@ -94,14 +97,15 @@ const Kanban = ({ projectId }) => {
             {getStatusLabel(status)}
           </Card.Header>
           <Card.Body>
-            {groupedActivities[status]?.map((activity) => (
-              <Activity
-                key={activity.numeroActividad}
-                activity={activity}
-                moveActivity={moveActivity}
-                removeActivity={removeActivity}
-              />
-            ))}
+          {groupedActivities[status]?.map((activity) => (
+            <Activity
+              key={activity.numeroActividad}
+              activity={activity}
+              moveActivity={moveActivity}
+              removeActivity={removeActivity}
+              isAdmin={isAdmin} 
+            />
+          ))}
           </Card.Body>
         </Card>
       </Col>
@@ -132,6 +136,8 @@ const Kanban = ({ projectId }) => {
       }
     }
   };
+
+  
 
   const addActivity = async () => {
     if (!newActivity.nombre.trim()) return;

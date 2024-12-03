@@ -1,0 +1,160 @@
+.homeContainer {
+    min-height: 100vh;
+    background-color: #ffffff;
+  }
+  
+  /* Hero Section */
+  .heroSection {
+    padding: 4rem 0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  }
+  
+  .heroTitle {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+    color: #2d3748;
+  }
+  
+  .brandHighlight {
+    color: #2b6cb0;
+  }
+  
+  .heroSubtitle {
+    font-size: 1.25rem;
+    color: #4a5568;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+  }
+  
+  .heroImage {
+    max-width: 100%;
+    height: auto;
+    border-radius: 1rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+                0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+  
+  .ctaButtons {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .mainCta {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+  }
+  
+  /* Features Section */
+  .featuresSection {
+    padding: 5rem 0;
+    background-color: #ffffff;
+  }
+  
+  .sectionTitle {
+    text-align: center;
+    font-size: 2.5rem;
+    color: #2d3748;
+    margin-bottom: 3rem;
+  }
+  
+  .featureCard {
+    padding: 2rem;
+    background: #ffffff;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: transform 0.2s ease;
+    height: 100%;
+  }
+  
+  .featureCard:hover {
+    transform: translateY(-5px);
+  }
+  
+  .featureIcon {
+    display: inline-flex;
+    padding: 1rem;
+    background: #ebf8ff;
+    border-radius: 12px;
+    color: #2b6cb0;
+    margin-bottom: 1.5rem;
+  }
+  
+  .featureTitle {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 1rem;
+  }
+  
+  .featureDescription {
+    color: #4a5568;
+    line-height: 1.6;
+  }
+  
+  /* CTA Section */
+  .ctaSection {
+    padding: 5rem 0;
+    background: linear-gradient(135deg, #2b6cb0 0%, #1a4971 100%);
+    color: white;
+  }
+  
+  .ctaTitle {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+  }
+  
+  .ctaText {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+  }
+  
+  .ctaButton {
+    padding: 1rem 2rem;
+    font-weight: 600;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .heroSection {
+      padding: 2rem 0;
+      text-align: center;
+    }
+  
+    .heroTitle {
+      font-size: 2.5rem;
+    }
+  
+    .ctaButtons {
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+  
+    .heroImage {
+      margin-top: 2rem;
+    }
+  
+    .featureCard {
+      margin-bottom: 1rem;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .heroTitle {
+      font-size: 2rem;
+    }
+  
+    .sectionTitle {
+      font-size: 2rem;
+    }
+  
+    .ctaTitle {
+      font-size: 2rem;
+    }
+  }

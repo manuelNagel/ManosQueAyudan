@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import RemoveParticipantModal from '../RemoveParticipantModal/RemoveParticipantModal';
 import DenunciaModal from '../DenunciaModal/DenunciaModal';
+import FeedbackModal from '../FeedbackModal/FeedbackModal';
 
 const ParticipantList = ({ projectId }) => {
   const [participants, setParticipants] = useState([]);
@@ -14,6 +15,7 @@ const ParticipantList = ({ projectId }) => {
 
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [showDenunciaModal, setShowDenunciaModal] = useState(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [selectedParticipant, setSelectedParticipant] = useState(null);
   const [removeLoading, setRemoveLoading] = useState(false);
 
@@ -98,6 +100,19 @@ const ParticipantList = ({ projectId }) => {
               {(isAdmin || user) && (
                 <td>
                   <div className="d-flex gap-2">
+                    {/* Only show feedback button if the participant is not the current user */}
+                    {participant.idUsuario !== user.id && (
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedParticipant(participant);
+                          setShowFeedbackModal(true);
+                        }}
+                      >
+                        Feedback
+                      </Button>
+                    )}
                     {isAdmin && participant.idUsuario !== user.id && (
                       <Button
                         variant="danger"
@@ -152,6 +167,16 @@ const ParticipantList = ({ projectId }) => {
         targetName={selectedParticipant ? 
           `${selectedParticipant.nombre} ${selectedParticipant.apellido}` : 
           ''}
+      />
+
+      <FeedbackModal
+        show={showFeedbackModal}
+        handleClose={() => {
+          setShowFeedbackModal(false);
+          setSelectedParticipant(null);
+        }}
+        recipient={selectedParticipant}
+        projectId={projectId}
       />
     </>
   );

@@ -43,8 +43,7 @@ type ParticipantCounts struct {
 
 type ActivityStatus struct {
     Name   string `json:"name"`
-    Status bool   `json:"status"`
-}
+	Status int    `json:"status"`}
 
 type ParticipantHistoryEntry struct {
     Month  string `json:"month"`
@@ -166,19 +165,19 @@ func (s *ProjectReportingService) GetProjectDetailedStats(projectId uint) (*Proj
 
     // participantes y completion rates
     var counts ParticipantCounts
-    err = s.DB.Raw(`
-        SELECT 
-            COUNT(DISTINCT pu.IdUsuario) as total_participants,
-            COUNT(DISTINCT CASE WHEN pu.FechaFin IS NULL THEN pu.IdUsuario END) as active_participants,
-            IFNULL(
-                (SUM(CASE WHEN a.Estado = true THEN 1 ELSE 0 END) * 100.0) / 
-                NULLIF(COUNT(a.NumeroActividad), 0),
-                0
-            ) as completion_rate
-        FROM Proyectos_Usuarios pu
-        LEFT JOIN Actividad a ON a.ProyectoID = pu.IdProyecto
-        WHERE pu.IdProyecto = ?
-    `, projectId).Scan(&counts).Error
+	err = s.DB.Raw(`
+    SELECT 
+        COUNT(DISTINCT pu.IdUsuario) as total_participants,
+        COUNT(DISTINCT CASE WHEN pu.FechaFin IS NULL THEN pu.IdUsuario END) as active_participants,
+        IFNULL(
+            (SUM(CASE WHEN a.Estado = 2 THEN 1 ELSE 0 END) * 100.0) /
+            NULLIF(COUNT(a.NumeroActividad), 0),
+            0
+        ) as completion_rate
+    FROM Proyectos_Usuarios pu
+    LEFT JOIN Actividad a ON a.ProyectoID = pu.IdProyecto
+    WHERE pu.IdProyecto = ?
+`, projectId).Scan(&counts).Error
     if err != nil {
         return nil, err
     }
@@ -188,15 +187,15 @@ func (s *ProjectReportingService) GetProjectDetailedStats(projectId uint) (*Proj
     stats.CompletionRate = counts.CompletionRate
 
     // estado de actividades
-    var activities []ActivityStatus
-    err = s.DB.Raw(`
-        SELECT 
-            Nombre as name,
-            Estado as status
-        FROM Actividad
-        WHERE ProyectoID = ?
-        ORDER BY NumeroActividad
-    `, projectId).Scan(&activities).Error
+	var activities []ActivityStatus
+	err = s.DB.Raw(`
+    	SELECT 
+    	    Nombre as name,
+    	    Estado as status  
+    	FROM Actividad
+    	WHERE ProyectoID = ?
+    	ORDER BY NumeroActividad
+	`, projectId).Scan(&activities).Error
     if err != nil {
         return nil, err
     }

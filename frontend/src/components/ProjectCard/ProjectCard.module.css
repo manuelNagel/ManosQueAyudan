@@ -1,0 +1,138 @@
+.card {
+    height: 100%;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .cardBody {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 1.5rem;
+  }
+  
+  .cardHeader {
+    margin-bottom: 1.25rem;
+  }
+  
+  .title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #2d3748;
+  }
+  
+  .description {
+    font-size: 0.875rem;
+    color: #718096;
+    margin-bottom: 1rem;
+  }
+  
+  .details {
+    margin-bottom: 1.5rem;
+  }
+  
+  .detailItem {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: #4a5568;
+    margin-bottom: 0.5rem;
+  }
+  
+  .detailItem i {
+    color: #4299e1;
+    width: 1rem;
+  }
+  
+  .progressSection {
+    margin-bottom: 1.5rem;
+  }
+  
+  .progressHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    color: #4a5568;
+  }
+  
+  .progressBar {
+    height: 0.5rem;
+    border-radius: 9999px;
+  }
+  
+  .cardFooter {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .distance {
+    font-size: 0.875rem;
+    color: #718096;
+  }
+  
+  @media (max-width: 768px) {
+    .cardBody {
+      padding: 1rem;
+    }
+  
+    .title {
+      font-size: 1.125rem;
+    }
+  
+    .description {
+      font-size: 0.813rem;
+    }
+  
+    .detailItem {
+      font-size: 0.813rem;
+    }
+  }
+
+  .progressSection {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background-color: #f8fafc;
+    border-radius: 0.5rem;
+  }
+  
+  .progressHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    color: #4a5568;
+  }
+  
+  .progressBar {
+    height: 0.5rem;
+    border-radius: 9999px;
+    margin-bottom: 0.5rem;
+  }
+  
+  .activitySummary {
+    display: block;
+    color: #718096;
+    font-size: 0.75rem;
+    margin-top: 0.5rem;
+    text-align: center;
+  }
+  
+  .actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  

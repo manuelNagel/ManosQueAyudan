@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect ,useCallback} from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Container, Form, Button, Alert,Tab,Tabs } from 'react-bootstrap';
 import axios from 'axios';
-
+import { useAuth } from '../../context/AuthContext';
 import ProjectForm from '../../components/ProjectForm/ProjectForm';
 import ActividadList from '../../components/ActividadList/ActividadList';
 import ActividadForm from '../../components/ActividadForm/ActividadForm';
@@ -34,40 +34,51 @@ const Project = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('details'); 
-  
+  const { user } = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const isViewMode = location.pathname.includes('/projects/joined/');
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    if (id) {
-      fetchProject();
-    } else {
-      setLoading(false);
-    }
-  }, [id]);
-
-  const fetchProject = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await axios.get(`/api/projects/${id}`);
-      const fetchedProject = response.data;
-      setProject({
-        ...fetchedProject,
-        actividades: fetchedProject.actividades || [], 
-        fechaInicio: fetchedProject.fechaInicio ? fetchedProject.fechaInicio.split('T')[0] : '',
-        fechaFinalizacion: fetchedProject.fechaFinalizacion ? fetchedProject.fechaFinalizacion.split('T')[0] : '',
-        horarioInicio: fetchedProject.horarioInicio ? new Date(fetchedProject.horarioInicio).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '',
-        horarioFinal: fetchedProject.horarioFinal ? new Date(fetchedProject.horarioFinal).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : ''
-      });
-    } catch (error) {
-      setError('Error al cargar el proyecto: ' + (error.response?.data?.error || error.message));
-    } finally {
-      setLoading(false);
-    }
-  };
+    const loadProjectData = async () => {
+      if (id) {
+        try {
+          setLoading(true);
+          setError(null);
+          
+          // Fetch project data
+          const projectResponse = await axios.get(`/api/projects/${id}`);
+          const fetchedProject = projectResponse.data;
+          setProject({
+            ...fetchedProject,
+            actividades: fetchedProject.actividades || [], 
+            fechaInicio: fetchedProject.fechaInicio ? fetchedProject.fechaInicio.split('T')[0] : '',
+            fechaFinalizacion: fetchedProject.fechaFinalizacion ? fetchedProject.fechaFinalizacion.split('T')[0] : '',
+            horarioInicio: fetchedProject.horarioInicio ? new Date(fetchedProject.horarioInicio).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '',
+            horarioFinal: fetchedProject.horarioFinal ? new Date(fetchedProject.horarioFinal).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : ''
+          });
+  
+          // Check admin status
+          if (user) {
+            const adminResponse = await axios.get(`/api/projects/${id}/admin`);
+            const adminUser = adminResponse.data;
+            setIsAdmin(adminUser?.id === user.id);
+          }
+        } catch (error) {
+          setError('Error al cargar el proyecto: ' + (error.response?.data?.error || error.message));
+          setIsAdmin(false);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setLoading(false);
+      }
+    };
+  
+    loadProjectData();
+  }, [id, user?.id]);
 
   const handleLocationChange = (location) => {
     setProject(prev => ({
@@ -82,6 +93,13 @@ const Project = () => {
     const { name, value } = e.target;
     setProject(prev => ({ ...prev, [name]: value }));
   };
+
+  const handleActivitiesChange = useCallback((updatedActivities) => {
+    setProject(prev => ({
+      ...prev,
+      actividades: updatedActivities
+    }));
+  }, []);
 
   const handleActivityChange = (e) => {
     const { name, value } = e.target;
@@ -216,18 +234,13 @@ const Project = () => {
         activities={project?.actividades || []}
         editActivity={!isViewMode ? editActivity : undefined}
         deleteActivity={!isViewMode ? deleteActivity : undefined}
+        isAdmin={isAdmin}
       />
-      {!isViewMode && (
-        <>
-          <h3 className="mt-4">Agregar Nueva Actividad</h3>
-          <ActividadForm 
-            newActivity={newActivity} 
-            handleActivityChange={handleActivityChange} 
-            addActivity={addActivity}
-          />
-        </>
-      )}
-      <Kanban projectId={ id } />
+      <Kanban 
+        projectId={id} 
+        isAdmin={isAdmin}
+        onStateChange={handleActivitiesChange}
+      />
     </div>
   );
 
@@ -265,7 +278,6 @@ const Project = () => {
           )}
         </Tabs>
       ) : (
-        // Show only the form for new projects
         renderProjectForm()
       )}
     </Container>

@@ -1,18 +1,21 @@
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
-export const useActividades = (projectId) => {
+export const useActividades = (projectId,onStateChange) => {
   const [actividades, setActividades] = useState([]);
 
-  // Envuelve fetchActividades con useCallback
   const fetchActividades = useCallback(async () => {
     try {
       const response = await axios.get(`/api/projects/${projectId}`);
-      setActividades(response.data.actividades || []);
+      const newActividades = response.data.actividades || [];
+      setActividades(newActividades);
+      if (onStateChange && JSON.stringify(newActividades) !== JSON.stringify(actividades)) {
+        onStateChange(newActividades);
+      }
     } catch (error) {
       console.error("Error al cargar actividades:", error);
     }
-  }, [projectId]); // Dependencia de projectId
+  }, [projectId, onStateChange, actividades]);
 
   const updateActividad = async (actividad) => {
     try {
@@ -38,7 +41,7 @@ export const useActividades = (projectId) => {
 
   useEffect(() => {
     fetchActividades();
-  }, [fetchActividades]); // Ahora incluye fetchActividades en las dependencias
+  }, [projectId]); 
 
   return { 
     actividades, 

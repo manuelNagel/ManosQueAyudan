@@ -21,7 +21,7 @@ type Proyecto struct {
     Usuarios              []Usuario `gorm:"many2many:Proyectos_Usuarios;foreignKey:IdProyecto;joinForeignKey:IdProyecto;References:Id;joinReferences:IdUsuario" json:"usuarios"`
     Roles                 []RolProyecto `gorm:"many2many:Proyectos_Usuarios;foreignKey:IdProyecto;joinForeignKey:IdProyecto;References:IdRol;joinReferences:IdRol" json:"roles"`
     ProyectosUsuarios     []ProyectosUsuarios `gorm:"foreignKey:IdProyecto" json:"-"`
-	Actividades           []Actividad `gorm:"foreignKey:ProyectoID" json:"actividades"`  
+    Actividades           []Actividad `gorm:"foreignKey:ProyectoID;references:IdProyecto" json:"actividades"`  
 	Denuncias             []Denuncia `gorm:"many2many:Denuncia_Proyecto;joinForeignKey:ProyectoDenunciado;joinReferences:IdDenuncia" json:"denuncias"`
 }
 

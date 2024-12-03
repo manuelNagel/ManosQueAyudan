@@ -37,9 +37,6 @@ const ActividadForm = ({ newActivity, handleActivityChange, addActivity }) => {
           />
         </Form.Group>
       </Col>
-      <Col>
-        <Button onClick={addActivity} className="mt-4">Añadir Actividad</Button>
-      </Col>
     </Row>
   );
 };

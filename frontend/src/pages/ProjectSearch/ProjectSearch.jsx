@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { Container, Card, Button, Row, Col, Alert } from 'react-bootstrap';
+import { Container, Alert, Spinner, Row, Col } from 'react-bootstrap';
 import { useAuth } from '../../context/AuthContext';
 import Navbar from '../../components/Navbar/Navbar';
 import LocationPicker from '../../components/LocationPicker/LocationPicker';
 import { useProjectSearch } from '../../hooks/useProjectSearch';
 import { useProjectParticipation } from '../../hooks/useProjectParticipation';
 import DenunciaModal from '../../components/DenunciaModal/DenunciaModal';
+import ProjectCard from '../../components/ProjectCard/ProjectCard';
+import styles from './ProjectSearch.module.css';
 
 const ProjectSearch = () => {
   const { user } = useAuth();
@@ -23,23 +25,11 @@ const ProjectSearch = () => {
     searchProjects
   } = useProjectSearch();
 
-  const formatDateTime = (dateString) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleString('es-AR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
   const handleJoinProject = async (projectId) => {
     try {
       const success = await joinProject(projectId);
       if (success) {
-        await searchProjects(); 
+        await searchProjects();
       }
     } catch (error) {
       console.error('Error joining project:', error);
@@ -55,18 +45,26 @@ const ProjectSearch = () => {
     }
   };
 
+  const handleReportProject = (project) => {
+    setSelectedProject(project);
+    setShowDenunciaModal(true);
+  };
+
   return (
-    <div>
+    <div className={styles.pageContainer}>
       <Navbar />
-      <Container className="mt-4">
-        <h2>Buscar Proyectos</h2>
+      <Container className={styles.contentContainer}>
+        <div className={styles.header}>
+          <h2>Buscar Proyectos</h2>
+        </div>
+
         {error && <Alert variant="danger">{error}</Alert>}
         {joinError && <Alert variant="danger">{joinError}</Alert>}
 
         {!isAuthenticated && (
-          <div className="mb-4">
+          <div className={styles.locationPickerSection}>
             <Alert variant="info">
-              Para ver proyectos, primero selecciona una ubicación. 
+              Para ver proyectos, primero selecciona una ubicación.
               {!manualLocation.latitude && 
                 ' Los proyectos se mostrarán en un radio de 20km desde el punto seleccionado.'}
             </Alert>
@@ -75,110 +73,61 @@ const ProjectSearch = () => {
                 lat: manualLocation.latitude,
                 lng: manualLocation.longitude
               } : undefined}
+              initialLocalizacion=""
               onLocationChange={handleLocationChange}
             />
           </div>
         )}
 
         {loading ? (
-          <div className="text-center">
-            <div className="spinner-border" role="status">
+          <div className={styles.loadingContainer}>
+            <Spinner animation="border" role="status">
               <span className="visually-hidden">Cargando...</span>
-            </div>
+            </Spinner>
           </div>
         ) : (
           <>
             {isAuthenticated && (
-              <Alert variant="info">
+              <Alert variant="info" className={styles.radiusAlert}>
                 Mostrando proyectos dentro de tu radio de trabajo ({user.radioTrabajo}km)
               </Alert>
             )}
             
             {projects.length === 0 ? (
-              <Alert variant="warning">
+              <Alert variant="warning" className={styles.noProjectsAlert}>
                 No se encontraron proyectos {isAuthenticated ? 
                   'en tu área de trabajo' : 
                   manualLocation.latitude ? 'en esta ubicación' : ''}
               </Alert>
             ) : (
-              <Row>
+              <Row className={styles.projectGrid}>
                 {projects.map(project => (
-                  <Col md={6} lg={4} key={project.idProyecto} className="mb-4">
-                    <Card>
-                      <Card.Body>
-                        <Card.Title>{project.nombre}</Card.Title>
-                        <Card.Text>
-                          <strong>Descripción:</strong> {project.descripcion}<br/>
-                          <strong>Ubicación:</strong> {project.localizacion}<br/>
-                          <strong>Inicio:</strong> {formatDateTime(project.fechaInicio)}<br/>
-                          <strong>Fin:</strong> {formatDateTime(project.fechaFinalizacion)}<br/>
-                          <strong>Horario:</strong> {formatDateTime(project.horarioInicio)} - {formatDateTime(project.horarioFinal)}<br/>
-                          <strong>Participantes:</strong> {project.cantidadParticipantes}
-                        </Card.Text>
-                        <div className="d-flex justify-content-between align-items-center">
-                          <div className="d-flex gap-2">
-                            {isAuthenticated ? (
-                              project.isMember ? (
-                                <Button 
-                                  variant="secondary" 
-                                  disabled
-                                >
-                                  Ya eres miembro
-                                </Button>
-                              ) : (
-                                <Button 
-                                  variant="primary"
-                                  onClick={() => handleJoinProject(project.idProyecto)}
-                                  disabled={joinLoading}
-                                >
-                                  {joinLoading ? 'Uniéndose...' : 'Unirse al Proyecto'}
-                                </Button>
-                              )
-                            ) : (
-                              <Button 
-                                variant="primary" 
-                                href="/login"
-                              >
-                                Iniciar sesión para unirse
-                              </Button>
-                            )}
-                            {isAuthenticated && (
-                              <Button
-                                variant="warning"
-                                size="sm"
-                                onClick={() => {
-                                  setSelectedProject(project);
-                                  setShowDenunciaModal(true);
-                                }}
-                              >
-                                Reportar Proyecto
-                              </Button>
-                            )}
-                          </div>
-                          <small className="text-muted">
-                            {project.distance ? `${project.distance.toFixed(1)} km` : ''}
-                          </small>
-                        </div>
-                      </Card.Body>
-                    </Card>
+                  <Col md={6} lg={4} key={project.idProyecto} className={styles.projectColumn}>
+                    <ProjectCard
+                      project={project}
+                      onJoin={handleJoinProject}
+                      onReport={() => handleReportProject(project)}
+                      isAuthenticated={isAuthenticated}
+                      loading={joinLoading}
+                    />
                   </Col>
                 ))}
               </Row>
             )}
           </>
         )}
-      </Container>
 
-      <DenunciaModal
-        show={showDenunciaModal}
-        handleClose={() => {
-          setShowDenunciaModal(false);
-          setSelectedProject(null);
-        }}
-        tipo="Proyecto"
-        targetId={selectedProject?.idProyecto}
-        targetName={selectedProject?.nombre}
-      />
+        <DenunciaModal
+          show={showDenunciaModal}
+          handleClose={() => {
+            setShowDenunciaModal(false);
+            setSelectedProject(null);
+          }}
+          tipo="Proyecto"
+          targetId={selectedProject?.idProyecto}
+          targetName={selectedProject?.nombre}
+        />
+      </Container>
     </div>
   );
 };

@@ -18,7 +18,6 @@ export const useProjectSearch = () => {
     try {
       let url = '/api/projects/search';
       
-      // Only append coordinates for non-authenticated users
       if (!user && latitude && longitude) {
         url += `?lat=${latitude}&lon=${longitude}`;
       }
@@ -26,7 +25,13 @@ export const useProjectSearch = () => {
       const response = await axios.get(url);
       
       if (response.data.projects) {
-        setProjects(response.data.projects);
+        const projectsWithParsedActivities = response.data.projects.map(project => ({
+          ...project,
+          actividades: typeof project.actividades === 'string' 
+            ? JSON.parse(project.actividades) 
+            : (project.actividades || [])
+        }));
+        setProjects(projectsWithParsedActivities);
       } else {
         setProjects([]);
       }
@@ -39,7 +44,6 @@ export const useProjectSearch = () => {
   };
 
   const handleLocationSelect = async (location) => {
-    // Check if location has valid coordinates
     if (location && typeof location.lat === 'number' && typeof location.lng === 'number') {
       setManualLocation({
         latitude: location.lat,
@@ -47,7 +51,6 @@ export const useProjectSearch = () => {
       });
 
       if (!user) {
-        // Only search with coordinates for non-authenticated users
         await searchProjects(location.lat, location.lng);
       }
     } else {
@@ -55,13 +58,10 @@ export const useProjectSearch = () => {
     }
   };
 
-  // Initial search when component mounts
   useEffect(() => {
     if (user) {
-      // For authenticated users, just search without coordinates
       searchProjects();
     } else if (manualLocation.latitude && manualLocation.longitude) {
-      // For non-authenticated users, search with coordinates
       searchProjects(manualLocation.latitude, manualLocation.longitude);
     }
   }, [user]);

@@ -99,10 +99,12 @@ func (s *ProyectoService) TransferAdminRole(proyectoID, currentAdminID, newAdmin
 func (s *ProyectoService) GetProyecto(id uint) (*models.Proyecto, error) {
 	log.Printf("GetProyecto called with ID: %d", id)
 	var proyecto models.Proyecto
-	if err := s.DB.Preload("Actividades").First(&proyecto, id).Error; err != nil {
-		log.Printf("Error in GetProyecto: %v", err)
-		return nil, err
-	}
+    if err := s.DB.Preload("Actividades", func(db *gorm.DB) *gorm.DB {
+        return db.Order("NumeroActividad ASC")
+    }).First(&proyecto, id).Error; err != nil {
+        log.Printf("Error in GetProyecto: %v", err)
+        return nil, err
+    }
 	return &proyecto, nil
 }
 
@@ -163,10 +165,12 @@ func (s *ProyectoService) ListJoinedProjects(userId uint) ([]models.Proyecto, er
 	}
 
 	var activities []models.Actividad
-	if err := s.DB.Where("ProyectoID IN ?", projectIDs).Find(&activities).Error; err != nil {
-		log.Printf("Error fetching activities: %v", err)
-		return nil, fmt.Errorf("error fetching activities: %v", err)
-	}
+    if err := s.DB.Where("ProyectoID IN ?", projectIDs).
+        Order("ProyectoID, NumeroActividad ASC").
+        Find(&activities).Error; err != nil {
+        log.Printf("Error fetching activities: %v", err)
+        return nil, fmt.Errorf("error fetching activities: %v", err)
+    }
 
 	activityMap := make(map[uint][]models.Actividad)
 	for _, activity := range activities {
@@ -207,15 +211,17 @@ func (s *ProyectoService) UpdateProyecto(proyecto *models.Proyecto) error {
 
 		// Handle Actividades
 		var existingActividades []models.Actividad
-		if err := tx.Where("ProyectoID = ?", proyecto.IdProyecto).Find(&existingActividades).Error; err != nil {
-			return err
-		}
+    if err := tx.Where("ProyectoID = ?", proyecto.IdProyecto).
+        Order("NumeroActividad ASC").
+        Find(&existingActividades).Error; err != nil {
+        return err
+    }
 
 		// Create a map of existing Actividades for easy lookup
 		existingMap := make(map[int]models.Actividad)
-		for _, act := range existingActividades {
-			existingMap[act.NumeroActividad] = act
-		}
+        for _, act := range existingActividades {
+           existingMap[act.NumeroActividad] = act
+        }
 
 		// Update or create Actividades
 		for _, act := range proyecto.Actividades {
@@ -348,26 +354,33 @@ func (s *ProyectoService) ListUserProjects(userId uint) ([]models.Proyecto, erro
 }
 
 func (s *ProyectoService) CreateActividad(proyectoID uint, actividad models.Actividad) (*models.Actividad, error) {
-	// Validaciones adicionales si son necesarias
-	if proyectoID == 0 {
-		return nil, errors.New("proyecto ID is required")
-	}
+    // Validaciones adicionales si son necesarias
+    if proyectoID == 0 {
+        return nil, errors.New("proyecto ID is required")
+    }
 
-	// Verificar que el proyecto exista
-	var proyecto models.Proyecto
-	if err := s.DB.First(&proyecto, proyectoID).Error; err != nil {
-		return nil, fmt.Errorf("proyecto not found: %v", err)
-	}
+    var proyecto models.Proyecto
+    if err := s.DB.First(&proyecto, proyectoID).Error; err != nil {
+        return nil, fmt.Errorf("proyecto not found: %v", err)
+    }
 
-	// Establecer el ID del proyecto
-	actividad.ProyectoID = proyectoID
+    var maxNumber int
+    err := s.DB.Model(&models.Actividad{}).
+        Where("ProyectoID = ?", proyectoID).
+        Select("COALESCE(MAX(NumeroActividad), 0)").
+        Scan(&maxNumber).Error
+    if err != nil {
+        return nil, fmt.Errorf("error getting max activity number: %v", err)
+    }
 
-	// Crear la actividad en la base de datos
-	if err := s.DB.Create(&actividad).Error; err != nil {
-		return nil, fmt.Errorf("error creating actividad: %v", err)
-	}
+    actividad.NumeroActividad = maxNumber + 1
+    actividad.ProyectoID = proyectoID
 
-	return &actividad, nil
+    if err := s.DB.Create(&actividad).Error; err != nil {
+        return nil, fmt.Errorf("error creating actividad: %v", err)
+    }
+
+    return &actividad, nil
 }
 
 func (s *ProyectoService) UpdateActividad(proyectoID uint, actividad models.Actividad) error {
@@ -503,18 +516,13 @@ func (s *ProyectoService) GetProjectParticipants(proyectoID uint) ([]ProjectPart
 /*
 *Metodo que busca los proyectos por la localización y radio del usuario
  */
-func (s *ProyectoService) SearchProyectosByLocation(lat, lon float64, radiusKm float64, userId uint) ([]struct {
-	models.Proyecto
-	Distance float64 `json:"distance"`
-	IsMember bool    `json:"isMember"`
+ func (s *ProyectoService) SearchProyectosByLocation(lat, lon float64, radiusKm float64, userId uint) ([]struct {
+    models.Proyecto
+    Distance float64 `json:"distance"`
+    IsMember bool    `json:"isMember"`
 }, error) {
-	var results []struct {
-		models.Proyecto
-		Distance float64 `json:"distance"`
-		IsMember bool    `json:"isMember"`
-	}
-
-	query := `
+    // First, get the base results with distance
+    baseQuery := `
         WITH ProjectDistances AS (
             SELECT p.*,
             (
@@ -547,20 +555,49 @@ func (s *ProyectoService) SearchProyectosByLocation(lat, lon float64, radiusKm f
             AND pu.FechaFin IS NULL
         ORDER BY pd.calculated_distance`
 
-	err := s.DB.Raw(
-		query,
-		lat, lon, lat,
-		lat, radiusKm, lat, radiusKm,
-		lon, radiusKm, lat, lon, radiusKm, lat,
-		radiusKm,
-		userId,
-	).Scan(&results).Error
+    var results []struct {
+        models.Proyecto
+        Distance float64 `json:"distance"`
+        IsMember bool    `json:"isMember"`
+    }
 
-	if err != nil {
-		return nil, fmt.Errorf("error searching projects: %v", err)
-	}
+    err := s.DB.Raw(
+        baseQuery,
+        lat, lon, lat,
+        lat, radiusKm, lat, radiusKm,
+        lon, radiusKm, lat, lon, radiusKm, lat,
+        radiusKm,
+        userId,
+    ).Scan(&results).Error
 
-	return results, nil
+    if err != nil {
+        return nil, fmt.Errorf("error searching projects: %v", err)
+    }
+
+    if len(results) > 0 {
+        var projectIds []uint
+        for _, result := range results {
+            projectIds = append(projectIds, result.IdProyecto)
+        }
+    
+        var activities []models.Actividad
+        if err := s.DB.Where("ProyectoID IN ?", projectIds).
+            Order("ProyectoID, NumeroActividad ASC").
+            Find(&activities).Error; err != nil {
+            return nil, fmt.Errorf("error fetching activities: %v", err)
+        }
+    
+        activityMap := make(map[uint][]models.Actividad)
+        for _, activity := range activities {
+            activityMap[activity.ProyectoID] = append(activityMap[activity.ProyectoID], activity)
+        }
+    
+        for i := range results {
+            results[i].Actividades = activityMap[results[i].IdProyecto]
+        }
+    }
+
+    return results, nil
 }
 
 func (s *ProyectoService) GetProjectWithMembershipStatus(id uint, userId uint) (*models.Proyecto, bool, error) {
