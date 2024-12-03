@@ -252,7 +252,7 @@ func (s *UsuarioService) GetUsariosbyProjectDistance(projectLat, projectLon floa
 				Fecha:             time.Now(),
 				Descripcion:       fmt.Sprintf("Hay un nuevo proyecto que podría interesarte. <a href=\"./projects/view/%d\" >Ir al Proyecto </a>", idproy),
 			}
-			fmt.Println("Hay un nuevo proyecto que podría interesarte. <a href=\"./projects/view/%d\" >Ir al Proyecto </a>", idproy)
+			// fmt.Println("Hay un nuevo proyecto que podría interesarte. <a href=\"./projects/view/%d\" >Ir al Proyecto </a>", idproy)
 			err = notificacionesService.AddNotificacion(notificacion)
 			if err != nil {
 				// Log error but continue processing other users
