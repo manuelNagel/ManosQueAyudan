@@ -1,0 +1,81 @@
+.navbar {
+    background-color: #FFFFFF;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 1rem 0;
+  }
+  
+  .brandContainer {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  
+  .brandLogo {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .brandName {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1ABC9C;
+    margin: 0;
+  }
+  
+  .navLink {
+    color: #2D3748;
+    padding: 0.5rem 1rem;
+    transition: color 0.2s ease;
+    text-decoration: none;
+  }
+  
+  .navLink:hover {
+    color: #1ABC9C;
+  }
+  
+  .navDropdown button {
+    background-color: #1ABC9C !important;
+    border-color: #1ABC9C !important;
+    padding: 0.5rem 1rem;
+  }
+  
+  .navDropdown button:hover {
+    background-color: #17A589 !important;
+    border-color: #17A589 !important;
+  }
+  
+  .userDropdown button {
+    background-color: transparent !important;
+    border-color: #1ABC9C !important;
+    color: #1ABC9C !important;
+  }
+  
+  .userDropdown button:hover {
+    background-color: #FAE5D3 !important;
+    border-color: #17A589 !important;
+    color: #17A589 !important;
+  }
+  
+  .dropdownMenu {
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: none;
+    padding: 0.5rem;
+  }
+  
+  .dropdownItem {
+    padding: 0.5rem 1rem;
+    color: #2D3748;
+    border-radius: 4px;
+  }
+  
+  .dropdownItem:hover {
+    background-color: #FAE5D3;
+    color: #17A589;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar {
+      padding: 0.5rem 0;
+    }
+  }

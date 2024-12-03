@@ -1,119 +1,114 @@
-import React, {useState} from 'react';
+import React from 'react';
 import { Form, Button } from 'react-bootstrap';
 import LocationPicker from '../LocationPicker/LocationPicker';
-
-import CustomDatePicker from '../CustomDatePicker/CustomDatePicker';
+import styles from './ProjectForm.module.css';
 
 const ProjectForm = ({ project, handleChange, handleSubmit, handleLocationChange, isEditing, readOnly }) => {
-  const inputStyles = readOnly ? {
-    backgroundColor: '#f8f9fa',
-    opacity: '0.8',
-    cursor: 'not-allowed'
-  } : {};
-
   return (
-    <Form onSubmit={handleSubmit}>
-      <Form.Group className="mb-3">
-        <Form.Label>Nombre del Proyecto</Form.Label>
+    <Form onSubmit={handleSubmit} className={styles.formContainer}>
+      <Form.Group className={styles.formGroup}>
+        <Form.Label className={styles.formLabel}>Nombre del Proyecto</Form.Label>
         <Form.Control
           type="text"
           name="nombre"
           value={project.nombre}
-          onChange={(e) => handleChange(e)}
+          onChange={handleChange}
           required
           readOnly={readOnly}
           disabled={readOnly}
-          style={inputStyles}
+          className={styles.formControl}
         />
       </Form.Group>
 
-      <Form.Group className="mb-3">
-        <Form.Label>Descripción</Form.Label>
+      <Form.Group className={styles.formGroup}>
+        <Form.Label className={styles.formLabel}>Descripción</Form.Label>
         <Form.Control
           as="textarea"
           name="descripcion"
           value={project.descripcion}
-          onChange={(e) => handleChange(e)}
+          onChange={handleChange}
           required
           readOnly={readOnly}
           disabled={readOnly}
-          style={inputStyles}
+          className={`${styles.formControl} ${styles.textArea}`}
         />
       </Form.Group>
 
-      <Form.Group className="mb-3">
-        <Form.Label>Fecha de Inicio</Form.Label>
-        <Form.Control
-          type="date"
-          name="fechaInicio"
-          value={project.fechaInicio}
-          onChange={(e) => handleChange(e)}
-          required
-          readOnly={readOnly}
-          disabled={readOnly}
-          style={inputStyles}
-        />
-      </Form.Group>
+      <div className={styles.dateTimeInputs}>
+        <Form.Group className={styles.formGroup}>
+          <Form.Label className={styles.formLabel}>Fecha de Inicio</Form.Label>
+          <Form.Control
+            type="date"
+            name="fechaInicio"
+            value={project.fechaInicio}
+            onChange={handleChange}
+            required
+            readOnly={readOnly}
+            disabled={readOnly}
+            className={styles.dateInput}
+          />
+        </Form.Group>
 
-      <Form.Group className="mb-3">
-        <Form.Label>Fecha de Finalización</Form.Label>
-        <Form.Control
-          type="date"
-          name="fechaFinalizacion"
-          value={project.fechaFinalizacion}
-          onChange={(e) => handleChange(e)}
-          required
-          readOnly={readOnly}
-          disabled={readOnly}
-          style={inputStyles}
-        />
-      </Form.Group>
+        <Form.Group className={styles.formGroup}>
+          <Form.Label className={styles.formLabel}>Fecha de Finalización</Form.Label>
+          <Form.Control
+            type="date"
+            name="fechaFinalizacion"
+            value={project.fechaFinalizacion}
+            onChange={handleChange}
+            required
+            readOnly={readOnly}
+            disabled={readOnly}
+            className={styles.dateInput}
+          />
+        </Form.Group>
 
-      <Form.Group className="mb-3">
-        <Form.Label>Horario de Inicio</Form.Label>
-        <Form.Control
-          type="time"
-          name="horarioInicio"
-          value={project.horarioInicio}
-          onChange={(e) => handleChange(e)}
-          required
-          readOnly={readOnly}
-          disabled={readOnly}
-          style={inputStyles}
-        />
-      </Form.Group>
+        <Form.Group className={styles.formGroup}>
+          <Form.Label className={styles.formLabel}>Horario de Inicio</Form.Label>
+          <Form.Control
+            type="time"
+            name="horarioInicio"
+            value={project.horarioInicio}
+            onChange={handleChange}
+            required
+            readOnly={readOnly}
+            disabled={readOnly}
+            className={styles.timeInput}
+          />
+        </Form.Group>
 
-      <Form.Group className="mb-3">
-        <Form.Label>Horario de Finalización</Form.Label>
-        <Form.Control
-          type="time"
-          name="horarioFinal"
-          value={project.horarioFinal}
-          onChange={(e) => handleChange(e)}
-          required
-          readOnly={readOnly}
-          disabled={readOnly}
-          style={inputStyles}
-        />
-      </Form.Group>
+        <Form.Group className={styles.formGroup}>
+          <Form.Label className={styles.formLabel}>Horario de Finalización</Form.Label>
+          <Form.Control
+            type="time"
+            name="horarioFinal"
+            value={project.horarioFinal}
+            onChange={handleChange}
+            required
+            readOnly={readOnly}
+            disabled={readOnly}
+            className={styles.timeInput}
+          />
+        </Form.Group>
+      </div>
 
-      <Form.Group className="mb-3">
-        <Form.Label>Cantidad de Participantes</Form.Label>
+      <Form.Group className={styles.formGroup}>
+        <Form.Label className={styles.formLabel}>Cantidad de Participantes</Form.Label>
         <Form.Control
           type="number"
           name="cantidadParticipantes"
           value={project.cantidadParticipantes}
-          onChange={(e) => handleChange(e)}
+          onChange={handleChange}
           required
           min="1"
           readOnly={readOnly}
           disabled={readOnly}
-          style={inputStyles}
+          className={`${styles.formControl} ${styles.numberInput}`}
         />
       </Form.Group>
 
-      <Form.Group className="mb-3">
-        <Form.Label>Ubicación</Form.Label>
+      <Form.Group className={`${styles.formGroup} ${styles.locationSection}`}>
+        <Form.Label className={styles.formLabel}>Ubicación</Form.Label>
         <LocationPicker
           initialLocation={{
             lat: project.latitud,
@@ -126,7 +121,7 @@ const ProjectForm = ({ project, handleChange, handleSubmit, handleLocationChange
       </Form.Group>
 
       {!readOnly && (
-        <Button type="submit" variant="primary">
+        <Button type="submit" className={styles.submitButton}>
           {isEditing ? 'Actualizar Proyecto' : 'Crear Proyecto'}
         </Button>
       )}

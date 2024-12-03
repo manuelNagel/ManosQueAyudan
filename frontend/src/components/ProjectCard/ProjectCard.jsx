@@ -3,7 +3,6 @@ import { Card, Button, ProgressBar } from 'react-bootstrap';
 import styles from './ProjectCard.module.css';
 
 const ProjectCard = ({ project, onJoin, onReport, isAuthenticated, loading }) => {
-  // Calculate completion rate from activities
   const { completionRate, activityStats } = useMemo(() => {
     const activities = project.actividades || [];
     if (activities.length === 0) {
@@ -20,7 +19,6 @@ const ProjectCard = ({ project, onJoin, onReport, isAuthenticated, loading }) =>
       total: activities.length
     };
 
-    // Only count activities in estado 2 (terminado) for completion rate
     const rate = (stats.completed / stats.total) * 100;
 
     return { completionRate: rate, activityStats: stats };
@@ -33,27 +31,31 @@ const ProjectCard = ({ project, onJoin, onReport, isAuthenticated, loading }) =>
     return 'danger';
   };
 
-  const formatDateTime = (dateString) => {
+  const formatDateOnly = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
-    return date.toLocaleString('es-AR', {
-      year: 'numeric',
+    return date.toLocaleDateString('es-ES', {
+      day: '2-digit',
       month: 'long',
-      day: 'numeric',
+      year: 'numeric'
+    });
+  };
+
+  const formatTimeOnly = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('es-ES', {
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
+      hour12: false
     });
   };
 
   return (
     <Card className={styles.card}>
       <Card.Body className={styles.cardBody}>
-        <div className={styles.cardHeader}>
-          <Card.Title className={styles.title}>{project.nombre}</Card.Title>
-          <Card.Text className={styles.description}>
-            {project.descripcion}
-          </Card.Text>
-        </div>
+        <h3 className={styles.title}>{project.nombre}</h3>
+        <p className={styles.description}>{project.descripcion}</p>
 
         <div className={styles.details}>
           <div className={styles.detailItem}>
@@ -62,11 +64,15 @@ const ProjectCard = ({ project, onJoin, onReport, isAuthenticated, loading }) =>
           </div>
           <div className={styles.detailItem}>
             <i className="bi bi-calendar"></i>
-            Inicio: {formatDateTime(project.fechaInicio)}
+            Fecha: {formatDateOnly(project.fechaInicio)}
+          </div>
+          <div className={styles.detailItem}>
+            <i className="bi bi-clock"></i>
+            Horario: {formatTimeOnly(project.horarioInicio)} - {formatTimeOnly(project.horarioFinal)}
           </div>
           <div className={styles.detailItem}>
             <i className="bi bi-calendar-check"></i>
-            Fin: {formatDateTime(project.fechaFinalizacion)}
+            Finaliza: {formatDateOnly(project.fechaFinalizacion)}
           </div>
           <div className={styles.detailItem}>
             <i className="bi bi-people"></i>
@@ -90,11 +96,12 @@ const ProjectCard = ({ project, onJoin, onReport, isAuthenticated, loading }) =>
             ) : (
               <>
                 <small>
-                  {activityStats.completed} terminadas, {activityStats.inProgress} en proceso, {activityStats.new} nuevas
+                  {activityStats.completed} terminadas, {activityStats.inProgress} en proceso,{' '}
+                  {activityStats.new} nuevas
                 </small>
-                <small className={styles.totalActivities}>
-                  Total: {activityStats.total} actividades
-                </small>
+                <div className="mt-1">
+                  <small>Total: {activityStats.total} actividades</small>
+                </div>
               </>
             )}
           </div>

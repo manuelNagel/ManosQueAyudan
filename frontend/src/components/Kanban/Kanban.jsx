@@ -3,6 +3,7 @@ import { Container, Row, Col, Card, Button, Modal, Form } from 'react-bootstrap'
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import axios from 'axios';
+import styles from './Kanban.module.css';
 import { useActividades } from '../../hooks/useActividades';
 
 // Tipos de elementos para drag and drop
@@ -36,12 +37,12 @@ const Activity = ({ activity, moveActivity, removeActivity, isAdmin }) => { // A
   return (
     <Card
       ref={drag}
-      className={`mb-2 ${isDragging ? 'opacity-50' : ''}`}
+      className={`${styles.activityCard} ${isDragging ? styles.dragging : ''}`}
     >
-      <Card.Body className="d-flex justify-content-between align-items-center">
+      <Card.Body className={styles.activityContent}>
         <div>
-          <Card.Text>{activity.nombre}</Card.Text>
-          <small className="text-muted">
+          <Card.Text className={styles.activityText}>{activity.nombre}</Card.Text>
+          <small className={styles.activityStatus}>
             Estado: {getStatusLabel(activity.estado)}
           </small>
         </div>
@@ -49,6 +50,7 @@ const Activity = ({ activity, moveActivity, removeActivity, isAdmin }) => { // A
           <Button
             variant="danger"
             size="sm"
+            className={styles.removeBtn}
             onClick={() => removeActivity(activity.numeroActividad)}
           >
             Eliminar
@@ -92,20 +94,29 @@ const Kanban = ({ projectId, onStateChange,isAdmin }) => {
 
     return (
       <Col>
-        <Card ref={drop}>
-          <Card.Header>
+        <Card 
+          ref={drop} 
+          className={`${styles.column} ${
+            status === 0 
+              ? styles.columnNew 
+              : status === 1 
+              ? styles.columnInProgress 
+              : styles.columnCompleted
+          }`}
+        >
+          <Card.Header className={styles.columnHeader}>
             {getStatusLabel(status)}
           </Card.Header>
-          <Card.Body>
-          {groupedActivities[status]?.map((activity) => (
-            <Activity
-              key={activity.numeroActividad}
-              activity={activity}
-              moveActivity={moveActivity}
-              removeActivity={removeActivity}
-              isAdmin={isAdmin} 
-            />
-          ))}
+          <Card.Body className={styles.columnBody}>
+            {groupedActivities[status]?.map((activity) => (
+              <Activity
+                key={activity.numeroActividad}
+                activity={activity}
+                moveActivity={moveActivity}
+                removeActivity={removeActivity}
+                isAdmin={isAdmin} 
+              />
+            ))}
           </Card.Body>
         </Card>
       </Col>
@@ -160,22 +171,22 @@ const Kanban = ({ projectId, onStateChange,isAdmin }) => {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <Container fluid>
-        <Button
-          variant="primary"
-          className="mb-3"
-          onClick={() => setShowModal(true)}
-        >
-          Nueva Actividad
-        </Button>
+    <Container fluid className={styles.container}>
+      <Button
+        variant="primary"
+        className={styles.newActivityBtn}
+        onClick={() => setShowModal(true)}
+      >
+        Nueva Actividad
+      </Button>
 
-        <Row>
-          {[0, 1, 2].map((status) => (
-            <StatusColumn key={status} status={status} />
-          ))}
-        </Row>
+      <Row className={styles.columnRow}>
+        {[0, 1, 2].map((status) => (
+          <StatusColumn key={status} status={status} />
+        ))}
+      </Row>
 
-        <Modal show={showModal} onHide={() => setShowModal(false)}>
+      <Modal show={showModal} onHide={() => setShowModal(false)} className={styles.modal}>
           <Modal.Header closeButton>
             <Modal.Title>Nueva Actividad</Modal.Title>
           </Modal.Header>

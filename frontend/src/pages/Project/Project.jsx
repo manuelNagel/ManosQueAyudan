@@ -1,16 +1,15 @@
 import React, { useState, useEffect ,useCallback} from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { Container, Form, Button, Alert,Tab,Tabs } from 'react-bootstrap';
+import { Container, Form, Button, Alert,Tab,Tabs,Spinner } from 'react-bootstrap';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import ProjectForm from '../../components/ProjectForm/ProjectForm';
 import ActividadList from '../../components/ActividadList/ActividadList';
-import ActividadForm from '../../components/ActividadForm/ActividadForm';
 import Navbar from '../../components/Navbar/Navbar';
 import ParticipantList from '../../components/ParticipantList/ParticipantList';
-import ShareButton from '../../components/ShareButton/ShareButton';
 import StatsContainer from '../../components/StatsContainer/StatsContainer';
-import { AlignLeft } from 'lucide-react';
+import styles from './Project.module.css';
+
 
 import Kanban from '../../components/Kanban/Kanban';
 
@@ -190,19 +189,21 @@ const Project = () => {
 
   if (loading) {
     return (
-      <Container>
+      <div className={styles.pageContainer}>
         <Navbar />
-        <div className="text-center mt-4">
-          <div className="spinner-border" role="status">
-            <span className="visually-hidden">Cargando...</span>
+        <Container>
+          <div className={styles.loadingContainer}>
+            <Spinner animation="border" role="status">
+              <span className="visually-hidden">Cargando...</span>
+            </Spinner>
           </div>
-        </div>
-      </Container>
+        </Container>
+      </div>
     );
   }
 
   const renderProjectForm = () => (
-    <>
+    <div className={styles.contentContainer}>
       <ProjectForm 
         project={project} 
         handleChange={handleChange} 
@@ -219,68 +220,83 @@ const Project = () => {
             label="Habilitado" 
             name="habilitado" 
             checked={project.habilitado} 
-            onChange={(e) => setProject(prev => ({ ...prev, habilitado: e.target.checked }))}
+            onChange={(e) => setProject(prev => ({ 
+              ...prev, 
+              habilitado: e.target.checked 
+            }))}
             disabled={project.actividades.length === 0}
           />
         </Form.Group>
       )}
-    </>
-  );
-
-  const renderActivities = () => (
-    <div className="mt-4">
-      <h2>Actividades</h2>
-      <ActividadList 
-        activities={project?.actividades || []}
-        editActivity={!isViewMode ? editActivity : undefined}
-        deleteActivity={!isViewMode ? deleteActivity : undefined}
-        isAdmin={isAdmin}
-      />
-      <Kanban 
-        projectId={id} 
-        isAdmin={isAdmin}
-        onStateChange={handleActivitiesChange}
-      />
     </div>
   );
 
   return (
-    <Container>
+    <div className={styles.pageContainer}>
       <Navbar />
-      <h1 className="mb-4">
-        {isViewMode ? 'Ver Proyecto' : id ? 'Editar Proyecto' : 'Crear Nuevo Proyecto'}
-      </h1>
+      
+      <div className={styles.header}>
+        <Container>
+          <h1 className={styles.headerTitle}>
+            {isViewMode ? 'Ver Proyecto' : id ? 'Editar Proyecto' : 'Crear Nuevo Proyecto'}
+          </h1>
+        </Container>
+      </div>
 
-      {error && <Alert variant="danger" className="mb-4">{error}</Alert>}
+      <Container>
+        {error && (
+          <Alert variant="danger" className={styles.errorAlert}>
+            {error}
+          </Alert>
+        )}
 
-      {id ? (
-        <Tabs
-          activeKey={activeTab}
-          onSelect={(k) => setActiveTab(k)}
-          className="mb-3"
-        >
-          <Tab eventKey="details" title="Detalles">
-            {renderProjectForm()}
-          </Tab>
-          
-          <Tab eventKey="activities" title="Actividades">
-            {renderActivities()}
-          </Tab>
-          
-          <Tab eventKey="participants" title="Participantes">
-            <ParticipantList projectId={id} />
-          </Tab>
+        {id ? (
+          <div className={styles.customTabs}>
+            <Tabs
+              activeKey={activeTab}
+              onSelect={(k) => setActiveTab(k)}
+              className="mb-3"
+            >
+              <Tab eventKey="details" title="Detalles">
+                {renderProjectForm()}
+              </Tab>
+              
+              <Tab eventKey="activities" title="Actividades">
+                <div className={styles.contentContainer}>
+                  <ActividadList 
+                    activities={project?.actividades || []}
+                    editActivity={!isViewMode ? editActivity : undefined}
+                    deleteActivity={!isViewMode ? deleteActivity : undefined}
+                    isAdmin={isAdmin}
+                  />
+                  <Kanban 
+                    projectId={id} 
+                    isAdmin={isAdmin}
+                    onStateChange={handleActivitiesChange}
+                  />
+                </div>
+              </Tab>
+              
+              <Tab eventKey="participants" title="Participantes">
+                <div className={styles.contentContainer}>
+                  <ParticipantList projectId={id} />
+                </div>
+              </Tab>
 
-          {isViewMode && (
-            <Tab eventKey="stats" title="Estadísticas">
-              <StatsContainer type="project" id={id} />
-            </Tab>
-          )}
-        </Tabs>
-      ) : (
-        renderProjectForm()
-      )}
-    </Container>
+              {isViewMode && (
+                <Tab eventKey="stats" title="Estadísticas">
+                  <div className={styles.contentContainer}>
+                    <StatsContainer type="project" id={id} />
+                  </div>
+                </Tab>
+              )}
+            </Tabs>
+          </div>
+        ) : (
+          renderProjectForm()
+        )}
+      </Container>
+    </div>
   );
 };
 
