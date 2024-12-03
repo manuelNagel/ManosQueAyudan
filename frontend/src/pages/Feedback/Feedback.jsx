@@ -3,6 +3,7 @@ import { Container, Card, Badge, Spinner, Alert, Tabs, Tab } from 'react-bootstr
 import { useAuth } from '../../context/AuthContext';
 import { useFeedback } from '../../hooks/useFeedback';
 import Navbar from '../../components/Navbar/Navbar';
+import styles from './Feedback.module.css';
 
 const Feedback = () => {
   const [feedbackStats, setFeedbackStats] = useState(null);
@@ -28,128 +29,126 @@ const Feedback = () => {
 
   if (loading) {
     return (
-      <Container>
+      <div className={styles.pageContainer}>
         <Navbar />
-        <div className="text-center mt-4">
+        <div className={styles.spinner}>
           <Spinner animation="border" />
         </div>
-      </Container>
+      </div>
     );
   }
 
   const ReceivedFeedbackContent = () => (
     <>
-      <Card className="mb-4">
-        <Card.Body>
-          <Card.Title>Resumen General</Card.Title>
-          <div className="d-flex justify-content-between align-items-center">
-            <div>
-              <h3>
-                {(feedbackStats?.averageScore || 0).toFixed(1)}
-                <small className="text-muted"> / 5.0</small>
-              </h3>
-              <p className="text-muted">Puntuación promedio</p>
+      <div className={styles.statsCard}>
+        <Card.Title className={styles.statsTitle}>Resumen General</Card.Title>
+        <div className={styles.statsFlex}>
+          <div>
+            <div className={styles.scoreValue}>
+              {(feedbackStats?.averageScore || 0).toFixed(1)}
+              <small className={styles.scoreLabel}> / 5.0</small>
             </div>
-            <div>
-              <h3>{feedbackStats?.totalFeedbacks || 0}</h3>
-              <p className="text-muted">Total de feedbacks recibidos</p>
+            <p className={styles.scoreLabel}>Puntuación promedio</p>
+          </div>
+          <div>
+            <div className={styles.scoreValue}>{feedbackStats?.totalFeedbacks || 0}</div>
+            <p className={styles.scoreLabel}>Total de feedbacks recibidos</p>
+          </div>
+        </div>
+      </div>
+
+      <h2 className={styles.statsTitle}>Feedback por Proyecto</h2>
+      {feedbackStats?.projectStats && feedbackStats.projectStats.length > 0 ? (
+        feedbackStats.projectStats.map((projectStat) => (
+          <div key={projectStat.projectId} className={styles.feedbackCard}>
+            <h3 className={styles.projectTitle}>{projectStat.projectName}</h3>
+            <p className={styles.userInfo}>Rol: {projectStat.role || 'No especificado'}</p>
+            <div className={styles.statsFlex}>
+              <div>
+                <span className={styles.scoreBadge}>
+                  {(projectStat.averageScore || 0).toFixed(1)} / 5.0
+                </span>
+                <span className={styles.dateText}>
+                  ({projectStat.feedbackCount || 0} feedbacks)
+                </span>
+              </div>
             </div>
           </div>
-        </Card.Body>
-      </Card>
-
-      <div className="mt-4">
-        <h2>Feedback por Proyecto</h2>
-        {feedbackStats?.projectStats && feedbackStats.projectStats.length > 0 ? (
-          feedbackStats.projectStats.map((projectStat) => (
-            <Card key={projectStat.projectId} className="mb-3">
-              <Card.Body>
-                <Card.Title>{projectStat.projectName}</Card.Title>
-                <Card.Subtitle className="mb-2 text-muted">
-                  Rol: {projectStat.role || 'No especificado'}
-                </Card.Subtitle>
-                <div className="d-flex justify-content-between align-items-center mt-3">
-                  <div>
-                    <Badge bg="primary" className="me-2">
-                      {(projectStat.averageScore || 0).toFixed(1)} / 5.0
-                    </Badge>
-                    <small className="text-muted">
-                      ({projectStat.feedbackCount || 0} feedbacks)
-                    </small>
-                  </div>
-                </div>
-              </Card.Body>
-            </Card>
-          ))
-        ) : (
-          <Alert variant="info">
-            No has recibido ningún feedback aún.
-          </Alert>
-        )}
-      </div>
+        ))
+      ) : (
+        <Alert variant="info" className={styles.emptyAlert}>
+          No has recibido ningún feedback aún.
+        </Alert>
+      )}
     </>
   );
 
   const GivenFeedbackContent = () => (
-    <div className="mt-4">
-      <h2>Feedback Otorgado</h2>
+    <>
+      <h2 className={styles.statsTitle}>Feedback Otorgado</h2>
       {givenFeedback && givenFeedback.length > 0 ? (
         givenFeedback.map((feedback) => (
-          <Card key={feedback.idFeedback} className="mb-3">
-            <Card.Body>
-              <Card.Title>{feedback.proyectoNombre}</Card.Title>
-              <Card.Subtitle className="mb-2 text-muted">
-                Para: {feedback.destinatarioNombre} {feedback.destinatarioApellido}
-              </Card.Subtitle>
-              <div className="mt-3">
-                <Badge bg="primary" className="me-2">
-                  {feedback.puntuacion} / 5
-                </Badge>
-                <small className="text-muted">
-                  {new Date(feedback.fecha).toLocaleDateString()}
-                </small>
+          <div key={feedback.idFeedback} className={styles.feedbackCard}>
+            <h3 className={styles.projectTitle}>{feedback.proyectoNombre}</h3>
+            <p className={styles.userInfo}>
+              Para: {feedback.destinatarioNombre} {feedback.destinatarioApellido}
+            </p>
+            <div className={styles.statsFlex}>
+              <span className={styles.scoreBadge}>
+                {feedback.puntuacion} / 5
+              </span>
+              <span className={styles.dateText}>
+                {new Date(feedback.fecha).toLocaleDateString()}
+              </span>
+            </div>
+            {feedback.descripcion && (
+              <div className={styles.feedbackComment}>
+                {feedback.descripcion}
               </div>
-              {feedback.descripcion && (
-                <div className="mt-3">
-                  <p className="text-muted mb-0">{feedback.descripcion}</p>
-                </div>
-              )}
-            </Card.Body>
-          </Card>
+            )}
+          </div>
         ))
       ) : (
-        <Alert variant="info">
+        <Alert variant="info" className={styles.emptyAlert}>
           No has dado ningún feedback aún.
         </Alert>
       )}
-    </div>
+    </>
   );
 
   return (
-    <Container>
+    <div className={styles.pageContainer}>
       <Navbar />
-      <h1 className="my-4">Mi Feedback</h1>
+      <div className={styles.header}>
+        <Container>
+          <h1 className={styles.headerTitle}>Mi Feedback</h1>
+        </Container>
+      </div>
 
-      {error ? (
-        <Alert variant="danger" className="mt-4">{error}</Alert>
-      ) : (
-        <Tabs
-          defaultActiveKey="received"
-          className="mb-4"
-        >
-          <Tab eventKey="received" title="Feedback Recibido">
-            <div className="pt-4">
-              <ReceivedFeedbackContent />
-            </div>
-          </Tab>
-          <Tab eventKey="given" title="Feedback Otorgado">
-            <div className="pt-4">
-              <GivenFeedbackContent />
-            </div>
-          </Tab>
-        </Tabs>
-      )}
-    </Container>
+      <Container>
+        {error ? (
+          <Alert variant="danger" className={styles.errorAlert}>{error}</Alert>
+        ) : (
+          <div className={styles.tabsContainer}>
+            <Tabs
+              defaultActiveKey="received"
+              className={styles.customTabs}
+            >
+              <Tab eventKey="received" title="Feedback Recibido">
+                <div className="pt-4">
+                  <ReceivedFeedbackContent />
+                </div>
+              </Tab>
+              <Tab eventKey="given" title="Feedback Otorgado">
+                <div className="pt-4">
+                  <GivenFeedbackContent />
+                </div>
+              </Tab>
+            </Tabs>
+          </div>
+        )}
+      </Container>
+    </div>
   );
 };
 

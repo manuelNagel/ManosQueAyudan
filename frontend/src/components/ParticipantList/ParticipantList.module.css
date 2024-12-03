@@ -1,0 +1,119 @@
+.listContainer {
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+  }
+  
+  .table {
+    margin-bottom: 0;
+  }
+  
+  .tableHeader {
+    background-color: #FAE5D3 !important;
+  }
+  
+  .tableHeader th {
+    color: #2D3748;
+    font-weight: 600;
+    padding: 1.25rem 1rem;
+    border-bottom: 2px solid rgba(26, 188, 156, 0.2);
+  }
+  
+  .tableRow {
+    transition: background-color 0.2s ease;
+  }
+  
+  .tableRow:hover {
+    background-color: rgba(250, 229, 211, 0.2);
+  }
+  
+  .tableCell {
+    vertical-align: middle;
+    padding: 1rem;
+  }
+  
+  .rolBadge {
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+  
+  .rolAdmin {
+    background-color: #1ABC9C;
+    color: white;
+  }
+  
+  .rolParticipant {
+    background-color: #FAE5D3;
+    color: #2D3748;
+  }
+  
+  .actionButtons {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .actionButton {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+  }
+  
+  .actionButton:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .feedbackButton {
+    background-color: #1ABC9C !important;
+    border-color: #1ABC9C !important;
+  }
+  
+  .feedbackButton:hover {
+    background-color: #17A589 !important;
+    border-color: #17A589 !important;
+  }
+  
+  .removeButton {
+    background-color: #E74C3C !important;
+    border-color: #E74C3C !important;
+  }
+  
+  .removeButton:hover {
+    background-color: #C0392B !important;
+    border-color: #C0392B !important;
+  }
+  
+  .reportButton {
+    background-color: #FAE5D3 !important;
+    border-color: #E2E8F0 !important;
+    color: #C0392B !important;
+  }
+  
+  .reportButton:hover {
+    background-color: #F8D8C5 !important;
+    color: #E74C3C !important;
+  }
+  
+  .loadingSpinner {
+    padding: 3rem;
+    text-align: center;
+  }
+  
+  .errorAlert {
+    margin: 1rem;
+    background-color: #FAE5D3;
+    color: #C0392B;
+    border: none;
+  }
+  
+  .emptyAlert {
+    margin: 1rem;
+    background-color: #FAE5D3;
+    color: #2D3748;
+    border: none;
+  }

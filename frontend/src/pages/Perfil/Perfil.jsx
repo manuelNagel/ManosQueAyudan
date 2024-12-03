@@ -2,21 +2,40 @@ import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import Navbar from '../../components/Navbar/Navbar';
 import ProfileForm from '../../components/ProfileForm/ProfileForm';
-import { Card, Alert, Tabs, Tab } from 'react-bootstrap';
+import { Card, Alert, Tabs, Tab, Container, Spinner } from 'react-bootstrap';
 import StatsContainer from '../../components/StatsContainer/StatsContainer';
+import styles from './Perfil.module.css';
 
 const Perfil = () => {
   const { user, loading, updateUserProfile } = useAuth();
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [activeTab, setActiveTab] = useState('profile'); // Add this for tab control
+  const [activeTab, setActiveTab] = useState('profile');
 
   if (loading) {
-    return <div>Cargando...</div>;
+    return (
+      <div className={styles.pageContainer}>
+        <Navbar />
+        <div className={styles.spinner}>
+          <Spinner animation="border" role="status">
+            <span className="visually-hidden">Cargando...</span>
+          </Spinner>
+        </div>
+      </div>
+    );
   }
 
   if (!user) {
-    return <div>Usuario no encontrado</div>;
+    return (
+      <div className={styles.pageContainer}>
+        <Navbar />
+        <Container>
+          <Alert variant="danger" className={styles.errorAlert}>
+            Usuario no encontrado
+          </Alert>
+        </Container>
+      </div>
+    );
   }
 
   const handleSubmit = async (updatedUserData) => {
@@ -25,6 +44,9 @@ const Perfil = () => {
     try {
       await updateUserProfile(updatedUserData);
       setSuccess('Perfil actualizado con éxito');
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       setError('Error al actualizar el perfil: ' + err.message);
     }
@@ -36,38 +58,55 @@ const Perfil = () => {
   };
 
   return (
-    <div>
+    <div className={styles.pageContainer}>
       <Navbar />
-      <div className="container mt-4">
-        <h2 className="mb-4">Perfil de Usuario</h2>
-        {error && <Alert variant="danger">{error}</Alert>}
-        {success && <Alert variant="success">{success}</Alert>}
-        
-        <Tabs
-          activeKey={activeTab}
-          onSelect={(k) => setActiveTab(k)}
-          className="mb-3"
-        >
-          <Tab eventKey="profile" title="Perfil">
-            <Card>
-              <Card.Body>
-                <ProfileForm 
-                  user={user} 
-                  onSubmit={handleSubmit} 
-                  onCancel={handleCancel}
-                />
-              </Card.Body>
-            </Card>
-          </Tab>
-          <Tab eventKey="stats" title="Estadísticas">
-            <Card>
-              <Card.Body>
-                <StatsContainer type="user" id={user.id} />
-              </Card.Body>
-            </Card>
-          </Tab>
-        </Tabs>
+      
+      <div className={styles.header}>
+        <Container>
+          <h1 className={styles.headerTitle}>Perfil de Usuario</h1>
+        </Container>
       </div>
+
+      <Container>
+        {error && (
+          <Alert variant="danger" className={styles.errorAlert}>
+            {error}
+          </Alert>
+        )}
+        {success && (
+          <Alert variant="success" className={styles.successAlert}>
+            {success}
+          </Alert>
+        )}
+        
+        <div className={styles.tabsContainer}>
+          <Tabs
+            activeKey={activeTab}
+            onSelect={(k) => setActiveTab(k)}
+            className={styles.customTabs}
+          >
+            <Tab eventKey="profile" title="Perfil">
+              <Card className={styles.card}>
+                <Card.Body className={styles.cardBody}>
+                  <ProfileForm 
+                    user={user} 
+                    onSubmit={handleSubmit} 
+                    onCancel={handleCancel}
+                  />
+                </Card.Body>
+              </Card>
+            </Tab>
+            
+            <Tab eventKey="stats" title="Estadísticas">
+              <Card className={styles.card}>
+                <Card.Body className={styles.cardBody}>
+                  <StatsContainer type="user" id={user.id} />
+                </Card.Body>
+              </Card>
+            </Tab>
+          </Tabs>
+        </div>
+      </Container>
     </div>
   );
 };

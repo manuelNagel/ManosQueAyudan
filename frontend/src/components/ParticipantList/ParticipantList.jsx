@@ -5,6 +5,8 @@ import { useAuth } from '../../context/AuthContext';
 import RemoveParticipantModal from '../RemoveParticipantModal/RemoveParticipantModal';
 import DenunciaModal from '../DenunciaModal/DenunciaModal';
 import FeedbackModal from '../FeedbackModal/FeedbackModal';
+import styles from './ParticipantList.module.css';
+
 
 const ParticipantList = ({ projectId }) => {
   const [participants, setParticipants] = useState([]);
@@ -62,7 +64,7 @@ const ParticipantList = ({ projectId }) => {
 
   if (loading) {
     return (
-      <div className="text-center p-3">
+      <div className={styles.loadingSpinner}>
         <Spinner animation="border" role="status">
           <span className="visually-hidden">Cargando...</span>
         </Spinner>
@@ -71,40 +73,47 @@ const ParticipantList = ({ projectId }) => {
   }
 
   if (error) {
-    return <Alert variant="danger">{error}</Alert>;
+    return <Alert variant="danger" className={styles.errorAlert}>{error}</Alert>;
   }
 
   if (participants.length === 0) {
-    return <Alert variant="info">No hay participantes en este proyecto.</Alert>;
+    return <Alert variant="info" className={styles.emptyAlert}>No hay participantes en este proyecto.</Alert>;
   }
 
   return (
-    <>
-      <Table responsive striped bordered hover>
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Email</th>
-            <th>Rol</th>
-            <th>Fecha de Ingreso</th>
-            {(isAdmin || user) && <th>Acciones</th>}
-          </tr>
-        </thead>
-        <tbody>
-          {participants.map((participant) => (
-            <tr key={participant.idUsuario}>
-              <td>{`${participant.nombre} ${participant.apellido}`}</td>
-              <td>{participant.email}</td>
-              <td>{participant.rolNombre}</td>
-              <td>{new Date(participant.fechaInicio).toLocaleDateString('es-AR')}</td>
-              {(isAdmin || user) && (
-                <td>
-                  <div className="d-flex gap-2">
-                    {/* Only show feedback button if the participant is not the current user */}
-                    {participant.idUsuario !== user.id && (
+    <div className={styles.listContainer}>
+    <Table responsive hover className={styles.table}>
+      <thead className={styles.tableHeader}>
+        <tr>
+          <th>Nombre</th>
+          <th>Email</th>
+          <th>Rol</th>
+          <th>Fecha de Ingreso</th>
+          {(isAdmin || user) && <th>Acciones</th>}
+        </tr>
+      </thead>
+      <tbody>
+        {participants.map((participant) => (
+          <tr key={participant.idUsuario} className={styles.tableRow}>
+            <td className={styles.tableCell}>{`${participant.nombre} ${participant.apellido}`}</td>
+            <td className={styles.tableCell}>{participant.email}</td>
+            <td className={styles.tableCell}>
+              <span className={`${styles.rolBadge} ${participant.rolNombre === 'Administrador' ? styles.rolAdmin : styles.rolParticipant}`}>
+                {participant.rolNombre}
+              </span>
+            </td>
+            <td className={styles.tableCell}>
+              {new Date(participant.fechaInicio).toLocaleDateString('es-AR')}
+            </td>
+            {(isAdmin || user) && (
+              <td className={styles.tableCell}>
+                <div className={styles.actionButtons}>
+                  {participant.idUsuario !== user.id && (
+                    <>
                       <Button
                         variant="primary"
                         size="sm"
+                        className={`${styles.actionButton} ${styles.feedbackButton}`}
                         onClick={() => {
                           setSelectedParticipant(participant);
                           setShowFeedbackModal(true);
@@ -112,23 +121,23 @@ const ParticipantList = ({ projectId }) => {
                       >
                         Feedback
                       </Button>
-                    )}
-                    {isAdmin && participant.idUsuario !== user.id && (
-                      <Button
-                        variant="danger"
-                        size="sm"
-                        onClick={() => {
-                          setSelectedParticipant(participant);
-                          setShowRemoveModal(true);
-                        }}
-                      >
-                        Remover
-                      </Button>
-                    )}
-                    {participant.idUsuario !== user.id && (
+                      {isAdmin && (
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          className={`${styles.actionButton} ${styles.removeButton}`}
+                          onClick={() => {
+                            setSelectedParticipant(participant);
+                            setShowRemoveModal(true);
+                          }}
+                        >
+                          Remover
+                        </Button>
+                      )}
                       <Button
                         variant="warning"
                         size="sm"
+                        className={`${styles.actionButton} ${styles.reportButton}`}
                         onClick={() => {
                           setSelectedParticipant(participant);
                           setShowDenunciaModal(true);
@@ -136,50 +145,51 @@ const ParticipantList = ({ projectId }) => {
                       >
                         Reportar
                       </Button>
-                    )}
-                  </div>
-                </td>
-              )}
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+                    </>
+                  )}
+                </div>
+              </td>
+            )}
+          </tr>
+        ))}
+      </tbody>
+    </Table>
 
-      <RemoveParticipantModal
-        show={showRemoveModal}
-        handleClose={() => {
-          setShowRemoveModal(false);
-          setSelectedParticipant(null);
-        }}
-        participant={selectedParticipant}
-        onRemove={handleRemoveParticipant}
-        isLoading={removeLoading}
-      />
+    <RemoveParticipantModal
+      show={showRemoveModal}
+      handleClose={() => {
+        setShowRemoveModal(false);
+        setSelectedParticipant(null);
+      }}
+      participant={selectedParticipant}
+      onRemove={handleRemoveParticipant}
+      isLoading={removeLoading}
+    />
 
-      <DenunciaModal
-        show={showDenunciaModal}
-        handleClose={() => {
-          setShowDenunciaModal(false);
-          setSelectedParticipant(null);
-        }}
-        tipo="Usuario"
-        targetId={selectedParticipant?.idUsuario}
-        targetName={selectedParticipant ? 
-          `${selectedParticipant.nombre} ${selectedParticipant.apellido}` : 
-          ''}
-      />
+    <DenunciaModal
+      show={showDenunciaModal}
+      handleClose={() => {
+        setShowDenunciaModal(false);
+        setSelectedParticipant(null);
+      }}
+      tipo="Usuario"
+      targetId={selectedParticipant?.idUsuario}
+      targetName={selectedParticipant ? 
+        `${selectedParticipant.nombre} ${selectedParticipant.apellido}` : 
+        ''}
+    />
 
-      <FeedbackModal
-        show={showFeedbackModal}
-        handleClose={() => {
-          setShowFeedbackModal(false);
-          setSelectedParticipant(null);
-        }}
-        recipient={selectedParticipant}
-        projectId={projectId}
-      />
-    </>
-  );
+    <FeedbackModal
+      show={showFeedbackModal}
+      handleClose={() => {
+        setShowFeedbackModal(false);
+        setSelectedParticipant(null);
+      }}
+      recipient={selectedParticipant}
+      projectId={projectId}
+    />
+  </div>
+);
 };
 
 export default ParticipantList;
