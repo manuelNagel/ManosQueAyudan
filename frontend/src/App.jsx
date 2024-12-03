@@ -38,6 +38,8 @@ function App() {
             <Route path="/projects/joined" element={<ProjectList mode="joined" />} />
             <Route path="/projects/joined/:id" element={<Project mode="view" />} />
 
+            <Route path="/projects/view/:id" element={<Project mode="view" />} />
+
             <Route path="/feedback" element={<Feedback/>} />
             <Route path="/habilidades/:id" element={<Habilidades />} />
           </Route>

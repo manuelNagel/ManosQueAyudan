@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 import styles from "./VentanaEmergente.module.css";
 
-const VentanaEmergente = ({ titulo, texto, onClose }) => {
+const VentanaEmergente = ({ titulo, texto, fecha, onClose }) => {
   return (
     <div
       style={{
@@ -35,8 +35,12 @@ const VentanaEmergente = ({ titulo, texto, onClose }) => {
         </button>
       </div>
       <hr />
-      <p style={{ marginTop: "10px" }}>{texto}</p>
-      <p className={styles.fechaEstilo}>2024-10-11</p>
+      {/* <p style={{ marginTop: "10px" }}>{texto}</p> */}
+      <p 
+        className="mt-3" 
+        dangerouslySetInnerHTML={{ __html: texto }}
+      />
+      <p className={styles.fechaEstilo}>{fecha}</p>
       <div style={{ textAlign: "right" }}>
         <button className="btn btn-secondary" onClick={onClose}>
           Cerrar
