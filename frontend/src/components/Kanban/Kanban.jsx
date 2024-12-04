@@ -42,6 +42,9 @@ const Activity = ({ activity, moveActivity, removeActivity, isAdmin }) => { // A
       <Card.Body className={styles.activityContent}>
         <div>
           <Card.Text className={styles.activityText}>{activity.nombre}</Card.Text>
+          <small className={`${styles.activityStatus} ${styles.activityDescription}`}>
+              Descripcion: {activity.descripcion}
+          </small>
           <small className={styles.activityStatus}>
             Estado: {getStatusLabel(activity.estado)}
           </small>
