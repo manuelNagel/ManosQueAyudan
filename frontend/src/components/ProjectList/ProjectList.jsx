@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../Navbar/Navbar';
 import DenunciaModal from '../DenunciaModal/DenunciaModal';
+import styles from './ProjectList.module.css';
 
 const ProjectList = ({ mode = 'owned' }) => {
   const [projects, setProjects] = useState([]);
@@ -82,18 +83,7 @@ const ProjectList = ({ mode = 'owned' }) => {
     </Modal>
   );
 
-  if (loading) {
-    return (
-      <Container>
-        <Navbar />
-        <div className="text-center mt-4">
-          <div className="spinner-border" role="status">
-            <span className="visually-hidden">Cargando...</span>
-          </div>
-        </div>
-      </Container>
-    );
-  }
+
 
   const formatDate = (dateString) => {
     if (!dateString) return '';
@@ -104,127 +94,155 @@ const ProjectList = ({ mode = 'owned' }) => {
     });
   };
 
-  return (
-    <Container>
-      <Navbar />
-      <div className="d-flex justify-content-between align-items-center mt-4 mb-4">
-        <h1>{mode === 'joined' ? 'Proyectos Unidos' : 'Mis Proyectos'}</h1>
-        {mode === 'owned' && (
-          <Link to="/projects/new">
-            <Button variant="primary">Crear Nuevo Proyecto</Button>
-          </Link>
-        )}
+  if (loading) {
+    return (
+      <div className={styles.pageContainer}>
+        <Navbar />
+        <div className={styles.loadingContainer}>
+          <div className={styles.spinner}>
+            <span className="visually-hidden">Cargando...</span>
+          </div>
+        </div>
       </div>
+    );
+  }
 
-      {error && <Alert variant="danger">{error}</Alert>}
+  return (
+    <div className={styles.pageContainer}>
+      <Navbar />
+      <Container>
+        <div className={styles.header}>
+          <h1 className={styles.headerTitle}>
+            {mode === 'joined' ? 'Proyectos Unidos' : 'Mis Proyectos'}
+          </h1>
+          {mode === 'owned' && (
+            <Link to="/projects/new">
+              <Button className={styles.createButton}>
+                Crear Nuevo Proyecto
+              </Button>
+            </Link>
+          )}
+        </div>
 
-      {projects.length === 0 ? (
-        <Alert variant="info">
-          {mode === 'joined' 
-            ? 'No te has unido a ningún proyecto aún.'
-            : 'No has creado ningún proyecto aún.'}
-        </Alert>
-      ) : (
-        <Table responsive striped bordered hover>
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>Fecha de Inicio</th>
-              <th>Fecha de Fin</th>
-              <th>Localización</th>
-              <th>Estado</th>
-              {mode === 'joined' && <th>Rol</th>}
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {projects.map((project) => (
-              <tr key={project.idProyecto}>
-                <td>{project.nombre}</td>
-                <td>{formatDate(project.fechaInicio)}</td>
-                <td>{formatDate(project.fechaFinalizacion)}</td>
-                <td>{project.localizacion}</td>
-                <td>
-                  <span className={`badge ${project.habilitado ? 'bg-success' : 'bg-warning'}`}>
-                    {project.habilitado ? 'Activo' : 'Inactivo'}
-                  </span>
-                </td>
-                {mode === 'joined' && (
-                  <td>
-                    <span className={`badge ${
-                      project.userRole === 'Administrador' ? 'bg-primary' : 'bg-info'
-                    }`}>
-                      {project.userRole}
-                    </span>
-                  </td>
-                )}
-                <td>
-                  <div className="d-flex gap-2">
-                    <Link to={`/projects/${mode === 'joined' ? 'joined/' : 'edit/'}${project.idProyecto}`}>
-                      <Button 
-                        variant="primary" 
-                        size="sm"
-                      >
-                        {mode === 'joined' ? 'Ver' : 'Editar'}
-                      </Button>
-                    </Link>
-                    {mode === 'owned' && (
-                      <Button 
-                        variant="danger" 
-                        size="sm" 
-                        onClick={() => handleDelete(project.idProyecto)}
-                      >
-                        Eliminar
-                      </Button>
-                    )}
+        {error && <Alert className={styles.errorAlert}>{error}</Alert>}
+
+        {projects.length === 0 ? (
+          <Alert className={styles.emptyAlert}>
+            {mode === 'joined' 
+              ? 'No te has unido a ningún proyecto aún.'
+              : 'No has creado ningún proyecto aún.'}
+          </Alert>
+        ) : (
+          <div className={styles.tableContainer}>
+            <Table responsive className={styles.table}>
+              <thead className={styles.tableHeader}>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Fecha de Inicio</th>
+                  <th>Fecha de Fin</th>
+                  <th>Localización</th>
+                  <th>Estado</th>
+                  {mode === 'joined' && <th>Rol</th>}
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {projects.map((project) => (
+                  <tr key={project.idProyecto} className={styles.tableRow}>
+                    <td className={styles.tableCell}>{project.nombre}</td>
+                    <td className={styles.tableCell}>{formatDate(project.fechaInicio)}</td>
+                    <td className={styles.tableCell}>{formatDate(project.fechaFinalizacion)}</td>
+                    <td className={styles.tableCell}>{project.localizacion}</td>
+                    <td className={styles.tableCell}>
+                      <span className={`${styles.badge} ${project.habilitado ? styles.badgeSuccess : styles.badgeWarning}`}>
+                        {project.habilitado ? 'Activo' : 'Inactivo'}
+                      </span>
+                    </td>
                     {mode === 'joined' && (
-                      <>
-                        <Button
-                          variant="warning"
-                          size="sm"
-                          onClick={() => {
-                            setSelectedProject(project);
-                            setShowDenunciaModal(true);
-                          }}
-                        >
-                          Reportar
-                        </Button>
-                        {project.userRole !== 'Administrador' && (
-                          <Button
-                            variant="danger"
-                            size="sm"
-                            onClick={() => {
-                              setSelectedProject(project);
-                              setShowLeaveModal(true);
-                            }}
-                          >
-                            Abandonar
-                          </Button>
-                        )}
-                      </>
+                      <td className={styles.tableCell}>
+                        <span className={`${styles.badge} ${project.userRole === 'Administrador' ? styles.badgeAdmin : styles.badgeParticipant}`}>
+                          {project.userRole}
+                        </span>
+                      </td>
                     )}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-      )}
+                    <td className={styles.tableCell}>
+                      <div className={styles.actions}>
+                        <Link to={`/projects/${mode === 'joined' ? 'joined/' : 'edit/'}${project.idProyecto}`}>
+                          <Button className={`${styles.actionButton} ${styles.editButton}`}>
+                            {mode === 'joined' ? 'Ver' : 'Editar'}
+                          </Button>
+                        </Link>
+                        {mode === 'owned' ? (
+                          <Button 
+                            className={`${styles.actionButton} ${styles.deleteButton}`}
+                            onClick={() => handleDelete(project.idProyecto)}
+                          >
+                            Eliminar
+                          </Button>
+                        ) : (
+                          <>
+                            <Button
+                              className={`${styles.actionButton} ${styles.reportButton}`}
+                              onClick={() => {
+                                setSelectedProject(project);
+                                setShowDenunciaModal(true);
+                              }}
+                            >
+                              Reportar
+                            </Button>
+                            {project.userRole !== 'Administrador' && (
+                              <Button
+                                className={`${styles.actionButton} ${styles.leaveButton}`}
+                                onClick={() => {
+                                  setSelectedProject(project);
+                                  setShowLeaveModal(true);
+                                }}
+                              >
+                                Abandonar
+                              </Button>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </div>
+        )}
 
-      <LeaveProjectModal />
-      
-      <DenunciaModal
-        show={showDenunciaModal}
-        handleClose={() => {
-          setShowDenunciaModal(false);
-          setSelectedProject(null);
-        }}
-        tipo="Proyecto"
-        targetId={selectedProject?.idProyecto}
-        targetName={selectedProject?.nombre}
-      />
-    </Container>
+        <Modal show={showLeaveModal} onHide={() => setShowLeaveModal(false)} className={styles.modal}>
+          <Modal.Header closeButton>
+            <Modal.Title>Abandonar Proyecto</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            ¿Estás seguro que deseas abandonar el proyecto "{selectedProject?.nombre}"?
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowLeaveModal(false)}>
+              Cancelar
+            </Button>
+            <Button className={styles.leaveButton} onClick={handleLeaveProject}>
+              Abandonar
+            </Button>
+          </Modal.Footer>
+        </Modal>
+        
+        <DenunciaModal
+          show={showDenunciaModal}
+          handleClose={() => {
+            setShowDenunciaModal(false);
+            setSelectedProject(null);
+          }}
+          tipo="Proyecto"
+          targetId={selectedProject?.idProyecto}
+          targetName={selectedProject?.nombre}
+        />
+      </Container>
+    </div>
   );
 };
+
 
 export default ProjectList;
