@@ -67,6 +67,7 @@ const Kanban = ({ projectId, onStateChange,isAdmin }) => {
   const [showModal, setShowModal] = useState(false);
   const [newActivity, setNewActivity] = useState({
     nombre: '',
+    descripcion:'',
     estado: 0
   });
 
@@ -157,12 +158,13 @@ const Kanban = ({ projectId, onStateChange,isAdmin }) => {
       await axios.post(`/api/projects/${projectId}/actividades`, {
         nombre: newActivity.nombre,
         estado: newActivity.estado,
+        descripcion: newActivity.descripcion,
         projectId: projectId
       });
       
       await fetchActividades();
       
-      setNewActivity({ nombre: '', estado: 0 });
+      setNewActivity({ nombre: '',descripcion: '', estado: 0 });
       setShowModal(false);
     } catch (error) {
       console.error("Error al añadir actividad:", error);
@@ -179,6 +181,7 @@ const Kanban = ({ projectId, onStateChange,isAdmin }) => {
       >
         Nueva Actividad
       </Button>
+      <br />
 
       <Row className={styles.columnRow}>
         {[0, 1, 2].map((status) => (
@@ -202,6 +205,17 @@ const Kanban = ({ projectId, onStateChange,isAdmin }) => {
                     nombre: e.target.value
                   }))}
                 />
+              </Form.Group>
+              <Form.Group>
+                <Form.Label>Descripción</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={newActivity.descripcion}
+                  onChange={(e) => setNewActivity(prev => ({
+                    ...prev,
+                    descripcion: e.target.value
+                  }))}
+                  />
               </Form.Group>
               <Form.Group>
                 <Form.Label>Estado</Form.Label>
