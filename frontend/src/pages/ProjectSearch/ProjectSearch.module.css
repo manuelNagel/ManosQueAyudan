@@ -1,72 +1,83 @@
 .pageContainer {
-    min-height: 100vh;
-    background-color: #f8f9fa;
-  }
-  
-  .contentContainer {
-    padding: 2rem 0;
-  }
-  
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5ebe0 0%, #faf0e6 50%, #f5ebe0 100%);
+}
+
+.header {
+  background-color: #FAE5D3;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.headerTitle {
+  color: #2D3748;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0;
+}
+
+.searchSection {
+  background-color: rgba(255, 255, 255, 0.6);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.alert {
+  background-color: rgba(250, 229, 211, 0.7);
+  border: none;
+  color: #2D3748;
+  margin-bottom: 1.5rem;
+}
+
+.errorAlert {
+  background-color: #FAE5D3;
+  color: #C0392B;
+  border: none;
+}
+
+.emptyAlert {
+  background-color: rgba(250, 229, 211, 0.7);
+  border: none;
+  color: #2D3748;
+  text-align: center;
+  padding: 2rem;
+}
+
+.projectsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+  padding: 1rem 0;
+}
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+.loadingSpinner {
+  color: #1ABC9C !important;
+}
+
+@media (max-width: 768px) {
   .header {
-    margin-bottom: 2rem;
+    padding: 1.5rem 0;
   }
-  
-  .header h2 {
-    color: #2d3748;
-    font-weight: 600;
+
+  .headerTitle {
+    font-size: 1.5rem;
   }
-  
-  .locationPickerSection {
-    margin-bottom: 2rem;
-    background: white;
-    padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+  .projectsGrid {
+    grid-template-columns: 1fr;
   }
-  
-  .loadingContainer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 200px;
+
+  .searchSection {
+    padding: 1rem;
   }
-  
-  .radiusAlert {
-    margin-bottom: 1.5rem;
-  }
-  
-  .noProjectsAlert {
-    text-align: center;
-    padding: 2rem;
-  }
-  
-  .projectGrid {
-    margin: 0 -0.75rem;
-  }
-  
-  .projectColumn {
-    padding: 0.75rem;
-  }
-  
-  /* Responsive adjustments */
-  @media (max-width: 768px) {
-    .contentContainer {
-      padding: 1rem 0;
-    }
-  
-    .header {
-      margin-bottom: 1.5rem;
-    }
-  
-    .locationPickerSection {
-      padding: 1rem;
-    }
-  
-    .projectGrid {
-      margin: 0 -0.5rem;
-    }
-  
-    .projectColumn {
-      padding: 0.5rem;
-    }
-  }
+}
