@@ -37,7 +37,7 @@ const Home = () => {
           <div className={styles.heroContent}>
             <div className={styles.heroText}>
               <h1 className={styles.heroTitle}>
-                Bienvenidos a <span className={styles.heroHighlight}>ManosQueAyudan</span>
+                Bienvenidos a <span className={styles.heroHighlight}>Manos Que Ayudan</span>
               </h1>
               <p className={styles.heroSubtitle}>
                 Únete a una comunidad comprometida con el cambio social. 
@@ -60,7 +60,7 @@ const Home = () => {
             </div>
             <img 
               src={mainImage} 
-              alt="ManosQueAyudan" 
+              alt="Manos Que Ayudan" 
               className={styles.heroImage}
             />
           </div>

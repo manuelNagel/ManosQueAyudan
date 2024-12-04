@@ -21,7 +21,7 @@ const Navbar = () => {
         <div className="d-flex justify-content-between align-items-center">
           <Link to="/" className={styles.brandContainer}>
             <img src={logo} alt="Logo" className={styles.brandLogo} />
-            <span className={styles.brandName}>ManosQueAyudan</span>
+            <span className={styles.brandName}>Manos Que Ayudan</span>
           </Link>
 
           <Nav className="d-flex align-items-center gap-3">
