@@ -153,6 +153,25 @@ CREATE TABLE `Habilidad` (
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+
+-- ----------------------------
+-- Records of habilidad
+-- ----------------------------
+INSERT INTO `habilidad` VALUES (1, 'Cocinar', 'cocinar');
+INSERT INTO `habilidad` VALUES (2, 'Pintar', 'Pintar');
+INSERT INTO `habilidad` VALUES (3, 'Limpiar', 'Limpiar');
+INSERT INTO `habilidad` VALUES (4, 'Barrer', 'Barrer');
+INSERT INTO `habilidad` VALUES (5, 'Carpinteria', 'Carpinteria');
+INSERT INTO `habilidad` VALUES (6, 'Pintar', NULL);
+INSERT INTO `habilidad` VALUES (7, 'Animacion Chicos', NULL);
+INSERT INTO `habilidad` VALUES (8, 'Dibujar', NULL);
+INSERT INTO `habilidad` VALUES (9, 'Coser', NULL);
+INSERT INTO `habilidad` VALUES (10, 'Animación Adultos', NULL);
+INSERT INTO `habilidad` VALUES (11, 'Enseñar primaria', NULL);
+INSERT INTO `habilidad` VALUES (12, 'Enseñar Secundadria', NULL);
+INSERT INTO `habilidad` VALUES (13, 'Títeres', NULL);
+INSERT INTO `habilidad` VALUES (14, 'Soldadura', NULL);
+
 --
 -- Table structure for table `Habilidades`
 --
@@ -273,6 +292,12 @@ CREATE TABLE `Rol_Proyecto` (
   PRIMARY KEY (`IdRol`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+-- ----------------------------
+-- Records of rol_proyecto
+-- ----------------------------
+INSERT INTO `rol_proyecto` VALUES (1, 'Administrador', 'Administrador del proyecto con todos los permisos', NULL, NULL);
+INSERT INTO `rol_proyecto` VALUES (2, 'Participante', 'Participante regular del proyecto', NULL, NULL);
 
 --
 -- Table structure for table `Rol_Sistema`
