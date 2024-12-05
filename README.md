@@ -102,6 +102,12 @@ CUENTA_MAIL="correo@ejemplo.com"
 MAIL_KEY="clave-correo"
 ```
 
+### Usuarios de ejemplo
+juan@gmail.com		12345345
+praa.nqn@hotmail.com	123456
+gustavo@hotmail.com 12345345
+tester@test.com		123456
+
 ### Variables de Entorno Frontend (.env)
 ```env
 REACT_APP_API_URL=http://localhost:8080

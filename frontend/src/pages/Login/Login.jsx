@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import Navbar from '../../components/Navbar/Navbar';
+import { Form, Button, Alert, Container } from 'react-bootstrap';
 import FormInput from '../../components/FormInput/FormInput';
+import styles from  './Login.module.css';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -36,41 +38,69 @@ const Login = () => {
   };
 
   return (
-    <div>
+    <div className={styles.pageContainer}>
       <Navbar />
-      <div className="container mt-5">
-        <div className="row justify-content-center">
-          <div className="col-md-6">
-            <h2 className="mb-4">Login</h2>
-            {errors.general && <div className="alert alert-danger">{errors.general}</div>}
-            <form onSubmit={handleSubmit}>
-              <FormInput
-                label="Email"
+      <Container className={styles.contentContainer}>
+        <div className={styles.formContainer}>
+          <h2 className={styles.formTitle}>Iniciar Sesión</h2>
+          
+          {errors.general && (
+            <Alert variant="danger" className={styles.errorAlert}>
+              {errors.general}
+            </Alert>
+          )}
+
+          <Form onSubmit={handleSubmit}>
+            <Form.Group className={styles.formGroup}>
+              <Form.Label className={styles.formLabel}>Email</Form.Label>
+              <Form.Control
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                error={errors.email}
+                className={styles.formControl}
+                isInvalid={!!errors.email}
+                placeholder="Ingresa tu email"
+                required
               />
-              <FormInput
-                label="Password"
+              <Form.Control.Feedback type="invalid">
+                {errors.email}
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group className={styles.formGroup}>
+              <Form.Label className={styles.formLabel}>Contraseña</Form.Label>
+              <Form.Control
                 type="password"
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                error={errors.password}
+                className={styles.formControl}
+                isInvalid={!!errors.password}
+                placeholder="Ingresa tu contraseña"
+                required
               />
-              <button type="submit" className="btn btn-primary">Login</button>
-            </form>
-            <p className="mt-3">
-              ¿No tienes cuenta? <Link to="/register">Registrate aquí</Link>
-            </p>
-            <p className="mt-3">
-              <Link to="/passwordReset">Olvidé mi contraseña</Link>
-            </p>
+              <Form.Control.Feedback type="invalid">
+                {errors.password}
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Button type="submit" className={styles.submitButton}>
+              Iniciar Sesión
+            </Button>
+          </Form>
+
+          <div className={styles.linkContainer}>
+            <Link to="/register" className={styles.link}>
+              ¿No tienes cuenta? Regístrate aquí
+            </Link>
+            <span className={styles.separator}>•</span>
+            <Link to="/passwordReset" className={styles.link}>
+              Olvidé mi contraseña
+            </Link>
           </div>
         </div>
-      </div>
+      </Container>
     </div>
   );
 };

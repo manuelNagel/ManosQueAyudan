@@ -378,22 +378,8 @@ CREATE TABLE `usuario_habilidades` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Table structure for table `UsuarioHabilidades`
---
 
-DROP TABLE IF EXISTS `UsuarioHabilidades`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `UsuarioHabilidades` (
-  `IdUsuario` int unsigned NOT NULL,
-  `IdHabilidad` int unsigned NOT NULL,
-  PRIMARY KEY (`IdUsuario`,`IdHabilidad`),
-  KEY `fk_UsuarioHabilidades_Habilidades` (`IdHabilidad`),
-  CONSTRAINT `fk_UsuarioHabilidades_Habilidades` FOREIGN KEY (`IdHabilidad`) REFERENCES `Habilidades` (`IdHabilidades`),
-  CONSTRAINT `fk_UsuarioHabilidades_Usuario` FOREIGN KEY (`IdUsuario`) REFERENCES `Usuario` (`Id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
